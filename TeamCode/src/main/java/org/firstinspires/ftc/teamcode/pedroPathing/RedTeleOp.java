@@ -112,6 +112,11 @@ public class RedTeleOp extends OpMode {
     private CRServo feederL;
 
     private Servo indicatorLight1;
+    private double frontLeftPower;
+
+    double backLeftPower;
+    double frontRightPower;
+    double backRightPower;
 
     private Servo indicatorLight2;
 
@@ -579,23 +584,20 @@ public class RedTeleOp extends OpMode {
                 // This ensures all the powers maintain the same ratio,
                 // but only if at least one is out of the range [-1, 1]
                 double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
-                double frontLeftPower = (y + x + rx) / denominator;
-                double backLeftPower = (y - x + rx) / denominator;
-                double frontRightPower = (y - x - rx) / denominator;
-                double backRightPower = (y + x - rx) / denominator;
+                frontLeftPower = (y + x + rx) / denominator;
+                 backLeftPower = (y - x + rx) / denominator;
+                 frontRightPower = (y - x - rx) / denominator;
+                 backRightPower = (y + x - rx) / denominator;
 
-<<<<<<< Updated upstream
                 frontLeftMotor.setVelocity(500 * frontLeftPower);
                 backLeftMotor.setVelocity(500 * backLeftPower);
                 frontRightMotor.setVelocity(500 * frontRightPower);
                 backRightMotor.setVelocity(500 * backRightPower);
             }
-=======
                 frontLeftMotor.setPower(frontLeftPower);
                 backLeftMotor.setPower(backLeftPower);
                 frontRightMotor.setPower(frontRightPower);
                 backRightMotor.setPower(backRightPower);
->>>>>>> Stashed changes
 
                 telemetry.addData("FL Power Sent", frontLeftPower);
                 telemetry.addData("BL Power Sent", backLeftPower);
@@ -649,26 +651,11 @@ public class RedTeleOp extends OpMode {
 //            telemetry.addData("gate", gate.getPosition());
 //            telemetry.addData("balls shot this burst", ballsPassed);
 //            telemetry.addData("heading according to pedro", follower.getHeading());
-        }
-<<<<<<< Updated upstream
-
-        //Automated PathFollowing
-
-        //Stop automated following if the follower is done
-
-
-        //Slow Mode
-
-
-        //Optional way to change slow mode strength
-
-
-        //Optional way to change slow mode strength
 
 
         telemetry.addData("axonL", laxon.getPosition());
         telemetry.addData("axonR", raxon.getPosition());
-         telemetry.addData("blocker pos",blocker.getPosition());
+        telemetry.addData("blocker pos",blocker.getPosition());
         telemetry.addData("Hood position", hood.getPosition());
         //telemetry.addData("raxon",raxon.getPosition());
         //telemetry.addData("laxon",laxon.getPosition());
@@ -688,11 +675,25 @@ public class RedTeleOp extends OpMode {
         telemetry.addData("distance", distance);
         telemetry.addData("Distance Sensor", distanceSensor.getDistance(DistanceUnit.CM));
         telemetry.addData("gate", gate.getPosition() );
-        telemetry.addData("balls shot this burst" ,ballsPassed );
+        telemetry.addData("balls shot this burst" ,ballsPassed);
         telemetry.addData("heading according to pedro" , follower.getHeading());
+        }
 
-=======
->>>>>>> Stashed changes
+        //Automated PathFollowing
+
+        //Stop automated following if the follower is done
+
+
+        //Slow Mode
+
+
+        //Optional way to change slow mode strength
+
+
+        //Optional way to change slow mode strength
+
+
+
     }
-}
+
 
