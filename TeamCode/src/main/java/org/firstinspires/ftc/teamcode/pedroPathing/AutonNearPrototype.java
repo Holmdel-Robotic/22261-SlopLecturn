@@ -38,26 +38,25 @@ public class AutonNearPrototype extends OpMode {
     private Timer pathTimer, actionTimer, opmodeTimer;
 
     private int count;
-    private final Pose sidePose = new Pose(8, 8, Math.toRadians(0)); // Start Pose of our robot.
-    private final Pose scorePose = new Pose(56, 8, Math.toRadians(0)); // Scoring Pose of our robot. It is facing the wall.
-    private final Pose pickup1Pose = new Pose(24, 36, Math.toRadians(0)); // Highest (First Set) of Artifacts.
+    private final Pose sidePose = new Pose(10, 10, Math.toRadians(180)); // Start Pose of our robot.
+    private final Pose scorePose = new Pose(56, 10, Math.toRadians(180)); // Scoring Pose of our robot. It is facing the wall.
+    private final Pose pickup1Pose = new Pose(24, 36, Math.toRadians(180)); // Highest (First Set) of Artifacts.
 //    private final Pose pickup3Pose = new Pose(42, 60, Math.toRadians(180)); // Middle (Second Set) of Artifacts from the Spike Mark.
-    private final Pose pickup1CPose = new Pose(22,18, Math.toRadians(0));
+    private final Pose cPose = new Pose(24,0, Math.toRadians(180));
 
     //private final Pose pickup1C2Pose = new Pose(48,98, Math.toRadians(0));
-    private final Pose pickup2Pose = new Pose(24, 60, Math.toRadians(0)); // Second Row of Artifacts from the Spike Mark.
-    private final Pose pickup2CPose = new Pose(23,35, Math.toRadians(0));
+    private final Pose pickup2Pose = new Pose(24, 72, Math.toRadians(180)); // Second Row of Artifacts from the Spike Mark.
+    private final Pose leverPose = new Pose(12,72, Math.toRadians(180));
 
     //private final Pose pickup2C2Pose = new Pose(50,97, Math.toRadians(0));
 
-    private final Pose pickup3Pose = new Pose(24, 84, Math.toRadians(0));
-    private final Pose pickup3CPose = new Pose(24,36, Math.toRadians(0));
+    private final Pose pickup3Pose = new Pose(24, 84, Math.toRadians(180));
 
-    private final Pose scorePose2 = new Pose(60,84, Math.toRadians(0));
+    private final Pose endPose = new Pose(24,10, Math.toRadians(180));
 
     private Path scorePreload;
 
-    private PathChain grab1, score1, grab2, score2, grab3, score3,grab4, score4, end;
+    private PathChain leverPush, score1, grab2, score2, grab3, score3,grab4, score4, end;
 
     private Servo kicker;
 
@@ -74,6 +73,8 @@ public class AutonNearPrototype extends OpMode {
         PICKUP5,
 
         SCORING,
+        LEVERPUSH,
+
         END
 
     }
@@ -127,19 +128,18 @@ public class AutonNearPrototype extends OpMode {
         /* This is our grabPickup1 PathChain. We are using a single path with a BezierLine, which is a straight line. */
         score1 = follower.pathBuilder()
                 .addPath(new BezierLine(sidePose, scorePose))
-                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .setConstantHeadingInterpolation(Math.toRadians(90))
                 .build();
 
         grab2 = follower.pathBuilder()
-                .addPath(new BezierCurve(scorePose, pickup1CPose, pickup1Pose))
-                .setConstantHeadingInterpolation(Math.toRadians(135))
+                .addPath(new BezierCurve(scorePose, cPose, pickup1Pose))
+                .setConstantHeadingInterpolation(Math.toRadians(90))
                 .build();
 
         /* This is our scorePickup1 PathChain. We are using a single path with a BezierLine, which is a straight line. */
         score2 = follower.pathBuilder()
                 .addPath(new BezierLine(pickup1Pose, scorePose))
-                .setTangentHeadingInterpolation()
-                .setReversed()
+                .setConstantHeadingInterpolation(Math.toRadians(90))
                 .build();
 
         /* This is our grabPickup2 PathChain. We are using a single path with a BezierLine, which is a straight line. */
@@ -150,8 +150,8 @@ public class AutonNearPrototype extends OpMode {
 //                .setVelocityConstraint(0.01)
 //                .build();
         grab3 = follower.pathBuilder()
-                .addPath(new BezierCurve(scorePose, pickup2CPose, pickup2Pose))
-                .setTangentHeadingInterpolation()
+                .addPath(new BezierCurve(scorePose, cPose, pickup2Pose))
+                .setConstantHeadingInterpolation(Math.toRadians(90))
                 .build();
 
         /* This is our scorePickup2 PathChain. We are using a single path with a BezierLine, which is a straight line. */
@@ -168,32 +168,37 @@ public class AutonNearPrototype extends OpMode {
                 .build();
 
         /* This is our scorePickup3 PathChain. We are using a single path with a BezierLine, which is a straight line. */
+        leverPush = follower.pathBuilder()
+                .addPath(new BezierLine(pickup2Pose, leverPose))
+                .setConstantHeadingInterpolation(Math.toRadians(90))
+                .build();
+
         score3 = follower.pathBuilder()
                 .addPath(new BezierLine(pickup2Pose, scorePose))
-                .setTangentHeadingInterpolation()
-                .setReversed()
+                .setConstantHeadingInterpolation(Math.toRadians(90))
                 .build();
 
         grab4 = follower.pathBuilder()
-                .addPath(new BezierCurve(scorePose, pickup3CPose, pickup3Pose))
-                .setTangentHeadingInterpolation()
+                .addPath(new BezierCurve(scorePose, cPose, pickup3Pose))
+                .setConstantHeadingInterpolation(Math.toRadians(90))
                 .build();
 
         score4 = follower.pathBuilder()
-                .addPath(new BezierLine(pickup3Pose, scorePose2))
-                .setTangentHeadingInterpolation()
+                .addPath(new BezierLine(pickup3Pose, scorePose))
+                .setConstantHeadingInterpolation(Math.toRadians(90))
                 .build();
         end = follower.pathBuilder()
-                .addPath(new BezierLine(scorePose2, pickup3Pose))
-                .setTangentHeadingInterpolation().build();
+                .addPath(new BezierLine(scorePose,endPose ))
+                .setConstantHeadingInterpolation(Math.toRadians(90))
+                .build();
     }
 
     public void autonomousPathUpdate() {
         switch (state) {
-            case START:
+            case LEVERPUSH:
 
                 follower.setMaxPower(0.9);
-                follower.followPath(score1);
+                follower.followPath(score3);
                 setPathState(State.SCORING);
                 actionTimer.resetTimer();
 
@@ -319,8 +324,8 @@ public class AutonNearPrototype extends OpMode {
 
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
                     follower.setMaxPower(.9);
-                    follower.followPath(score3, true);
-                    setPathState(State.SCORING);
+                    follower.followPath(leverPush, true);
+                    setPathState(State.LEVERPUSH);
                     //IntakeInner.setVelocity(300);
                     //IntakeOuter.setVelocity(-300);
 

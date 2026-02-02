@@ -73,7 +73,7 @@ public class AutonBlue2 extends OpMode {
 
     }
 
-    State state = State.START;
+    State state = State.SCORING;
     public void buildPaths() {
         /* This is our scorePreload path. We are using a BezierLine, which is a straight line. */
         grabPickup1 = new Path(new BezierLine(homePose, pickup1Pose));
@@ -189,8 +189,8 @@ public class AutonBlue2 extends OpMode {
             case PICKUP1:
 
                 follower.setMaxPower(0.9);
-                follower.followPath(leverPush);
-                setPathState(State.SCORING);
+                follower.followPath(leverPush, true);
+                setPathState(State.LEVER);
                 actionTimer.resetTimer();
 
 
@@ -405,7 +405,7 @@ public class AutonBlue2 extends OpMode {
     @Override
     public void start() {
         opmodeTimer.resetTimer();
-        setPathState(State.START);
+        setPathState(State.SCORING);
     }
 
     /** We do not use this because everything should automatically disable **/
