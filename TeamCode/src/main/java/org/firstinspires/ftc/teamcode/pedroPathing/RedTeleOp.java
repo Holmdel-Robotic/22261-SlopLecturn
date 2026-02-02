@@ -195,7 +195,7 @@ public class RedTeleOp extends OpMode {
         debounceY = false;
         debounceBACK = false;
         macroActive = false;
-
+        automatedDrive = false;
 
         actiontimer = new Timer();
 
@@ -580,6 +580,7 @@ public class RedTeleOp extends OpMode {
 
 
       */
+
         if (!automatedDrive) {
             if (follower.getPose().getY() > 72) {
                 follower.setTeleOpDrive(
