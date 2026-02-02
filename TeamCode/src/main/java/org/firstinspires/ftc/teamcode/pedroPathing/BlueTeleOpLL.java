@@ -321,7 +321,7 @@ public class BlueTeleOpLL extends OpMode {
             intakeOuter.setPower(-.8);
 
             if (distanceSensor.getDistance(DistanceUnit.CM) > 13.5 || kickerpos) {
-                intakeInner.setPower(.4);
+                intakeInner.setPower(.2);
             } else {
                 intakeInner.setPower(0);
             }
