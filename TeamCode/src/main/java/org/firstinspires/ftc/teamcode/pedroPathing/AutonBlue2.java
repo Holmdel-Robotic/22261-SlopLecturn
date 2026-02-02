@@ -188,10 +188,14 @@ public class AutonBlue2 extends OpMode {
         switch (state) {
             case PICKUP1:
 
-                follower.setMaxPower(0.9);
-                follower.followPath(leverPush, true);
-                setPathState(State.LEVER);
-                actionTimer.resetTimer();
+                if(!follower.isBusy())
+                {
+                    follower.setMaxPower(0.9);
+                    follower.followPath(leverPush, true);
+                    setPathState(State.LEVER);
+                    actionTimer.resetTimer();
+                }
+
 
 
                 break;
