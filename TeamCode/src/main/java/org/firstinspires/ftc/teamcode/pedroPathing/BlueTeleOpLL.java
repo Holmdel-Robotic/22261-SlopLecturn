@@ -123,8 +123,8 @@ public class BlueTeleOpLL extends OpMode {
     // AprilTag tracking variables
     private Limelight3A limelight;
     private AnalogInput encoder;
-    private double kP = 0.003;
-    private double max = 0.05;
+    private double kP = 0.09;
+    private double max = 0.02;
     private boolean aprilTagTracking = false;
     private boolean debounceRightStick;
 
@@ -248,7 +248,7 @@ public class BlueTeleOpLL extends OpMode {
             debounceRightStick = true;
         }
 
-        // AprilTag tracking runs continuously when enabled
+        // LL runs continuously when enabled
         if (aprilTagTracking) {
             trackAprilTag();
         }
@@ -276,7 +276,7 @@ public class BlueTeleOpLL extends OpMode {
             laxonPos = 1;
         }
 
-        // Only manual servo control if AprilTag tracking is OFF
+        // Only manual servo control if LL is OFF
         if (!aprilTagTracking) {
             raxon.setPosition(raxonPos);
             laxon.setPosition(laxonPos);
