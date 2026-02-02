@@ -195,7 +195,7 @@ public class RedTeleOp extends OpMode {
         debounceY = false;
         debounceBACK = false;
         macroActive = false;
-
+        automatedDrive = false;
 
         actiontimer = new Timer();
 
@@ -213,12 +213,13 @@ public class RedTeleOp extends OpMode {
         //The parameter controls whether the Follower should use break mode on the motors (using it is recommended).
         //In order to use float mode, add .useBrakeModeInTeleOp(true); to your Drivetrain Constants in Constant.java (for Mecanum)
         //If you don't pass anything in, it uses the default (false)
+
         blocker.setPosition(.57);
         indicatorLight1.setPosition(RED);
         indicatorLight2.setPosition(RED);
         gate.setPosition(.55);
         follower.startTeleopDrive();
-        follower.setMaxPower(.8);
+        follower.setMaxPower(1);
         kickerpos = false;
         raxon.setPosition(.48);
         laxon.setPosition(.48);
@@ -381,10 +382,11 @@ public class RedTeleOp extends OpMode {
                 toFarShoot = follower.pathBuilder()
                         .addPath(new BezierLine(follower.getPose() , FarShootPose))
                         .setLinearHeadingInterpolation(follower.getPose().getHeading(), FarShootPose.getHeading())
-
+                        .setTValueConstraint(.95)
                         .build();
 
                 follower.followPath(toFarShoot);
+
                 debounceGUIDE = false;
         }
 
@@ -537,7 +539,7 @@ public class RedTeleOp extends OpMode {
 
 
 
-        if (!automatedDrive) {
+        /*   if (!automatedDrive) {
             if (follower.getPose().getY() > 72) {
                 double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
                 double x = gamepad1.left_stick_x * 1.1;
@@ -575,12 +577,39 @@ public class RedTeleOp extends OpMode {
             }
 
         }
+
+
+      */
+
+        if (!automatedDrive) {
+            if (follower.getPose().getY() > 72) {
+                follower.setTeleOpDrive(
+                        -gamepad1.left_stick_y,
+                        -gamepad1.left_stick_x,
+                        -gamepad1.right_stick_x,
+                        true // Robot Centric
+                );
+            }
+
+
+            //This is how it looks with slowMode on
+            else {
+                    follower.setTeleOpDrive(
+                            -gamepad1.left_stick_y,
+                    -gamepad1.left_stick_x,
+                    -gamepad1.right_stick_x * .3,
+                    true // Robot Centric
+            );
+
+            }
+
+        }
             // 2/1 Mr. B Commented out the following if statement to test
-            /*if (!follower.isBusy()) {
-
+            if (((gamepad1.guide && debounceGUIDE) || !follower.isBusy()) && automatedDrive) {
+                debounceGUIDE = false;
                 automatedDrive = false;
-
-            }*/
+                follower.startTeleopDrive();
+            }
 
 
             //}   2/1 Mr. B moved this to after the Telemetry (to mirror BlueTeleop)
