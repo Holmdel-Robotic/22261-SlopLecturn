@@ -195,7 +195,7 @@ public class RedTeleOp extends OpMode {
         debounceY = false;
         debounceBACK = false;
         macroActive = false;
-
+        automatedDrive = false;
 
         actiontimer = new Timer();
 
@@ -213,12 +213,13 @@ public class RedTeleOp extends OpMode {
         //The parameter controls whether the Follower should use break mode on the motors (using it is recommended).
         //In order to use float mode, add .useBrakeModeInTeleOp(true); to your Drivetrain Constants in Constant.java (for Mecanum)
         //If you don't pass anything in, it uses the default (false)
+
         blocker.setPosition(.57);
         indicatorLight1.setPosition(RED);
         indicatorLight2.setPosition(RED);
         gate.setPosition(.55);
         follower.startTeleopDrive();
-        follower.setMaxPower(.8);
+        follower.setMaxPower(1);
         kickerpos = false;
         raxon.setPosition(.48);
         laxon.setPosition(.48);
@@ -381,10 +382,11 @@ public class RedTeleOp extends OpMode {
                 toFarShoot = follower.pathBuilder()
                         .addPath(new BezierLine(follower.getPose() , FarShootPose))
                         .setLinearHeadingInterpolation(follower.getPose().getHeading(), FarShootPose.getHeading())
-
+                        .setTValueConstraint(.95)
                         .build();
 
                 follower.followPath(toFarShoot);
+
                 debounceGUIDE = false;
         }
 
@@ -537,26 +539,12 @@ public class RedTeleOp extends OpMode {
 
 
 
-        if (!automatedDrive) {
-
-
-            //Make the last parameter false for field-centric
-            //In case the drivers want to use a "slowMode" you can scale the vectors
-
-            //This is the normal version to use in the TeleOp
-            //Use this for the slower turning!!!! 144>y>sqrt{x^{2}}+72
+        /*   if (!automatedDrive) {
             if (follower.getPose().getY() > 72) {
                 double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
                 double x = gamepad1.left_stick_x * 1.1;
-                double rx = gamepad1.right_stick_x * .5;
+                double rx = gamepad1.right_stick_x * .3;
 
-                // This button choice was made so that it is hard to hit on accident,
-                // it can be freely changed based on preference.
-                // The equivalent button is start on Xbox-style controllers.
-
-                // Denominator is the largest motor power (absolute value) or 1
-                // This ensures all the powers maintain the same ratio,
-                // but only if at least one is out of the range [-1, 1]
                 double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
                 double frontLeftPower = (y + x + rx) / denominator;
                 double backLeftPower = (y - x + rx) / denominator;
@@ -576,40 +564,52 @@ public class RedTeleOp extends OpMode {
                 double x = gamepad1.left_stick_x * 1.1;
                 double rx = gamepad1.right_stick_x * .5;
 
-                // This button choice was made so that it is hard to hit on accident,
-                // it can be freely changed based on preference.
-                // The equivalent button is start on Xbox-style controllers.
-
-                // Denominator is the largest motor power (absolute value) or 1
-                // This ensures all the powers maintain the same ratio,
-                // but only if at least one is out of the range [-1, 1]
                 double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
-                frontLeftPower = (y + x + rx) / denominator;
-                 backLeftPower = (y - x + rx) / denominator;
-                 frontRightPower = (y - x - rx) / denominator;
-                 backRightPower = (y + x - rx) / denominator;
+                double frontLeftPower = (y + x + rx) / denominator;
+                double backLeftPower = (y - x + rx) / denominator;
+                double frontRightPower = (y - x - rx) / denominator;
+                double backRightPower = (y + x - rx) / denominator;
 
-                frontLeftMotor.setVelocity(500 * frontLeftPower);
-                backLeftMotor.setVelocity(500 * backLeftPower);
-                frontRightMotor.setVelocity(500 * frontRightPower);
-                backRightMotor.setVelocity(500 * backRightPower);
-            }
                 frontLeftMotor.setPower(frontLeftPower);
                 backLeftMotor.setPower(backLeftPower);
                 frontRightMotor.setPower(frontRightPower);
                 backRightMotor.setPower(backRightPower);
-
-                telemetry.addData("FL Power Sent", frontLeftPower);
-                telemetry.addData("BL Power Sent", backLeftPower);
-                telemetry.addData("FR Power Sent", frontRightPower);
-                telemetry.addData("BR Power Sent", backRightPower);
             }
+
+        }
+
+
+      */
+
+        if (!automatedDrive) {
+            if (follower.getPose().getY() > 72) {
+                follower.setTeleOpDrive(
+                        -gamepad1.left_stick_y,
+                        -gamepad1.left_stick_x,
+                        -gamepad1.right_stick_x,
+                        true // Robot Centric
+                );
+            }
+
+
+            //This is how it looks with slowMode on
+            else {
+                    follower.setTeleOpDrive(
+                            -gamepad1.left_stick_y,
+                    -gamepad1.left_stick_x,
+                    -gamepad1.right_stick_x * .3,
+                    true // Robot Centric
+            );
+
+            }
+
+        }
             // 2/1 Mr. B Commented out the following if statement to test
-            /*if (!follower.isBusy()) {
-
+            if (((gamepad1.guide && debounceGUIDE) || !follower.isBusy()) && automatedDrive) {
+                debounceGUIDE = false;
                 automatedDrive = false;
-
-            }*/
+                follower.startTeleopDrive();
+            }
 
 
             //}   2/1 Mr. B moved this to after the Telemetry (to mirror BlueTeleop)
