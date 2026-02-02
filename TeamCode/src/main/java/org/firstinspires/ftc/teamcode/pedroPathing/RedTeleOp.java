@@ -380,9 +380,12 @@ public class RedTeleOp extends OpMode {
             automatedDrive = true;
 
                 toFarShoot = follower.pathBuilder()
-                        .addPath(new BezierLine(follower.getPose() , FarShootPose))
-                        .setLinearHeadingInterpolation(follower.getPose().getHeading(), FarShootPose.getHeading())
-                        .setTValueConstraint(.95)
+                        .addPath(new Path(new BezierLine(follower::getPose, FarShootPose)))
+
+                        .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, FarShootPose.getHeading(), 0.8))
+
+                        .setTValueConstraint(.8)
+
                         .build();
 
                 follower.followPath(toFarShoot);
