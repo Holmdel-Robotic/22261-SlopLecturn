@@ -217,7 +217,7 @@ public class RedTeleOp extends OpMode {
         indicatorLight1.setPosition(RED);
         indicatorLight2.setPosition(RED);
         gate.setPosition(.55);
-        follower.startTeleopDrive();
+        //follower.startTeleopDrive();
         follower.setMaxPower(.8);
         kickerpos = false;
         raxon.setPosition(.48);
@@ -576,11 +576,11 @@ public class RedTeleOp extends OpMode {
 
         }
             // 2/1 Mr. B Commented out the following if statement to test
-            /*if (!follower.isBusy()) {
-
+            if (((gamepad1.guide && debounceGUIDE) || !follower.isBusy()) && automatedDrive) {
+                debounceGUIDE = false;
                 automatedDrive = false;
-
-            }*/
+                follower.startTeleopDrive();
+            }
 
 
             //}   2/1 Mr. B moved this to after the Telemetry (to mirror BlueTeleop)
