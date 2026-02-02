@@ -123,8 +123,8 @@ public class BlueTeleOpLL extends OpMode {
     // AprilTag tracking variables
     private Limelight3A limelight;
     private AnalogInput encoder;
-    private double kP = 0.09;
-    private double max = 0.02;
+    private double kP = 0.095 ;
+    private double max = 0.01;
     private boolean aprilTagTracking = false;
     private boolean debounceRightStick;
 
@@ -595,7 +595,7 @@ public class BlueTeleOpLL extends OpMode {
         if (result != null && result.isValid() && !result.getFiducialResults().isEmpty()) {
             double error = result.getFiducialResults().get(0).getTargetXDegrees();
 
-            if (Math.abs(error) > 2) {
+            if (Math.abs(error) > 3) {
                 // Calculate correction
                 double correction = kP * error;
                 correction = Math.max(-max, Math.min(max, correction));
