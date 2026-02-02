@@ -285,14 +285,13 @@ public class BlueTeleOpLL extends OpMode {
 
         if (gamepad1.back && debounceBACK && kickerpos){
             kickerpos = false;
-            blocker.setPosition(.3);
+            gate.setPosition(.55);
             debounceBACK = false;
             indicatorLight1.setPosition(RED);
             indicatorLight2.setPosition(RED);
-
         }
         if (gamepad1.back && debounceBACK && !kickerpos){
-            blocker.setPosition(.57 );
+            gate.setPosition(.88);
             kickerpos = true;
             debounceBACK = false;
             indicatorLight1.setPosition(GREEN);
