@@ -216,7 +216,7 @@ public class BlueTeleOpLL extends OpMode {
         gate.setPosition(.5);
         follower.startTeleopDrive();
         follower.setMaxPower(.8);
-        blocker.setPosition(.3);
+        blocker.setPosition(.57);
         indicatorLight1.setPosition(BLUE);
         indicatorLight2.setPosition(BLUE);
         kickerpos = false;
