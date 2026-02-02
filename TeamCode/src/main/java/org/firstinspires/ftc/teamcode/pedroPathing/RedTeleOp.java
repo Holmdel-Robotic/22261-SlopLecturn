@@ -112,6 +112,11 @@ public class RedTeleOp extends OpMode {
     private CRServo feederL;
 
     private Servo indicatorLight1;
+    private double frontLeftPower;
+
+    double backLeftPower;
+    double frontRightPower;
+    double backRightPower;
 
     private Servo indicatorLight2;
 
@@ -565,8 +570,8 @@ public class RedTeleOp extends OpMode {
             }
 
 
-                //This is how it looks with slowMode on
-            else{
+            //This is how it looks with slowMode on
+            else {
                 double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
                 double x = gamepad1.left_stick_x * 1.1;
                 double rx = gamepad1.right_stick_x * .5;
@@ -579,43 +584,78 @@ public class RedTeleOp extends OpMode {
                 // This ensures all the powers maintain the same ratio,
                 // but only if at least one is out of the range [-1, 1]
                 double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
-                double frontLeftPower = (y + x + rx) / denominator;
-                double backLeftPower = (y - x + rx) / denominator;
-                double frontRightPower = (y - x - rx) / denominator;
-                double backRightPower = (y + x - rx) / denominator;
+                frontLeftPower = (y + x + rx) / denominator;
+                 backLeftPower = (y - x + rx) / denominator;
+                 frontRightPower = (y - x - rx) / denominator;
+                 backRightPower = (y + x - rx) / denominator;
 
                 frontLeftMotor.setVelocity(500 * frontLeftPower);
                 backLeftMotor.setVelocity(500 * backLeftPower);
                 frontRightMotor.setVelocity(500 * frontRightPower);
                 backRightMotor.setVelocity(500 * backRightPower);
             }
+                frontLeftMotor.setPower(frontLeftPower);
+                backLeftMotor.setPower(backLeftPower);
+                frontRightMotor.setPower(frontRightPower);
+                backRightMotor.setPower(backRightPower);
 
-            if (!follower.isBusy()){
+                telemetry.addData("FL Power Sent", frontLeftPower);
+                telemetry.addData("BL Power Sent", backLeftPower);
+                telemetry.addData("FR Power Sent", frontRightPower);
+                telemetry.addData("BR Power Sent", backRightPower);
+            }
+            // 2/1 Mr. B Commented out the following if statement to test
+            /*if (!follower.isBusy()) {
 
                 automatedDrive = false;
 
-            }
+            }*/
 
 
-        }
+            //}   2/1 Mr. B moved this to after the Telemetry (to mirror BlueTeleop)
 
-        //Automated PathFollowing
+            //Automated PathFollowing
 
-        //Stop automated following if the follower is done
-
-
-        //Slow Mode
+            //Stop automated following if the follower is done
 
 
-        //Optional way to change slow mode strength
+            //Slow Mode
 
 
-        //Optional way to change slow mode strength
+            //Optional way to change slow mode strength
+
+
+            //Optional way to change slow mode strength
+
+            telemetry.addData("FL Power", frontLeftMotor.getPower());
+            telemetry.addData("BL Power", backLeftMotor.getPower());
+            telemetry.addData("FR Power", frontRightMotor.getPower());
+            telemetry.addData("BR Power", backRightMotor.getPower());
+//            telemetry.addData("axonL", laxon.getPosition());
+//            telemetry.addData("axonR", raxon.getPosition());
+//            telemetry.addData("blocker pos", blocker.getPosition());
+//            telemetry.addData("Hood position", hood.getPosition());
+//            //telemetry.addData("raxon",raxon.getPosition());
+//            //telemetry.addData("laxon",laxon.getPosition());
+//            telemetry.addData("atr", angleToRot);
+//            telemetry.addData("flywheel velocity", flywheelLeft.getVelocity());
+//            telemetry.addData("debounce y", debounceY);
+//            telemetry.addData("Angle(y/x)", Math.toDegrees(Math.atan((144 - y) / (144 - x))));
+//            telemetry.addData("Angle(x/y)", Math.toDegrees(Math.atan((144 - x) / (144 - y))));
+//            telemetry.addData("position", follower.getPose());
+//            /*telemetryM.debug("position", follower.getPose()); */
+//
+//            telemetry.addData("YAW", imu.getRobotYawPitchRollAngles().getYaw());
+//            telemetry.addData("distance", distance);
+//            telemetry.addData("Distance Sensor", distanceSensor.getDistance(DistanceUnit.CM));
+//            telemetry.addData("gate", gate.getPosition());
+//            telemetry.addData("balls shot this burst", ballsPassed);
+//            telemetry.addData("heading according to pedro", follower.getHeading());
 
 
         telemetry.addData("axonL", laxon.getPosition());
         telemetry.addData("axonR", raxon.getPosition());
-         telemetry.addData("blocker pos",blocker.getPosition());
+        telemetry.addData("blocker pos",blocker.getPosition());
         telemetry.addData("Hood position", hood.getPosition());
         //telemetry.addData("raxon",raxon.getPosition());
         //telemetry.addData("laxon",laxon.getPosition());
@@ -635,9 +675,25 @@ public class RedTeleOp extends OpMode {
         telemetry.addData("distance", distance);
         telemetry.addData("Distance Sensor", distanceSensor.getDistance(DistanceUnit.CM));
         telemetry.addData("gate", gate.getPosition() );
-        telemetry.addData("balls shot this burst" ,ballsPassed );
+        telemetry.addData("balls shot this burst" ,ballsPassed);
         telemetry.addData("heading according to pedro" , follower.getHeading());
+        }
+
+        //Automated PathFollowing
+
+        //Stop automated following if the follower is done
+
+
+        //Slow Mode
+
+
+        //Optional way to change slow mode strength
+
+
+        //Optional way to change slow mode strength
+
+
 
     }
-}
+
 

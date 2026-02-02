@@ -69,7 +69,7 @@ public class AprilTagCBlue extends LinearOpMode {
             if (result != null && result.isValid() && !result.getFiducialResults().isEmpty()) {
                 double error = result.getFiducialResults().get(0).getTargetXDegrees();
 
-                if (Math.abs(error) > 7) {
+                if (Math.abs(error) > 7 && Math.abs(lError) > 7 ) {
 
                     double d = error - lError;
                     iSum += error;
