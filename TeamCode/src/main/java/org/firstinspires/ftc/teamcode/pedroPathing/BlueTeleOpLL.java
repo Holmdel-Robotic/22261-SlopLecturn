@@ -124,7 +124,7 @@ public class BlueTeleOpLL extends OpMode {
     private Limelight3A limelight;
     private AnalogInput encoder;
     private double kP = 0.12 ;
-    private double max = 0.012;
+    private double max = 0.0096;
     private boolean aprilTagTracking = false;
     private boolean debounceRightStick;
 
