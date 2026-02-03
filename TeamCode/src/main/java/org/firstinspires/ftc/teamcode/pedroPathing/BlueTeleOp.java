@@ -567,6 +567,7 @@ public class BlueTeleOp extends OpMode {
                 frontRightMotor.setPower(frontRightPower);
                 backRightMotor.setPower(backRightPower);
             }
+        }
 
             //Automated PathFollowing
 
@@ -606,5 +607,5 @@ public class BlueTeleOp extends OpMode {
         }
     }
 
-}
+
 
