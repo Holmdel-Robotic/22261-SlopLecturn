@@ -123,8 +123,8 @@ public class BlueTeleOpLL extends OpMode {
     // AprilTag tracking variables
     private Limelight3A limelight;
     private AnalogInput encoder;
-    private double kP = 0.095 ;
-    private double max = 0.01;
+    private double kP = 0.12 ;
+    private double max = 0.012;
     private boolean aprilTagTracking = false;
     private boolean debounceRightStick;
 
