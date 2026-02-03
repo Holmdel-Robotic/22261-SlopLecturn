@@ -38,8 +38,8 @@ public class AutonNearPrototype extends OpMode {
     private Timer pathTimer, actionTimer, opmodeTimer;
 
     private int count;
-    private final Pose sidePose = new Pose(10, 10, Math.toRadians(180)); // Start Pose of our robot.
-    private final Pose scorePose = new Pose(56, 10, Math.toRadians(180)); // Scoring Pose of our robot. It is facing the wall.
+    private final Pose sidePose = new Pose(10, 8, Math.toRadians(180)); // Start Pose of our robot.
+    private final Pose scorePose = new Pose(56, 8, Math.toRadians(180)); // Scoring Pose of our robot. It is facing the wall.
     private final Pose pickup1Pose = new Pose(24, 36, Math.toRadians(180)); // Highest (First Set) of Artifacts.
 //    private final Pose pickup3Pose = new Pose(42, 60, Math.toRadians(180)); // Middle (Second Set) of Artifacts from the Spike Mark.
     private final Pose cPose = new Pose(24,0, Math.toRadians(180));
@@ -79,7 +79,7 @@ public class AutonNearPrototype extends OpMode {
 
     }
 
-    State state = State.START;
+    State state = State.SCORING;
     public void buildPaths() {
         /* This is our scorePreload path. We are using a BezierLine, which is a straight line. */
         scorePreload = new Path(new BezierLine(scorePose, sidePose));
@@ -196,11 +196,14 @@ public class AutonNearPrototype extends OpMode {
     public void autonomousPathUpdate() {
         switch (state) {
             case LEVERPUSH:
+                if(!follower.isBusy())
+                {
+                    follower.setMaxPower(0.9);
+                    follower.followPath(score3);
+                    setPathState(State.SCORING);
+                    actionTimer.resetTimer();
+                }
 
-                follower.setMaxPower(0.9);
-                follower.followPath(score3);
-                setPathState(State.SCORING);
-                actionTimer.resetTimer();
 
 
                 break;
