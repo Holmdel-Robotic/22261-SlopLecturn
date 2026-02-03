@@ -348,22 +348,24 @@ public class RedTeleOp extends OpMode {
 
         }
 
-        if (intakeOn && intakeSensor1.getDistance(DistanceUnit.CM) > 15 && intakeSensor2.getDistance(DistanceUnit.CM) > 15) {
-            intakeOuter.setPower(-.8);
+        if (intakeOn) {
+            if (intakeSensor1.getDistance(DistanceUnit.CM) > 15 || intakeSensor2.getDistance(DistanceUnit.CM) > 15){
+                intakeOuter.setPower(-.8);
+            } else if (intakeSensor1.getDistance(DistanceUnit.CM) < 15 && intakeSensor2.getDistance(DistanceUnit.CM) < 15) {
+                intakeOuter.setPower(-.4);
+
+            }
 
 
             if (kickerpos){
-                intakeInner.setPower(.4);
+                intakeInner.setPower(.6);
                 intakeOuter.setPower(-.5);
             }
             else{
                 intakeInner.setPower(0);
             }
 
-        } else if (intakeOn && intakeSensor1.getDistance(DistanceUnit.CM) < 15 && intakeSensor2.getDistance(DistanceUnit.CM) < 15) {
-            intakeOuter.setPower(-.4);
-
-        }else if (!intakeOn) {
+        } else if (!intakeOn) {
 
 
             intakeOuter.setPower(0);
