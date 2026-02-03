@@ -341,24 +341,30 @@ public class RedTeleOp extends OpMode {
             intakeOn = true;
 
         }
-        if (intakeOn) {
+
+        if (intakeOn && intakeSensor1.getDistance(DistanceUnit.CM) > 15 && intakeSensor2.getDistance(DistanceUnit.CM) > 15) {
             intakeOuter.setPower(-.8);
+
 
             if (kickerpos){
                 intakeInner.setPower(.4);
+                intakeOuter.setPower(-.5);
             }
             else{
                 intakeInner.setPower(0);
             }
 
-        }
+        } else if (intakeOn && intakeSensor1.getDistance(DistanceUnit.CM) < 15 && intakeSensor2.getDistance(DistanceUnit.CM) < 15) {
+            intakeOuter.setPower(-.4);
 
-        if (!intakeOn) {
+        }else if (!intakeOn) {
 
 
             intakeOuter.setPower(0);
             intakeInner.setPower(0);
         }
+
+
         if (gamepad1.a && intakeOn && !debounceA){
             debounceA = true;
             intakeOn = false;
@@ -556,7 +562,7 @@ public class RedTeleOp extends OpMode {
 
 
 
-        /*   if (!automatedDrive) {
+           if (!automatedDrive) {
             if (follower.getPose().getY() > 72) {
                 double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
                 double x = gamepad1.left_stick_x * 1.1;
@@ -596,31 +602,9 @@ public class RedTeleOp extends OpMode {
         }
 
 
-      */
-
-        if (!automatedDrive) {
-            if (follower.getPose().getY() > 72) {
-                follower.setTeleOpDrive(
-                        -gamepad1.left_stick_y,
-                        -gamepad1.left_stick_x,
-                        -gamepad1.right_stick_x,
-                        true // Robot Centric
-                );
-            }
 
 
-            //This is how it looks with slowMode on
-            else {
-                    follower.setTeleOpDrive(
-                            -gamepad1.left_stick_y,
-                    -gamepad1.left_stick_x,
-                    -gamepad1.right_stick_x * .3,
-                    true // Robot Centric
-            );
 
-            }
-
-        }
             // 2/1 Mr. B Commented out the following if statement to test
             if (((gamepad1.guide && debounceGUIDE) || !follower.isBusy()) && automatedDrive) {
                 debounceGUIDE = false;
