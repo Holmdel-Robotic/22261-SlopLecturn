@@ -196,11 +196,14 @@ public class AutonNearPrototype extends OpMode {
     public void autonomousPathUpdate() {
         switch (state) {
             case LEVERPUSH:
+                if(!follower.isBusy())
+                {
+                    follower.setMaxPower(0.9);
+                    follower.followPath(score3);
+                    setPathState(State.SCORING);
+                    actionTimer.resetTimer();
+                }
 
-                follower.setMaxPower(0.9);
-                follower.followPath(score3);
-                setPathState(State.SCORING);
-                actionTimer.resetTimer();
 
 
                 break;
