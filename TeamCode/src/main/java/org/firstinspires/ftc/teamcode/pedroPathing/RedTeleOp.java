@@ -359,7 +359,7 @@ public class RedTeleOp extends OpMode {
 
             if (kickerpos){
                 intakeInner.setPower(.6);
-                intakeOuter.setPower(-.5);
+                intakeOuter.setPower(-.65);
             }
             else{
                 intakeInner.setPower(0);
