@@ -109,11 +109,16 @@ public class RedTeleOp extends OpMode {
     private DcMotorEx intakeInner;
 
     private DistanceSensor distanceSensor;
+
+
     private CRServo feederL;
 
     private Servo indicatorLight1;
     private double frontLeftPower;
 
+    private DistanceSensor intakeSensor1;
+
+    private DistanceSensor intakeSensor2;
     double backLeftPower;
     double frontRightPower;
     double backRightPower;
@@ -157,6 +162,12 @@ public class RedTeleOp extends OpMode {
         imu = hardwareMap.get(IMU.class, "imu");
         gate = hardwareMap.get(Servo.class, "gate");
         distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
+
+        intakeSensor1 = hardwareMap.get(DistanceSensor.class, "intakeSensor1");
+        intakeSensor2 = hardwareMap.get(DistanceSensor.class, "intakeSensor2");
+
+
+
         indicatorLight1 = hardwareMap.get(Servo.class, "lightOne");
         indicatorLight2 = hardwareMap.get(Servo.class, "lightTwo");
         imu.initialize(
@@ -167,6 +178,9 @@ public class RedTeleOp extends OpMode {
                         )
                 )
         );
+
+
+
         intakeOuter = hardwareMap.get(DcMotorEx.class, "intOuter");
         intakeInner = hardwareMap.get(DcMotorEx.class, "intInner");
         intakeOuter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -384,7 +398,7 @@ public class RedTeleOp extends OpMode {
 
                         .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, FarShootPose.getHeading(), 0.8))
 
-                        .setTValueConstraint(.8)
+                        //.setTValueConstraint(.8)
 
                         .build();
 
@@ -655,7 +669,8 @@ public class RedTeleOp extends OpMode {
 //            telemetry.addData("balls shot this burst", ballsPassed);
 //            telemetry.addData("heading according to pedro", follower.getHeading());
 
-
+        telemetry.addData("intakeSensor1", intakeSensor1.getDistance(DistanceUnit.CM));
+        telemetry.addData("intakeSensor2", intakeSensor2.getDistance(DistanceUnit.CM));
         telemetry.addData("axonL", laxon.getPosition());
         telemetry.addData("axonR", raxon.getPosition());
         telemetry.addData("blocker pos",blocker.getPosition());
