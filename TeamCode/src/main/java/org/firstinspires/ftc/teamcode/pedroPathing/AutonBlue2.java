@@ -41,7 +41,7 @@ public class AutonBlue2 extends OpMode {
     private final Pose homePose = new Pose(24, 120, Math.toRadians(270)); // Start Pose of our robot.
     private final Pose pickup1Pose = new Pose(24, 70, Math.toRadians(270)); // Highest (First Set) of Artifacts.
 //    private final Pose pickup3Pose = new Pose(42, 60, Math.toRadians(180)); // Middle (Second Set) of Artifacts from the Spike Mark.
-    private final Pose leverPose = new Pose(15,70,Math.toRadians(270));
+    private final Pose leverPose = new Pose(20,70,Math.toRadians(270));
     private final Pose pickup2Pose = new Pose(24, 60, Math.toRadians(270)); // Second Row of Artifacts from the Spike Mark.
     private final Pose pickup3Pose = new Pose(20, 36, Math.toRadians(270));
     private final Pose pickup4Pose = new Pose(10,8,Math.toRadians(270));
@@ -77,7 +77,7 @@ public class AutonBlue2 extends OpMode {
     public void buildPaths() {
         /* This is our scorePreload path. We are using a BezierLine, which is a straight line. */
         grabPickup1 = new Path(new BezierLine(homePose, pickup1Pose));
-        grabPickup1.setLinearHeadingInterpolation(Math.toRadians(270),Math.toRadians(135));
+        grabPickup1.setConstantHeadingInterpolation(Math.toRadians(270));
 
         flywheelLeft = hardwareMap.get(DcMotorEx.class, "flyL");
         flywheelRight = hardwareMap.get(DcMotorEx.class, "flyR");

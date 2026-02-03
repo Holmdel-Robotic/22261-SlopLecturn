@@ -1,5 +1,7 @@
 
 package org.firstinspires.ftc.teamcode.pedroPathing;
+import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
+
 import android.net.EthernetNetworkSpecifier;
 
 import com.bylazar.configurables.annotations.Configurable;
@@ -109,11 +111,16 @@ public class RedTeleOp extends OpMode {
     private DcMotorEx intakeInner;
 
     private DistanceSensor distanceSensor;
+
+
     private CRServo feederL;
 
     private Servo indicatorLight1;
     private double frontLeftPower;
 
+    private DistanceSensor intakeSensor1;
+
+    private DistanceSensor intakeSensor2;
     double backLeftPower;
     double frontRightPower;
     double backRightPower;
@@ -137,15 +144,18 @@ public class RedTeleOp extends OpMode {
         backLeftMotor = hardwareMap.get(DcMotorEx.class, "bl");
         backRightMotor = hardwareMap.get(DcMotorEx.class, "br");
 
+        /*
+        frontLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        */
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(new Pose(84, 36, Math.toRadians(0)));
         FarShootPose = new Pose(82, 15, Math.toRadians(64.33));
         follower.update();
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
-        backLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         flywheelLeft = hardwareMap.get(DcMotorEx.class, "flyL");
         flywheelRight = hardwareMap.get(DcMotorEx.class, "flyR");
         flywheelRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -157,6 +167,12 @@ public class RedTeleOp extends OpMode {
         imu = hardwareMap.get(IMU.class, "imu");
         gate = hardwareMap.get(Servo.class, "gate");
         distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
+
+        intakeSensor1 = hardwareMap.get(DistanceSensor.class, "intakeSensor1");
+        intakeSensor2 = hardwareMap.get(DistanceSensor.class, "intakeSensor2");
+
+
+
         indicatorLight1 = hardwareMap.get(Servo.class, "lightOne");
         indicatorLight2 = hardwareMap.get(Servo.class, "lightTwo");
         imu.initialize(
@@ -167,6 +183,9 @@ public class RedTeleOp extends OpMode {
                         )
                 )
         );
+
+
+
         intakeOuter = hardwareMap.get(DcMotorEx.class, "intOuter");
         intakeInner = hardwareMap.get(DcMotorEx.class, "intInner");
         intakeOuter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -213,13 +232,14 @@ public class RedTeleOp extends OpMode {
         //The parameter controls whether the Follower should use break mode on the motors (using it is recommended).
         //In order to use float mode, add .useBrakeModeInTeleOp(true); to your Drivetrain Constants in Constant.java (for Mecanum)
         //If you don't pass anything in, it uses the default (false)
-
+        follower.startTeleopDrive();
+        follower.setMaxPower(.8);
         blocker.setPosition(.57);
         indicatorLight1.setPosition(RED);
         indicatorLight2.setPosition(RED);
         gate.setPosition(.55);
-        follower.startTeleopDrive();
-        follower.setMaxPower(1);
+
+
         kickerpos = false;
         raxon.setPosition(.48);
         laxon.setPosition(.48);
@@ -236,7 +256,7 @@ public class RedTeleOp extends OpMode {
     @Override
     public void loop() {
 
-
+        follower.update();
 
 
         if(autoTarget)
@@ -327,24 +347,32 @@ public class RedTeleOp extends OpMode {
             intakeOn = true;
 
         }
+
         if (intakeOn) {
-            intakeOuter.setPower(-.8);
+            if (intakeSensor1.getDistance(DistanceUnit.CM) > 15 || intakeSensor2.getDistance(DistanceUnit.CM) > 15){
+                intakeOuter.setPower(-.8);
+            } else if (intakeSensor1.getDistance(DistanceUnit.CM) < 15 && intakeSensor2.getDistance(DistanceUnit.CM) < 15) {
+                intakeOuter.setPower(-.4);
+
+            }
+
 
             if (kickerpos){
-                intakeInner.setPower(.4);
+                intakeInner.setPower(.6);
+                intakeOuter.setPower(-.5);
             }
             else{
                 intakeInner.setPower(0);
             }
 
-        }
-
-        if (!intakeOn) {
+        } else if (!intakeOn) {
 
 
             intakeOuter.setPower(0);
             intakeInner.setPower(0);
         }
+
+
         if (gamepad1.a && intakeOn && !debounceA){
             debounceA = true;
             intakeOn = false;
@@ -384,7 +412,7 @@ public class RedTeleOp extends OpMode {
 
                         .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, FarShootPose.getHeading(), 0.8))
 
-                        .setTValueConstraint(.8)
+                        //.setTValueConstraint(.8)
 
                         .build();
 
@@ -488,7 +516,7 @@ public class RedTeleOp extends OpMode {
             debounceDR = true;
         }
         //Call this once per loop
-        follower.update();
+
         telemetryM.update();
 
 
@@ -541,13 +569,26 @@ public class RedTeleOp extends OpMode {
 
 
 
+        if (!automatedDrive) {
 
-        /*   if (!automatedDrive) {
+
+            //Make the last parameter false for field-centric
+            //In case the drivers want to use a "slowMode" you can scale the vectors
+
+            //This is the normal version to use in the TeleOp
+            //Use this for the slower turning!!!! 144>y>sqrt{x^{2}}+72
             if (follower.getPose().getY() > 72) {
                 double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
                 double x = gamepad1.left_stick_x * 1.1;
                 double rx = gamepad1.right_stick_x * .3;
 
+                // This button choice was made so that it is hard to hit on accident,
+                // it can be freely changed based on preference.
+                // The equivalent button is start on Xbox-style controllers.
+
+                // Denominator is the largest motor power (absolute value) or 1
+                // This ensures all the powers maintain the same ratio,
+                // but only if at least one is out of the range [-1, 1]
                 double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
                 double frontLeftPower = (y + x + rx) / denominator;
                 double backLeftPower = (y - x + rx) / denominator;
@@ -567,6 +608,13 @@ public class RedTeleOp extends OpMode {
                 double x = gamepad1.left_stick_x * 1.1;
                 double rx = gamepad1.right_stick_x * .5;
 
+                // This button choice was made so that it is hard to hit on accident,
+                // it can be freely changed based on preference.
+                // The equivalent button is start on Xbox-style controllers.
+
+                // Denominator is the largest motor power (absolute value) or 1
+                // This ensures all the powers maintain the same ratio,
+                // but only if at least one is out of the range [-1, 1]
                 double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
                 double frontLeftPower = (y + x + rx) / denominator;
                 double backLeftPower = (y - x + rx) / denominator;
@@ -578,40 +626,15 @@ public class RedTeleOp extends OpMode {
                 frontRightMotor.setPower(frontRightPower);
                 backRightMotor.setPower(backRightPower);
             }
-
         }
 
 
-      */
 
-        if (!automatedDrive) {
-            if (follower.getPose().getY() > 72) {
-                follower.setTeleOpDrive(
-                        -gamepad1.left_stick_y,
-                        -gamepad1.left_stick_x,
-                        -gamepad1.right_stick_x,
-                        true // Robot Centric
-                );
-            }
-
-
-            //This is how it looks with slowMode on
-            else {
-                    follower.setTeleOpDrive(
-                            -gamepad1.left_stick_y,
-                    -gamepad1.left_stick_x,
-                    -gamepad1.right_stick_x * .3,
-                    true // Robot Centric
-            );
-
-            }
-
-        }
             // 2/1 Mr. B Commented out the following if statement to test
             if (((gamepad1.guide && debounceGUIDE) || !follower.isBusy()) && automatedDrive) {
                 debounceGUIDE = false;
                 automatedDrive = false;
-                follower.startTeleopDrive();
+
             }
 
 
@@ -655,7 +678,8 @@ public class RedTeleOp extends OpMode {
 //            telemetry.addData("balls shot this burst", ballsPassed);
 //            telemetry.addData("heading according to pedro", follower.getHeading());
 
-
+        telemetry.addData("intakeSensor1", intakeSensor1.getDistance(DistanceUnit.CM));
+        telemetry.addData("intakeSensor2", intakeSensor2.getDistance(DistanceUnit.CM));
         telemetry.addData("axonL", laxon.getPosition());
         telemetry.addData("axonR", raxon.getPosition());
         telemetry.addData("blocker pos",blocker.getPosition());
