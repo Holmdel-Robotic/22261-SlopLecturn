@@ -83,7 +83,7 @@ public class AutonNearPrototype extends OpMode {
     public void buildPaths() {
         /* This is our scorePreload path. We are using a BezierLine, which is a straight line. */
         scorePreload = new Path(new BezierLine(scorePose, sidePose));
-        scorePreload.setConstantHeadingInterpolation(180);
+        scorePreload.setConstantHeadingInterpolation(Math.toRadians(180));
 
         flywheelLeft = hardwareMap.get(DcMotorEx.class, "flyL");
         flywheelRight = hardwareMap.get(DcMotorEx.class, "flyR");
