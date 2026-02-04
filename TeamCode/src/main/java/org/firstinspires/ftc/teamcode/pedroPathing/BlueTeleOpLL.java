@@ -128,8 +128,8 @@ public class BlueTeleOpLL extends OpMode {
     // AprilTag tracking variables
     private Limelight3A limelight;
     private AnalogInput encoder;
-    private double kP = 0.11818 ;
-    private double max = 0.00962;
+    private double kP = 0.08 ;
+    private double max = 0.01;
     private boolean aprilTagTracking = false;
     private boolean debounceRightStick;
 
@@ -645,11 +645,11 @@ public class BlueTeleOpLL extends OpMode {
                 telemetry.addData("AT Correction", "%.5f", correction);
                 telemetry.addData("AT Status", "TRACKING");
             } else {
-                telemetry.addData("AT Status", "✓ LOCKED ON");
+                telemetry.addData("AT Status", "LOCKED ON");
                 telemetry.addData("AT Error", "%.2f°", error);
             }
         } else {
-            telemetry.addData("AT Status", "⚠ Searching...");
+            telemetry.addData("AT Status", "Searching...");
         }
     }
 
