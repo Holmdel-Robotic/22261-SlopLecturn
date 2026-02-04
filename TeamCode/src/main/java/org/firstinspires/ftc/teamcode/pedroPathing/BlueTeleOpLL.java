@@ -128,7 +128,7 @@ public class BlueTeleOpLL extends OpMode {
     private Limelight3A limelight;
     private AnalogInput encoder;
     private double kP = 0.12 ;
-    private double max = 0.0096;
+    private double max = 0.00962;
     private boolean aprilTagTracking = false;
     private boolean debounceRightStick;
 
@@ -617,19 +617,13 @@ public class BlueTeleOpLL extends OpMode {
             double error = result.getFiducialResults().get(0).getTargetXDegrees();
 
             if (Math.abs(error) > 3) {
-                // Calculate correction
                 double correction = kP * error;
                 correction = Math.max(-max, Math.min(max, correction));
-
-                // Update position
                 raxonPos += correction;
                 laxonPos += correction;
-
-                // Clamp positions
                 raxonPos = Math.max(0.1, Math.min(1.0, raxonPos));
                 laxonPos = Math.max(0.1, Math.min(1.0, laxonPos));
 
-                // Set servos
                 laxon.setPosition(laxonPos);
                 raxon.setPosition(raxonPos);
 
