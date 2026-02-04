@@ -329,13 +329,13 @@ public class BlueTeleOpLL extends OpMode {
             if (intakeSensor1.getDistance(DistanceUnit.CM) > 15 || intakeSensor2.getDistance(DistanceUnit.CM) > 15){
                 intakeOuter.setPower(-.8);
             } else if (intakeSensor1.getDistance(DistanceUnit.CM) < 15 && intakeSensor2.getDistance(DistanceUnit.CM) < 15) {
-                intakeOuter.setPower(-.4);
+                intakeOuter.setPower(-.2);
 
             }
 
 
             if (kickerpos){
-                intakeInner.setPower(.6);
+                intakeInner.setPower(.45);
                 intakeOuter.setPower(-.65);
             }
             else{
