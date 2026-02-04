@@ -267,9 +267,11 @@ public class BlueTeleOpLL extends OpMode {
             x = follower.getPose().getX();
             y = follower.getPose().getY();
             distance = Math.sqrt(Math.pow(144 - y, 2) + Math.pow(x, 2));
-            flywheelVelocity = 8.87 * (distance) + 1000;
+            hoodPos = 0.000705998 * distance + 0.337882;
+            flywheelVelocity = 2.82399 * distance + 1531.52943;
 
-            hoodPos = (-.00424324 * distance + .935);
+
+
             if (hoodPos < .17) {
                 hoodPos = .17;
             }
