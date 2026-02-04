@@ -128,7 +128,7 @@ public class BlueTeleOpLL extends OpMode {
     private Limelight3A limelight;
     private AnalogInput encoder;
     private double kP = 0.12 ;
-    private double max = 0.0096;
+    private double max = 0.00962;
     private boolean aprilTagTracking = false;
     private boolean debounceRightStick;
 
@@ -267,7 +267,7 @@ public class BlueTeleOpLL extends OpMode {
             y = follower.getPose().getY();
             distance = Math.sqrt(Math.pow(144 - y, 2) + Math.pow(x, 2));
             flywheelVelocity = 8.87 * (distance) + 1000;
-            hood.setPosition((-.00554324 * distance + .95));
+            hood.setPosition((-.00454324 * distance + .935));
 
         }
 
@@ -606,6 +606,9 @@ public class BlueTeleOpLL extends OpMode {
             telemetry.addData("heading according to pedro", follower.getHeading());
             telemetry.addData("Encoder", "%.0f°", (encoder.getVoltage() / 3.3) * 360);
             telemetry.addData("intended flywheel velocity", flywheelVelocity);
+            telemetry.addData("intake full", intakeSensor1.getDistance(DistanceUnit.CM) > 15 && intakeSensor2.getDistance(DistanceUnit.CM) > 15);
+            telemetry.addData("intake1Sensor", "intake full", intakeSensor1.getDistance(DistanceUnit.CM));
+            telemetry.addData("intake2Sensor", intakeSensor2.getDistance(DistanceUnit.CM));
         }
     }
 
@@ -617,19 +620,13 @@ public class BlueTeleOpLL extends OpMode {
             double error = result.getFiducialResults().get(0).getTargetXDegrees();
 
             if (Math.abs(error) > 3) {
-                // Calculate correction
                 double correction = kP * error;
                 correction = Math.max(-max, Math.min(max, correction));
-
-                // Update position
                 raxonPos += correction;
                 laxonPos += correction;
-
-                // Clamp positions
                 raxonPos = Math.max(0.1, Math.min(1.0, raxonPos));
                 laxonPos = Math.max(0.1, Math.min(1.0, laxonPos));
 
-                // Set servos
                 laxon.setPosition(laxonPos);
                 raxon.setPosition(raxonPos);
 

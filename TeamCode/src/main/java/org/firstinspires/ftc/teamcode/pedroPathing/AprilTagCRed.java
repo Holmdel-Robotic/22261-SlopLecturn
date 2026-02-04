@@ -26,7 +26,7 @@ public class AprilTagCRed extends LinearOpMode {
         AnalogInput encoder = hardwareMap.get(AnalogInput.class, "absEncoder");
         Limelight3A limelight = hardwareMap.get(Limelight3A.class, "limelight");
 
-        limelight.pipelineSwitch(1);
+        limelight.pipelineSwitch(0);
         limelight.start();
 
         double pos = .48;
