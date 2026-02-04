@@ -233,7 +233,7 @@ public class RedTeleOp extends OpMode {
         //In order to use float mode, add .useBrakeModeInTeleOp(true); to your Drivetrain Constants in Constant.java (for Mecanum)
         //If you don't pass anything in, it uses the default (false)
         follower.startTeleopDrive();
-        follower.setMaxPower(.8);
+        follower.setMaxPower(1);
         blocker.setPosition(.57);
         indicatorLight1.setPosition(RED);
         indicatorLight2.setPosition(RED);

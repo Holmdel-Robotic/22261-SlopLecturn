@@ -44,6 +44,10 @@ public class BlueTeleOpLL extends OpMode {
     private double GREEN;
     private Follower follower;
 
+    private DistanceSensor intakeSensor1;
+
+    private DistanceSensor intakeSensor2;
+
     private boolean driveState;
     private Servo gate;
     private boolean macroActive;
@@ -155,6 +159,10 @@ public class BlueTeleOpLL extends OpMode {
         distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
         indicatorLight1 = hardwareMap.get(Servo.class, "lightOne");
         indicatorLight2 = hardwareMap.get(Servo.class, "lightTwo");
+
+        intakeSensor1 = hardwareMap.get(DistanceSensor.class, "intakeSensor1");
+        intakeSensor2 = hardwareMap.get(DistanceSensor.class, "intakeSensor2");
+
 
         // Initialize AprilTag tracking hardware
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
@@ -318,14 +326,27 @@ public class BlueTeleOpLL extends OpMode {
 
         }
         if (intakeOn) {
-            intakeOuter.setPower(-.8);
+            if (intakeSensor1.getDistance(DistanceUnit.CM) > 15 || intakeSensor2.getDistance(DistanceUnit.CM) > 15){
+                intakeOuter.setPower(-.8);
+            } else if (intakeSensor1.getDistance(DistanceUnit.CM) < 15 && intakeSensor2.getDistance(DistanceUnit.CM) < 15) {
+                intakeOuter.setPower(-.4);
 
-            if (distanceSensor.getDistance(DistanceUnit.CM) > 13.5 || kickerpos) {
-                intakeInner.setPower(.2);
-            } else {
+            }
+
+
+            if (kickerpos){
+                intakeInner.setPower(.6);
+                intakeOuter.setPower(-.65);
+            }
+            else{
                 intakeInner.setPower(0);
             }
 
+        } else if (!intakeOn) {
+
+
+            intakeOuter.setPower(0);
+            intakeInner.setPower(0);
         }
 
         if (!intakeOn) {
@@ -584,7 +605,7 @@ public class BlueTeleOpLL extends OpMode {
             telemetry.addData("balls shot this burst", ballsPassed);
             telemetry.addData("heading according to pedro", follower.getHeading());
             telemetry.addData("Encoder", "%.0f°", (encoder.getVoltage() / 3.3) * 360);
-
+            telemetry.addData("intended flywheel velocity", flywheelVelocity);
         }
     }
 
