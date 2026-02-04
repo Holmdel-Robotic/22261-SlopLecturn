@@ -38,6 +38,7 @@ import java.util.function.Supplier;
 @TeleOp
 public class BlueTeleOpLL extends OpMode {
 
+    private double hoodPos;
     private double RED;
     private double defaultVelo;
     private double defaultHood;
@@ -267,7 +268,13 @@ public class BlueTeleOpLL extends OpMode {
             y = follower.getPose().getY();
             distance = Math.sqrt(Math.pow(144 - y, 2) + Math.pow(x, 2));
             flywheelVelocity = 8.87 * (distance) + 1000;
-            hood.setPosition((-.00454324 * distance + .935));
+
+            hoodPos = (-.00424324 * distance + .935);
+            if (hoodPos < .17) {
+                hoodPos = .17;
+            }
+
+            hood.setPosition((hoodPos));
 
         }
 
