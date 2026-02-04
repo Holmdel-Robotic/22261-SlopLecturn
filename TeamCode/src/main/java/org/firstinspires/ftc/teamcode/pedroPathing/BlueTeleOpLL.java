@@ -605,7 +605,7 @@ public class BlueTeleOpLL extends OpMode {
             telemetry.addData("balls shot this burst", ballsPassed);
             telemetry.addData("heading according to pedro", follower.getHeading());
             telemetry.addData("Encoder", "%.0f°", (encoder.getVoltage() / 3.3) * 360);
-
+            telemetry.addData("intended flywheel velocity", flywheelVelocity);
         }
     }
 
