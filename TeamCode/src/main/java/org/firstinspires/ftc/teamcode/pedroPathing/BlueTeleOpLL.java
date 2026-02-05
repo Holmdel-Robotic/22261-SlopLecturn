@@ -41,6 +41,8 @@ import java.util.function.Supplier;
 
 public class BlueTeleOpLL extends OpMode {
 
+
+    private long lastLoopTime;
     private double hoodPos;
     private double RED;
     private double defaultVelo;
@@ -70,6 +72,7 @@ public class BlueTeleOpLL extends OpMode {
 
     private double x;
     private double y;
+
 
     double ballsPassed;
     private double distance;
@@ -140,6 +143,33 @@ public class BlueTeleOpLL extends OpMode {
 
     @Override
     public void init() {
+<<<<<<< HEAD
+=======
+        lastLoopTime = 0;
+        frontLeftMotor = hardwareMap.get(DcMotorEx.class, "fl");
+        frontRightMotor = hardwareMap.get(DcMotorEx.class, "fr");
+        backLeftMotor = hardwareMap.get(DcMotorEx.class, "bl");
+        backRightMotor = hardwareMap.get(DcMotorEx.class, "br");
+        defaultHood = .64;
+        defaultVelo = 1540;
+        follower = Constants.createFollower(hardwareMap);
+        follower.setStartingPose(new Pose(144 - 84, 36, Math.toRadians(180)));
+        follower.update();
+        telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
+        flywheelLeft = hardwareMap.get(DcMotorEx.class, "flyL");
+        flywheelRight = hardwareMap.get(DcMotorEx.class, "flyR");
+        flywheelRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        flywheelLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        flywheelRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        flywheelLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        flywheelLeft.setDirection(DcMotor.Direction.FORWARD);
+        flywheelRight.setDirection(DcMotor.Direction.REVERSE);
+        imu = hardwareMap.get(IMU.class, "imu");
+        gate = hardwareMap.get(Servo.class, "gate");
+        distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
+        indicatorLight1 = hardwareMap.get(Servo.class, "lightOne");
+        indicatorLight2 = hardwareMap.get(Servo.class, "lightTwo");
+>>>>>>> f69140002324d865d0e1d874bc15ab749af4c20a
 
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : allHubs) {
@@ -196,6 +226,7 @@ public class BlueTeleOpLL extends OpMode {
             intakeInner.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
+<<<<<<< HEAD
             hood = hardwareMap.get(Servo.class, "hood");
             blocker = hardwareMap.get(Servo.class, "blocker");
             GREEN = .5;
@@ -204,6 +235,130 @@ public class BlueTeleOpLL extends OpMode {
             intakeOn = false;
             flywheelOn = false;
             feederOn = false;
+=======
+        hood = hardwareMap.get(Servo.class, "hood");
+        blocker = hardwareMap.get(Servo.class, "blocker");
+        GREEN = .5;
+        BLUE = .6;
+        flywheelVelocity = 1600;
+        intakeOn = false;
+        flywheelOn = false;
+        feederOn = false;
+        kickerpos = true;
+        debounceA = false;
+        debounceB = false;
+        debounceX = false;
+        debounce_dpad_up = false;
+        debounce_dpad_down = false;
+        debounceY = false;
+        debounceBACK = false;
+        debounceRightStick = false;
+
+
+        actiontimer = new Timer();
+
+        raxon = hardwareMap.get(Servo.class, "raxon");
+        laxon = hardwareMap.get(Servo.class, "laxon");
+
+
+        pathChain = () -> follower.pathBuilder()
+                .addPath(new Path(new BezierLine(follower::getPose, new Pose(23.687, 119.835))))
+                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(180), 0.8))
+                .build();
+    }
+
+    @Override
+    public void start() {
+        gate.setPosition(.5);
+        follower.startTeleopDrive();
+        follower.setMaxPower(.8);
+        blocker.setPosition(.57);
+        indicatorLight1.setPosition(BLUE);
+        indicatorLight2.setPosition(BLUE);
+        kickerpos = false;
+        raxon.setPosition(.48);
+        laxon.setPosition(.48);
+        raxonPos = .48;
+        laxonPos = .48;
+//        hood.setPosition(.8);
+        hood.setPosition(.5694);
+        imu.resetYaw();
+        //Parallel: .5
+        //Min Values: .1
+        //Max Values: 1
+        //R45 = .36
+        //B45 = .64
+        //AxonRot CCW = .28/90
+
+    }
+
+    @Override
+    public void loop() {
+
+        // Toggle AprilTag tracking with right stick (press down on right stick)
+        if (gamepad1.right_stick_button && debounceRightStick) {
+            aprilTagTracking = !aprilTagTracking;
+            debounceRightStick = false;
+        }
+        if (!gamepad1.right_stick_button) {
+            debounceRightStick = true;
+        }
+
+        // LL runs continuously when enabled
+        if (aprilTagTracking) {
+            trackAprilTag();
+        }
+
+        if (autoTarget) {
+
+            x = follower.getPose().getX();
+            y = follower.getPose().getY();
+            distance = Math.sqrt(Math.pow(144 - y, 2) + Math.pow(x, 2));
+            hoodPos = 0.000705998 * distance + 0.337882;
+            flywheelVelocity = 3 * distance + 1531.52943;
+
+
+
+            if (hoodPos < .17) {
+                hoodPos = .17;
+            }
+
+            hood.setPosition((hoodPos));
+
+        }
+
+        if (raxonPos > 1) {
+            raxonPos = 1;
+        }
+        if (raxonPos < .1) {
+            raxonPos = .1;
+        }
+        if (laxonPos < .1) {
+            laxonPos = .1;
+        }
+        if (laxonPos > 1) {
+            laxonPos = 1;
+        }
+
+        // Only manual servo control if LL is OFF
+        if (!aprilTagTracking) {
+            raxon.setPosition(raxonPos);
+            laxon.setPosition(laxonPos);
+        }
+
+
+
+
+        if (gamepad1.back && debounceBACK && kickerpos){
+            kickerpos = false;
+            gate.setPosition(.55);
+            debounceBACK = false;
+            indicatorLight1.setPosition(RED);
+            indicatorLight2.setPosition(RED);
+        }
+        if (gamepad1.back && debounceBACK && !kickerpos){
+            gate.setPosition(.88);
+>>>>>>> f69140002324d865d0e1d874bc15ab749af4c20a
             kickerpos = true;
             debounceA = false;
             debounceB = false;
@@ -252,6 +407,7 @@ public class BlueTeleOpLL extends OpMode {
             //AxonRot CCW = .28/90
 
         }
+<<<<<<< HEAD
 
         @Override
         public void loop () {
@@ -286,6 +442,13 @@ public class BlueTeleOpLL extends OpMode {
                 }
 
                 hood.setPosition((hoodPos));
+=======
+        if (intakeOn) {
+            if (intakeSensor1.getDistance(DistanceUnit.CM) > 15 || intakeSensor2.getDistance(DistanceUnit.CM) > 15){
+                intakeOuter.setPower(-.8);
+            } else if (intakeSensor1.getDistance(DistanceUnit.CM) < 15 && intakeSensor2.getDistance(DistanceUnit.CM) < 15) {
+                intakeOuter.setPower(0);
+>>>>>>> f69140002324d865d0e1d874bc15ab749af4c20a
 
             }
 
@@ -470,6 +633,7 @@ public class BlueTeleOpLL extends OpMode {
             }
 
 
+<<<<<<< HEAD
             if (gamepad1.left_trigger < .01) {
                 debounceLEFT_TRIGGER = true;
             }
@@ -627,6 +791,59 @@ public class BlueTeleOpLL extends OpMode {
                 telemetry.addData("intake1Sensor", "intake full", intakeSensor1.getDistance(DistanceUnit.CM));
                 telemetry.addData("intake2Sensor", intakeSensor2.getDistance(DistanceUnit.CM));
             }
+=======
+            //This is how it looks with slowMode on
+            else {
+                double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
+                 double x = gamepad1.left_stick_x * 1.1;
+                 double rx = gamepad1.right_stick_x * .5;
+
+                double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+                double frontLeftPower = (y + x + rx) / denominator;
+                double backLeftPower = (y - x + rx) / denominator;
+                double frontRightPower = (y - x - rx) / denominator;
+                double backRightPower = (y + x - rx) / denominator;
+
+                frontLeftMotor.setPower(frontLeftPower);
+                backLeftMotor.setPower(backLeftPower);
+                frontRightMotor.setPower(frontRightPower);
+                backRightMotor.setPower(backRightPower);
+            }
+
+            long currentTime = System.currentTimeMillis();
+            long loopTime = currentTime - lastLoopTime;
+            lastLoopTime = currentTime;
+
+            telemetry.addData("Loop Time (ms)", loopTime);
+            telemetry.addData("Frequency (Hz)", 1000.0 / loopTime);
+
+            telemetry.addData("AprilTag Tracking", aprilTagTracking ? "ENABLED" : "DISABLED");
+            telemetry.addData("axonL", laxon.getPosition());
+            telemetry.addData("axonR", raxon.getPosition());
+            telemetry.addData("blocker pos", blocker.getPosition());
+            telemetry.addData("Hood position", hood.getPosition());
+            //telemetry.addData("raxon",raxon.getPosition());
+            //telemetry.addData("laxon",laxon.getPosition());
+            telemetry.addData("atr", angleToRot);
+            telemetry.addData("flywheel velocity", flywheelLeft.getVelocity());
+            telemetry.addData("debounce y", debounceY);
+
+            telemetry.addData("position", follower.getPose());
+            /*telemetryM.debug("position", follower.getPose()); */
+            //telemetryM.debug("velocity", follower.getVelocity());
+            //telemetryM.debug("automatedDrive", automatedDrive);
+            telemetry.addData("YAW", imu.getRobotYawPitchRollAngles().getYaw());
+            telemetry.addData("distance", distance);
+            telemetry.addData("Distance Sensor", distanceSensor.getDistance(DistanceUnit.CM));
+            telemetry.addData("gate", gate.getPosition());
+            telemetry.addData("balls shot this burst", ballsPassed);
+            telemetry.addData("heading according to pedro", follower.getHeading());
+            telemetry.addData("Encoder", "%.0f°", (encoder.getVoltage() / 3.3) * 360);
+            telemetry.addData("intended flywheel velocity", flywheelVelocity);
+            telemetry.addData("intake full", intakeSensor1.getDistance(DistanceUnit.CM) < 15 && intakeSensor2.getDistance(DistanceUnit.CM) < 15);
+            telemetry.addData("intake1Sensor", intakeSensor1.getDistance(DistanceUnit.CM));
+            telemetry.addData("intake2Sensor", intakeSensor2.getDistance(DistanceUnit.CM));
+>>>>>>> f69140002324d865d0e1d874bc15ab749af4c20a
         }
 
         // AprilTag tracking method
@@ -661,3 +878,17 @@ public class BlueTeleOpLL extends OpMode {
             }
         }
     }
+<<<<<<< HEAD
+=======
+
+
+    public void stop(){
+        try {
+            if (limelight != null) limelight.stop();
+            } catch (Exception ignored) {}
+        }
+
+
+
+}
+>>>>>>> f69140002324d865d0e1d874bc15ab749af4c20a
