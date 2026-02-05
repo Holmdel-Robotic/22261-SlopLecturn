@@ -38,6 +38,8 @@ import java.util.function.Supplier;
 @TeleOp
 public class BlueTeleOpLL extends OpMode {
 
+
+    private long lastLoopTime;
     private double hoodPos;
     private double RED;
     private double defaultVelo;
@@ -67,6 +69,7 @@ public class BlueTeleOpLL extends OpMode {
 
     private double x;
     private double y;
+
 
     double ballsPassed;
     private double distance;
@@ -137,6 +140,7 @@ public class BlueTeleOpLL extends OpMode {
 
     @Override
     public void init() {
+        lastLoopTime = 0;
         frontLeftMotor = hardwareMap.get(DcMotorEx.class, "fl");
         frontRightMotor = hardwareMap.get(DcMotorEx.class, "fr");
         backLeftMotor = hardwareMap.get(DcMotorEx.class, "bl");
@@ -268,7 +272,7 @@ public class BlueTeleOpLL extends OpMode {
             y = follower.getPose().getY();
             distance = Math.sqrt(Math.pow(144 - y, 2) + Math.pow(x, 2));
             hoodPos = 0.000705998 * distance + 0.337882;
-            flywheelVelocity = 2.82399 * distance + 1531.52943;
+            flywheelVelocity = 3 * distance + 1531.52943;
 
 
 
@@ -298,6 +302,8 @@ public class BlueTeleOpLL extends OpMode {
             raxon.setPosition(raxonPos);
             laxon.setPosition(laxonPos);
         }
+
+
 
 
         if (gamepad1.back && debounceBACK && kickerpos){
@@ -577,8 +583,8 @@ public class BlueTeleOpLL extends OpMode {
             //This is how it looks with slowMode on
             else {
                 double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
-                double x = gamepad1.left_stick_x * 1.1;
-                double rx = gamepad1.right_stick_x * .5;
+                 double x = gamepad1.left_stick_x * 1.1;
+                 double rx = gamepad1.right_stick_x * .5;
 
                 double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
                 double frontLeftPower = (y + x + rx) / denominator;
@@ -591,6 +597,13 @@ public class BlueTeleOpLL extends OpMode {
                 frontRightMotor.setPower(frontRightPower);
                 backRightMotor.setPower(backRightPower);
             }
+
+            long currentTime = System.currentTimeMillis();
+            long loopTime = currentTime - lastLoopTime;
+            lastLoopTime = currentTime;
+
+            telemetry.addData("Loop Time (ms)", loopTime);
+            telemetry.addData("Frequency (Hz)", 1000.0 / loopTime);
 
             telemetry.addData("AprilTag Tracking", aprilTagTracking ? "ENABLED" : "DISABLED");
             telemetry.addData("axonL", laxon.getPosition());
@@ -616,7 +629,7 @@ public class BlueTeleOpLL extends OpMode {
             telemetry.addData("Encoder", "%.0f°", (encoder.getVoltage() / 3.3) * 360);
             telemetry.addData("intended flywheel velocity", flywheelVelocity);
             telemetry.addData("intake full", intakeSensor1.getDistance(DistanceUnit.CM) < 15 && intakeSensor2.getDistance(DistanceUnit.CM) < 15);
-            telemetry.addData("intake1Sensor", "intake full", intakeSensor1.getDistance(DistanceUnit.CM));
+            telemetry.addData("intake1Sensor", intakeSensor1.getDistance(DistanceUnit.CM));
             telemetry.addData("intake2Sensor", intakeSensor2.getDistance(DistanceUnit.CM));
         }
     }
@@ -652,5 +665,14 @@ public class BlueTeleOpLL extends OpMode {
             telemetry.addData("AT Status", "Searching...");
         }
     }
+
+
+    public void stop(){
+        try {
+            if (limelight != null) limelight.stop();
+            } catch (Exception ignored) {}
+        }
+
+
 
 }
