@@ -338,7 +338,7 @@ public class BlueTeleOpLL extends OpMode {
             if (intakeSensor1.getDistance(DistanceUnit.CM) > 15 || intakeSensor2.getDistance(DistanceUnit.CM) > 15){
                 intakeOuter.setPower(-.8);
             } else if (intakeSensor1.getDistance(DistanceUnit.CM) < 15 && intakeSensor2.getDistance(DistanceUnit.CM) < 15) {
-                intakeOuter.setPower(-.2);
+                intakeOuter.setPower(0);
 
             }
 
@@ -615,7 +615,7 @@ public class BlueTeleOpLL extends OpMode {
             telemetry.addData("heading according to pedro", follower.getHeading());
             telemetry.addData("Encoder", "%.0f°", (encoder.getVoltage() / 3.3) * 360);
             telemetry.addData("intended flywheel velocity", flywheelVelocity);
-            telemetry.addData("intake full", intakeSensor1.getDistance(DistanceUnit.CM) > 15 && intakeSensor2.getDistance(DistanceUnit.CM) > 15);
+            telemetry.addData("intake full", intakeSensor1.getDistance(DistanceUnit.CM) < 15 && intakeSensor2.getDistance(DistanceUnit.CM) < 15);
             telemetry.addData("intake1Sensor", "intake full", intakeSensor1.getDistance(DistanceUnit.CM));
             telemetry.addData("intake2Sensor", intakeSensor2.getDistance(DistanceUnit.CM));
         }
