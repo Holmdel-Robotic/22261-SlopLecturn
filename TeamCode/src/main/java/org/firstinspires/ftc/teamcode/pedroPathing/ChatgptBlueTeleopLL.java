@@ -178,7 +178,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
         double dy = 144 - y;
         distance = Math.sqrt(dy * dy + x * x);
 
-        hoodPos = 0.001405998 * distance + 0.337882;
+        hoodPos = -0.002005998 * distance + (1 - 0.337882)  ;
         flywheelVelocity = 2.88 * distance + 1531.52943;
 
         if (hoodPos < .17) hoodPos = .17;
