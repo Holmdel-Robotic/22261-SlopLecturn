@@ -223,6 +223,7 @@ public class BlueTeleOpLL extends OpMode {
             intakeInner.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
+
             hood = hardwareMap.get(Servo.class, "hood");
             blocker = hardwareMap.get(Servo.class, "blocker");
             GREEN = .5;
@@ -759,4 +760,4 @@ public class BlueTeleOpLL extends OpMode {
         }
 
 
-        }
+}
