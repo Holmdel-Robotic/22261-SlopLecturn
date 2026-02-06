@@ -348,6 +348,7 @@ public class BlueTeleOpLL extends OpMode {
                     if (!aprilTagTracking) {
                         raxon.setPosition(raxonPos);
                         laxon.setPosition(laxonPos);
+                        stop();
                     }
 
 
