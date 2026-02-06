@@ -16,6 +16,10 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
     private Follower follower;
 
+
+    private Pose pose;
+
+    private Servo gate, indicatorLight1, indicatorLight2;
     private DcMotorEx frontRightMotor, frontLeftMotor, backRightMotor, backLeftMotor;
     private DcMotorEx flywheelLeft, flywheelRight, intakeOuter, intakeInner;
 
@@ -25,11 +29,13 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
     private Limelight3A limelight;
 
+    private boolean gateOpen = false;
+
     private boolean intakeOn = false;
     private boolean flywheelOn = false;
     private boolean aprilTagTracking = false;
 
-    private boolean debounceA, debounceX, debounceRightStick;
+    private boolean debounceA, debounceX, debounceRightStick, debounceBack;
 
     private double flywheelVelocity = 1600;
     private double hoodPos;
@@ -42,8 +48,19 @@ public class ChatgptBlueTeleopLL extends OpMode {
     private double kP = 0.08;
     private double max = 0.00962;
 
+    private double GREEN = .5;
+    private double BLUE = .6;
+
+    private double distance;
     @Override
     public void init() {
+
+
+
+        gate = hardwareMap.get(Servo.class, "gate");
+
+        indicatorLight1 = hardwareMap.get(Servo.class, "lightOne");
+        indicatorLight2 = hardwareMap.get(Servo.class, "lightTwo");
 
         frontLeftMotor = hardwareMap.get(DcMotorEx.class, "fl");
         frontRightMotor = hardwareMap.get(DcMotorEx.class, "fr");
@@ -52,9 +69,21 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
         flywheelLeft = hardwareMap.get(DcMotorEx.class, "flyL");
         flywheelRight = hardwareMap.get(DcMotorEx.class, "flyR");
+        flywheelRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        flywheelLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        flywheelRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        flywheelLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        flywheelLeft.setDirection(DcMotor.Direction.FORWARD);
+        flywheelRight.setDirection(DcMotor.Direction.REVERSE);
 
         intakeOuter = hardwareMap.get(DcMotorEx.class, "intOuter");
         intakeInner = hardwareMap.get(DcMotorEx.class, "intInner");
+        intakeOuter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        intakeInner.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        intakeOuter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        intakeInner.setDirection(DcMotor.Direction.REVERSE);
+        intakeOuter.setDirection(DcMotor.Direction.REVERSE);
+        intakeInner.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         intakeSensor1 = hardwareMap.get(DistanceSensor.class, "intakeSensor1");
         intakeSensor2 = hardwareMap.get(DistanceSensor.class, "intakeSensor2");
@@ -64,11 +93,22 @@ public class ChatgptBlueTeleopLL extends OpMode {
         laxon = hardwareMap.get(Servo.class, "laxon");
 
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        limelight.pipelineSwitch(1);
         limelight.start();
 
         follower = Constants.createFollower(hardwareMap);
+        follower.setStartingPose(new Pose(144 - 84, 36, Math.toRadians(180)));
 
         lastLoopTime = System.currentTimeMillis();
+
+        indicatorLight1.setPosition(BLUE);
+        indicatorLight2.setPosition(BLUE);
+
+        raxon.setPosition(.48);
+        laxon.setPosition(.48);
+        raxonPos = .48;
+        laxonPos = .48;
+
     }
 
     @Override
@@ -89,6 +129,13 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
     private void processGamepad1() {
 
+
+
+        if (gamepad1.back && !debounceBack) {
+            gateOpen = !gateOpen;
+            debounceBack = true;
+        }
+
         if (gamepad1.a && !debounceA) {
             intakeOn = !intakeOn;
             debounceA = true;
@@ -101,6 +148,8 @@ public class ChatgptBlueTeleopLL extends OpMode {
         }
         if (!gamepad1.x) debounceX = false;
 
+        if (!gamepad1.back) debounceBack = false;
+
         if (gamepad1.right_stick_button && debounceRightStick) {
             aprilTagTracking = !aprilTagTracking;
             debounceRightStick = false;
@@ -112,19 +161,19 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
     private void updateRobotState() {
 
-        Pose pose = follower.getPose();
+        pose = follower.getPose();
         double x = pose.getX();
         double y = pose.getY();
 
         double dy = 144 - y;
-        double distance = Math.sqrt(dy * dy + x * x);
+        distance = Math.sqrt(dy * dy + x * x);
 
         hoodPos = 0.000705998 * distance + 0.337882;
-        flywheelVelocity = 3 * distance + 1531.52943;
+        flywheelVelocity = 2.95 * distance + 1531.52943;
 
         if (hoodPos < .17) hoodPos = .17;
 
-        if (aprilTagTracking && loopCount % 2 == 0) {
+        if (aprilTagTracking) {
             trackAprilTag();
         }
     }
@@ -139,8 +188,21 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
         hood.setPosition(hoodPos);
 
-        if (intakeOn && !intakeFull) intakeOuter.setPower(-.8);
+        if (gateOpen){
+            gate.setPosition(.88);
+            indicatorLight1.setPosition(GREEN);
+            indicatorLight2.setPosition(GREEN);
+        }
+        else{
+            gate.setPosition(.5);
+            indicatorLight1.setPosition(BLUE);
+            indicatorLight2.setPosition(BLUE);
+        }
+        if ((intakeOn && !intakeFull) || gateOpen) intakeOuter.setPower(-.8);
         else intakeOuter.setPower(0);
+
+        if (gateOpen) intakeInner.setPower(.45);
+        else intakeInner.setPower(0);
 
         if (flywheelOn) {
             flywheelLeft.setVelocity(flywheelVelocity);
@@ -174,13 +236,29 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
         if (result != null && result.isValid() && !result.getFiducialResults().isEmpty()) {
             double error = result.getFiducialResults().get(0).getTargetXDegrees();
-            double correction = Math.max(-max, Math.min(max, kP * error));
 
-            raxonPos += correction;
-            laxonPos += correction;
+            if (Math.abs(error) > 3) {
+                double correction = kP * error;
+                correction = Math.max(-max, Math.min(max, correction));
 
-            raxon.setPosition(raxonPos);
-            laxon.setPosition(laxonPos);
+                raxonPos += correction;
+                laxonPos += correction;
+                raxonPos = Math.max(0.1, Math.min(1.0, raxonPos));
+                laxonPos = Math.max(0.1, Math.min(1.0, laxonPos));
+
+                laxon.setPosition(laxonPos);
+                raxon.setPosition(raxonPos);
+
+                telemetry.addData("AT Target ID", result.getFiducialResults().get(0).getFiducialId());
+                telemetry.addData("AT Error", "%.2f°", error);
+                telemetry.addData("AT Correction", "%.5f", correction);
+                telemetry.addData("AT Status", "TRACKING");
+            } else {
+                telemetry.addData("AT Status", "LOCKED ON");
+                telemetry.addData("AT Error", "%.2f°", error);
+            }
+        } else {
+            telemetry.addData("AT Status", "Searching...");
         }
     }
 
@@ -191,11 +269,20 @@ public class ChatgptBlueTeleopLL extends OpMode {
         long now = System.currentTimeMillis();
         long loopTime = now - lastLoopTime;
         lastLoopTime = now;
-
+        telemetry.addData("AprilTracking?",aprilTagTracking);
         telemetry.addData("Loop ms", loopTime);
         telemetry.addData("Hz", 1000.0 / loopTime);
         telemetry.addData("FlywheelOn", flywheelOn);
         telemetry.addData("IntakeOn", intakeOn);
+        telemetry.addData("FlywheelV", (flywheelLeft.getVelocity() + flywheelRight.getVelocity())/2);
+        telemetry.addData("Distance",distance);
+        telemetry.addData("Hood Pos", hood.getPosition());
         telemetry.update();
+    }
+
+    public void stop(){
+        try {
+            if (limelight != null) limelight.stop();
+        } catch (Exception ignored) {}
     }
 }
