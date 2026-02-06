@@ -106,8 +106,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
         raxon.setPosition(.48);
         laxon.setPosition(.48);
-        raxonPos = .48;
-        laxonPos = .48;
+
 
     }
 
@@ -169,7 +168,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
         distance = Math.sqrt(dy * dy + x * x);
 
         hoodPos = 0.000705998 * distance + 0.337882;
-        flywheelVelocity = 2.95 * distance + 1531.52943;
+        flywheelVelocity = 2.85 * distance + 1531.52943;
 
         if (hoodPos < .17) hoodPos = .17;
 
