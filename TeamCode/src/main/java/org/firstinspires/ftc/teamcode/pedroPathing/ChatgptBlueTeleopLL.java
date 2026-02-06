@@ -31,6 +31,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
     private boolean gateOpen = false;
 
+    private boolean driving;
     private boolean intakeOn = false;
     private boolean flywheelOn = false;
     private boolean aprilTagTracking = false;
@@ -177,14 +178,15 @@ public class ChatgptBlueTeleopLL extends OpMode {
         double dy = 144 - y;
         distance = Math.sqrt(dy * dy + x * x);
 
-        hoodPos = 0.000705998 * distance + 0.337882;
-        flywheelVelocity = 2.85 * distance + 1531.52943;
+        hoodPos = 0.001405998 * distance + 0.337882;
+        flywheelVelocity = 2.88 * distance + 1531.52943;
 
         if (hoodPos < .17) hoodPos = .17;
 
-        if (aprilTagTracking) {
+        if (aprilTagTracking && loopCount % 2 == 0 && !driving) {
             trackAprilTag();
         }
+
     }
 
     /* ================= HARDWARE WRITES ================= */
@@ -196,6 +198,11 @@ public class ChatgptBlueTeleopLL extends OpMode {
         boolean intakeFull = intake1Dist < 15 && intake2Dist < 15;
 
         hood.setPosition(hoodPos);
+
+        if (driving){
+            raxon.setPosition(.48);
+            laxon.setPosition(.48);
+        }
 
         if (gateOpen){
             gate.setPosition(.88);
@@ -210,7 +217,10 @@ public class ChatgptBlueTeleopLL extends OpMode {
         if ((intakeOn && !intakeFull) || gateOpen) intakeOuter.setPower(-.8);
         else intakeOuter.setPower(0);
 
-        if (gateOpen) intakeInner.setPower(.45);
+        if (gateOpen){
+            intakeInner.setPower(.3);
+            intakeOuter.setPower(-.65);
+        }
         else intakeInner.setPower(0);
 
         if (flywheelOn) {
@@ -229,6 +239,10 @@ public class ChatgptBlueTeleopLL extends OpMode {
         double y = -gamepad1.left_stick_y;
         double x = gamepad1.left_stick_x * 1.1;
         double rx = gamepad1.right_stick_x * .4;
+
+        if (y < .03 && x < .03 && rx < .03) driving = false;
+        else driving = true;
+
 
         double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
 
