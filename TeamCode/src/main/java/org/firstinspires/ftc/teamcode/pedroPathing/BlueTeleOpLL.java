@@ -143,6 +143,7 @@ public class BlueTeleOpLL extends OpMode {
 
     @Override
     public void init() {
+
         lastLoopTime = 0;
         frontLeftMotor = hardwareMap.get(DcMotorEx.class, "fl");
         frontRightMotor = hardwareMap.get(DcMotorEx.class, "fr");
@@ -168,9 +169,6 @@ public class BlueTeleOpLL extends OpMode {
         indicatorLight1 = hardwareMap.get(Servo.class, "lightOne");
         indicatorLight2 = hardwareMap.get(Servo.class, "lightTwo");
 
-        List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
-        for (LynxModule hub : allHubs) {
-            hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
             frontLeftMotor = hardwareMap.get(DcMotorEx.class, "fl");
             frontRightMotor = hardwareMap.get(DcMotorEx.class, "fr");
             backLeftMotor = hardwareMap.get(DcMotorEx.class, "bl");
@@ -261,33 +259,37 @@ public class BlueTeleOpLL extends OpMode {
                     .addPath(new Path(new BezierLine(follower::getPose, new Pose(23.687, 119.835))))
                     .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(180), 0.8))
                     .build();
+
+
+
         }
-    }
 
         @Override
         public void start () {
-            gate.setPosition(.5);
-            follower.startTeleopDrive();
-            follower.setMaxPower(.8);
-            blocker.setPosition(.57);
-            indicatorLight1.setPosition(BLUE);
-            indicatorLight2.setPosition(BLUE);
-            kickerpos = false;
-            raxon.setPosition(.48);
-            laxon.setPosition(.48);
-            raxonPos = .48;
-            laxonPos = .48;
-//        hood.setPosition(.8);
-            hood.setPosition(.5694);
-            imu.resetYaw();
-            //Parallel: .5
-            //Min Values: .1
-            //Max Values: 1
-            //R45 = .36
-            //B45 = .64
-            //AxonRot CCW = .28/90
 
+
+                gate.setPosition(.5);
+                follower.startTeleopDrive();
+                follower.setMaxPower(.8);
+                blocker.setPosition(.57);
+                indicatorLight1.setPosition(BLUE);
+                indicatorLight2.setPosition(BLUE);
+                kickerpos = false;
+                raxon.setPosition(.48);
+                laxon.setPosition(.48);
+                raxonPos = .48;
+                laxonPos = .48;
+//        hood.setPosition(.8);
+                hood.setPosition(.5694);
+                imu.resetYaw();
+                //Parallel: .5
+                //Min Values: .1
+                //Max Values: 1
+                //R45 = .36
+                //B45 = .64
+                //AxonRot CCW = .28/90
         }
+
         @Override
         public void loop () {
 
@@ -757,7 +759,7 @@ public class BlueTeleOpLL extends OpMode {
         try {
             if (limelight != null) limelight.stop();
             } catch (Exception ignored) {}
-        }
+    }
 
 
 }
