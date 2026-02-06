@@ -35,7 +35,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
     private boolean flywheelOn = false;
     private boolean aprilTagTracking = false;
 
-    private boolean debounceA, debounceX, debounceRightStick, debounceBack;
+    private boolean debounceA, debounceX, debounceRightStick, debounceBack, debounceLEFT_TRIGGER;
 
     private double flywheelVelocity = 1600;
     private double hoodPos;
@@ -45,8 +45,8 @@ public class ChatgptBlueTeleopLL extends OpMode {
     private int loopCount = 0;
     private long lastLoopTime;
 
-    private double kP = 0.08;
-    private double max = 0.00962;
+    private double kP = 0.843;
+    private double max = 0.00922;
 
     private double GREEN = .5;
     private double BLUE = .6;
@@ -153,6 +153,16 @@ public class ChatgptBlueTeleopLL extends OpMode {
         if (gamepad1.right_stick_button && debounceRightStick) {
             aprilTagTracking = !aprilTagTracking;
             debounceRightStick = false;
+        }
+        if (!aprilTagTracking) {
+            if (gamepad1.left_trigger > .01 && debounceLEFT_TRIGGER) {
+                raxonPos = raxon.getPosition() + .03;
+                laxonPos = laxon.getPosition() - .03;
+                laxon.setPosition(laxonPos);
+                raxon.setPosition(raxonPos);
+
+                debounceLEFT_TRIGGER = false;
+            }
         }
         if (!gamepad1.right_stick_button) debounceRightStick = true;
     }
