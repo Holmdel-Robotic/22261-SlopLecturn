@@ -163,7 +163,8 @@ public class BlueTeleOp extends OpMode {
         intakeInner.setDirection(DcMotor.Direction.REVERSE);
         intakeOuter.setDirection(DcMotor.Direction.REVERSE);
         intakeInner.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
+        GREEN = .5;
+        BLUE = .6;
 
         hood = hardwareMap.get(Servo.class, "hood");
         blocker = hardwareMap.get(Servo.class, "blocker");
