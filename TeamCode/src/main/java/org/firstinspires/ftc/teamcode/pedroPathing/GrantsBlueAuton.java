@@ -18,7 +18,7 @@ package org.firstinspires.ftc.teamcode.pedroPathing;
 
     import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-@Autonomous(name = "Pedro Pathing Autonomous", group = "Autonomous")
+@Autonomous(name = "GrantsBlueAutonomous", group = "Autonomous") 
     @Configurable // Panels
     public class GrantsBlueAuton extends OpMode {
     private Pose pose;
