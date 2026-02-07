@@ -23,7 +23,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
     private DcMotorEx frontRightMotor, frontLeftMotor, backRightMotor, backLeftMotor;
     private DcMotorEx flywheelLeft, flywheelRight, intakeOuter, intakeInner;
 
-    private DistanceSensor intakeSensor1, intakeSensor2;
+    private DistanceSensor intakeSensor1, intakeSensor2, innerSensor;
 
     private Servo hood, raxon, laxon;
 
@@ -88,6 +88,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
         intakeSensor1 = hardwareMap.get(DistanceSensor.class, "intakeSensor1");
         intakeSensor2 = hardwareMap.get(DistanceSensor.class, "intakeSensor2");
+        innerSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
 
         hood = hardwareMap.get(Servo.class, "hood");
         raxon = hardwareMap.get(Servo.class, "raxon");
@@ -107,6 +108,8 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
         raxon.setPosition(.48);
         laxon.setPosition(.48);
+
+
 
 
     }
@@ -300,6 +303,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
         telemetry.addData("FlywheelV", (flywheelLeft.getVelocity() + flywheelRight.getVelocity())/2);
         telemetry.addData("Distance",distance);
         telemetry.addData("Hood Pos", hood.getPosition());
+        telemetry.addData("Inner Dist sensor",innerSensor.getDistance(DistanceUnit.CM));
         telemetry.update();
     }
 
