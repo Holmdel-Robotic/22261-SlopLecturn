@@ -60,6 +60,7 @@ package org.firstinspires.ftc.teamcode.pedroPathing;
 
           gate = hardwareMap.get(Servo.class, "gate");
 
+
           indicatorLight1 = hardwareMap.get(Servo.class, "lightOne");
           indicatorLight2 = hardwareMap.get(Servo.class, "lightTwo");
 
@@ -113,11 +114,15 @@ package org.firstinspires.ftc.teamcode.pedroPathing;
         autonomousPathUpdate(); // Update autonomous state machine
 
         // Log values to Panels and Driver Station
+
         panelsTelemetry.debug("Path State", pathState);
         panelsTelemetry.debug("X", follower.getPose().getX());
         panelsTelemetry.debug("Y", follower.getPose().getY());
         panelsTelemetry.debug("Heading", follower.getPose().getHeading());
         telemetry.addData("Follower Status", follower.isBusy());
+        telemetry.addData("State", state);
+        telemetry.addData("path following...", follower.getCurrentPath());
+        telemetry.update();
         panelsTelemetry.update(telemetry);
       }
 
@@ -257,14 +262,14 @@ ScoreEnd = follower.pathBuilder().addPath(
                       gate.setPosition(.88);
                       if (actionTimer.getElapsedTimeSeconds() > 3 && !follower.isBusy()){
                         gate.setPosition(.5);
-                        follower.followPath(paths.ScoreHuman);
+                        follower.followPath(paths.ScoreHuman, true);
                         setPathState(State.SCOREHUMAN);
                       }
                   case SCOREHUMAN:
                       if (intakeSensor1.getDistance(DistanceUnit.CM) > 15 && intakeSensor2.getDistance(DistanceUnit.CM) > 15) intakeOuter.setPower(-.8);
                       else intakeOuter.setPower(0);
                       if (!follower.isBusy()){
-                          follower.followPath(paths.HumanScore);
+                          follower.followPath(paths.HumanScore, true);
                           setPathState(State.HUMANSCORE);
                       }
                   case HUMANSCORE:
@@ -283,7 +288,7 @@ ScoreEnd = follower.pathBuilder().addPath(
                       }
                       if (actionTimer.getElapsedTimeSeconds() > 3) {
                           gate.setPosition(.5);
-                          follower.followPath(paths.ScoreGate);
+                          follower.followPath(paths.ScoreGate, true);
                           setPathState(State.SCOREGATE);
                       }
                   case SCOREGATE:
@@ -293,14 +298,14 @@ ScoreEnd = follower.pathBuilder().addPath(
                           actionTimer.resetTimer();
                       }else if (!follower.isBusy() && actionTimer.getElapsedTimeSeconds() > 3){
                           setPathState(State.GATETOWALL);
-                          follower.followPath(paths.GateToWall);
+                          follower.followPath(paths.GateToWall, true);
                       }
                   case GATETOWALL:
                       if (intakeSensor1.getDistance(DistanceUnit.CM) > 15 && intakeSensor2.getDistance(DistanceUnit.CM) > 15) intakeOuter.setPower(-.8);
                       else intakeOuter.setPower(0);
                       if (!follower.isBusy()){
                           setPathState(State.TOWALL);
-                          follower.followPath(paths.ToWall);
+                          follower.followPath(paths.ToWall, true);
                           actionTimer.resetTimer();
                       }
                   case SCORE3:
@@ -312,7 +317,7 @@ ScoreEnd = follower.pathBuilder().addPath(
                       }
                       if (actionTimer.getElapsedTimeSeconds() > 3){
                           gate.setPosition(.5);
-                          follower.followPath(paths.ScoreEnd);
+                          follower.followPath(paths.ScoreEnd, true);
                           setPathState(State.SCOREEND);
                       }
                   case SCOREEND:
