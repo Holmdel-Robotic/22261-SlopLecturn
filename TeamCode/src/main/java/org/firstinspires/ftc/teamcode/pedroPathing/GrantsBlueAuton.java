@@ -117,6 +117,7 @@ package org.firstinspires.ftc.teamcode.pedroPathing;
         panelsTelemetry.debug("X", follower.getPose().getX());
         panelsTelemetry.debug("Y", follower.getPose().getY());
         panelsTelemetry.debug("Heading", follower.getPose().getHeading());
+        telemetry.addData("Follower Status", !follower.isBusy());
         panelsTelemetry.update(telemetry);
       }
 
@@ -139,7 +140,7 @@ public PathChain ScoreEnd;
             new Pose(56.000, 8.000)
           )
         ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
-        
+              .setTValueConstraint(.95)
         .build();
 
 ScoreHuman = follower.pathBuilder().addPath(
@@ -149,7 +150,7 @@ ScoreHuman = follower.pathBuilder().addPath(
             new Pose(8.000, 7.512)
           )
         ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
-        
+        .setTValueConstraint(.95)
         .build();
 
 HumanScore = follower.pathBuilder().addPath(
@@ -159,7 +160,7 @@ HumanScore = follower.pathBuilder().addPath(
             new Pose(56.000, 8.000)
           )
         ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
-        
+        .setTValueConstraint(.95)
         .build();
 
 ScoreGate = follower.pathBuilder().addPath(
@@ -170,7 +171,7 @@ new Pose(63.360, 71.790),
             new Pose(14.832, 72.520)
           )
         ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(90))
-        
+        .setTValueConstraint(.95)
         .build();
 
 GateToWall = follower.pathBuilder().addPath(
@@ -181,7 +182,7 @@ new Pose(58.305, 18.984),
             new Pose(23.879, 22.847)
           )
         ).setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(180))
-        
+        .setTValueConstraint(.95)
         .build();
 
 ToWall = follower.pathBuilder().addPath(
@@ -191,7 +192,7 @@ ToWall = follower.pathBuilder().addPath(
             new Pose(8.000, 23.000)
           )
         ).setTangentHeadingInterpolation()
-        
+        .setTValueConstraint(.95)
         .build();
 
 WallScore = follower.pathBuilder().addPath(
@@ -201,7 +202,7 @@ WallScore = follower.pathBuilder().addPath(
             new Pose(56.000, 8.000)
           )
         ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
-        
+        .setTValueConstraint(.95)
         .build();
 
 ScoreEnd = follower.pathBuilder().addPath(
@@ -211,7 +212,7 @@ ScoreEnd = follower.pathBuilder().addPath(
             new Pose(59.000, 35.000)
           )
         ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
-        
+        .setTValueConstraint(.95)
         .build();
     }
   }
