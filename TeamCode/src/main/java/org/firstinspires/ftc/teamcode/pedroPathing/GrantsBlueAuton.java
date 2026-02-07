@@ -117,7 +117,7 @@ package org.firstinspires.ftc.teamcode.pedroPathing;
         panelsTelemetry.debug("X", follower.getPose().getX());
         panelsTelemetry.debug("Y", follower.getPose().getY());
         panelsTelemetry.debug("Heading", follower.getPose().getHeading());
-        telemetry.addData("Follower Status", !follower.isBusy());
+        telemetry.addData("Follower Status", follower.isBusy());
         panelsTelemetry.update(telemetry);
       }
 
