@@ -42,10 +42,12 @@ package org.firstinspires.ftc.teamcode.pedroPathing;
 
     private boolean debounceA, debounceX, debounceRightStick, debounceBack, debounceLEFT_TRIGGER;
 
-    private double flywheelVelocity = 1600;
-    private double hoodPos;
-    private double raxonPos;
-    private double laxonPoss;
+    private double FlywheelV = 2000;
+    private double hoodPos = .67;
+    private double raxonPos = .6;
+    private double laxonPos = .6;
+
+    private Timer actionTimer = new Timer();
 
     private Timer pathTimer = new Timer();
       private TelemetryManager panelsTelemetry; // Panels Telemetry instance
@@ -236,14 +238,80 @@ ScoreEnd = follower.pathBuilder().addPath(
 
               switch (state) {
                   case START:
-                      flywheelLeft.setVelocity(1600);
-                      flywheelRight.setVelocity(1600);
+                      raxon.setPosition(raxonPos);
+                      laxon.setPosition(laxonPos);
+                      flywheelLeft.setVelocity(FlywheelV);
+                      flywheelRight.setVelocity(FlywheelV);
+                      hood.setPosition(hoodPos);
                       if (intakeSensor1.getDistance(DistanceUnit.CM) > 15 && intakeSensor2.getDistance(DistanceUnit.CM) > 15) intakeOuter.setPower(-.8);
                       else intakeOuter.setPower(0);
+                      actionTimer.resetTimer();
                       setPathState(State.SCORE1);
 
 
 
+                  case SCORE1:
+                      intakeOuter.setPower(-.8);
+                      intakeInner.setPower(.3);
+                      gate.setPosition(.88);
+                      if (actionTimer.getElapsedTimeSeconds() > 3){
+                        gate.setPosition(.5);
+                        follower.followPath(paths.ScoreHuman);
+                        setPathState(State.SCOREHUMAN);
+                      }
+                  case SCOREHUMAN:
+                      if (intakeSensor1.getDistance(DistanceUnit.CM) > 15 && intakeSensor2.getDistance(DistanceUnit.CM) > 15) intakeOuter.setPower(-.8);
+                      else intakeOuter.setPower(0);
+                      if (!follower.isBusy()){
+                          follower.followPath(paths.HumanScore);
+                          setPathState(State.HUMANSCORE);
+                      }
+                  case HUMANSCORE:
+                      if (intakeSensor1.getDistance(DistanceUnit.CM) > 15 && intakeSensor2.getDistance(DistanceUnit.CM) > 15) intakeOuter.setPower(-.8);
+                      else intakeOuter.setPower(0);
+                      if (!follower.isBusy()){
+                          setPathState(State.SCORE2);
+                          actionTimer.resetTimer();
+                      }
+                  case SCORE2:
+                      intakeOuter.setPower(-.8);
+                      intakeInner.setPower(.3);
+                      gate.setPosition(.88);
+                      if (actionTimer.getElapsedTimeSeconds() > 3){
+                          gate.setPosition(.5);
+                          follower.followPath(paths.ScoreGate);
+                          setPathState(State.SCOREGATE);
+                      }
+                  case SCOREGATE:
+                      if (intakeSensor1.getDistance(DistanceUnit.CM) > 15 && intakeSensor2.getDistance(DistanceUnit.CM) > 15) intakeOuter.setPower(-.8);
+                      else intakeOuter.setPower(0);
+                      if (follower.isBusy()){
+                          actionTimer.resetTimer();
+                      }else if (!follower.isBusy() && actionTimer.getElapsedTimeSeconds() > 3){
+                          setPathState(State.GATETOWALL);
+                          follower.followPath(paths.GateToWall);
+                      }
+                  case GATETOWALL:
+                      if (intakeSensor1.getDistance(DistanceUnit.CM) > 15 && intakeSensor2.getDistance(DistanceUnit.CM) > 15) intakeOuter.setPower(-.8);
+                      else intakeOuter.setPower(0);
+                      if (!follower.isBusy()){
+                          setPathState(State.TOWALL);
+                          follower.followPath(paths.ToWall);
+                          actionTimer.resetTimer();
+                      }
+                  case SCORE3:
+                      intakeOuter.setPower(-.8);
+                      intakeInner.setPower(.3);
+                      gate.setPosition(.88);
+                      if (actionTimer.getElapsedTimeSeconds() > 3){
+                          gate.setPosition(.5);
+                          follower.followPath(paths.ScoreEnd);
+                          setPathState(State.SCOREEND);
+                      }
+                  case SCOREEND:
+                     if (!follower.isBusy()) {
+                         break;
+                     }
 
               }
 
