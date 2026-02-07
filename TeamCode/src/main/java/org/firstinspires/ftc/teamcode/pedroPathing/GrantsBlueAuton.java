@@ -18,7 +18,7 @@ package org.firstinspires.ftc.teamcode.pedroPathing;
 
     import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-@Autonomous(name = "GrantsBlueAutonomous", group = "Autonomous") 
+@Autonomous(name = "GrantsBlueAutonomous", group = "Autonomous")
     @Configurable // Panels
     public class GrantsBlueAuton extends OpMode {
     private Pose pose;
@@ -94,12 +94,12 @@ package org.firstinspires.ftc.teamcode.pedroPathing;
           laxon = hardwareMap.get(Servo.class, "laxon");
 
           follower = Constants.createFollower(hardwareMap);
-          follower.setStartingPose(new Pose(144 - 84, 36, Math.toRadians(180)));
+
 
           panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
 
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(72, 8, Math.toRadians(90)));
+        follower.setStartingPose(new Pose(56, 8, Math.toRadians(180)));
 
         paths = new Paths(follower); // Build paths
 
