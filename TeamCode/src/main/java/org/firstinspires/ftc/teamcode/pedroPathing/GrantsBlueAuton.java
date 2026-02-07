@@ -254,7 +254,7 @@ ScoreEnd = follower.pathBuilder().addPath(
                       intakeOuter.setPower(-.8);
                       intakeInner.setPower(.3);
                       gate.setPosition(.88);
-                      if (actionTimer.getElapsedTimeSeconds() > 3){
+                      if (actionTimer.getElapsedTimeSeconds() > 3 && !follower.isBusy()){
                         gate.setPosition(.5);
                         follower.followPath(paths.ScoreHuman);
                         setPathState(State.SCOREHUMAN);
@@ -277,7 +277,10 @@ ScoreEnd = follower.pathBuilder().addPath(
                       intakeOuter.setPower(-.8);
                       intakeInner.setPower(.3);
                       gate.setPosition(.88);
-                      if (actionTimer.getElapsedTimeSeconds() > 3){
+                      if (!follower.isBusy()){
+                          actionTimer.resetTimer();
+                      }
+                      if (actionTimer.getElapsedTimeSeconds() > 3) {
                           gate.setPosition(.5);
                           follower.followPath(paths.ScoreGate);
                           setPathState(State.SCOREGATE);
@@ -303,6 +306,9 @@ ScoreEnd = follower.pathBuilder().addPath(
                       intakeOuter.setPower(-.8);
                       intakeInner.setPower(.3);
                       gate.setPosition(.88);
+                      if (!follower.isBusy()){
+                          actionTimer.resetTimer();
+                      }
                       if (actionTimer.getElapsedTimeSeconds() > 3){
                           gate.setPosition(.5);
                           follower.followPath(paths.ScoreEnd);
