@@ -317,6 +317,15 @@ ScoreEnd = follower.pathBuilder().addPath(
                           actionTimer.resetTimer();
                       }
                       break;
+                  case TOWALL:
+                      if (intakeSensor1.getDistance(DistanceUnit.CM) > 15 && intakeSensor2.getDistance(DistanceUnit.CM) > 15) intakeOuter.setPower(-.8);
+                      else intakeOuter.setPower(0);
+                      if (!follower.isBusy()){
+                          setPathState(State.WALLSCORE);
+                          follower.followPath(paths.WallScore, true);
+                          actionTimer.resetTimer();
+                      }
+                      break;
                   case SCORE3:
                       intakeOuter.setPower(-.8);
                       intakeInner.setPower(.3);
