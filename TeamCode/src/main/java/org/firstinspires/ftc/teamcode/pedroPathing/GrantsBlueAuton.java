@@ -286,11 +286,13 @@ ScoreEnd = follower.pathBuilder().addPath(
                       }
                       break;
                   case SCORE2:
-                      intakeOuter.setPower(-.8);
-                      intakeInner.setPower(.3);
-                      gate.setPosition(.88);
+
                       if (follower.isBusy()){
                           actionTimer.resetTimer();
+                      }else{
+                          intakeOuter.setPower(-.8);
+                          intakeInner.setPower(.3);
+                          gate.setPosition(.88);
                       }
                       if (actionTimer.getElapsedTimeSeconds() > 3) {
                           gate.setPosition(.5);
@@ -321,17 +323,19 @@ ScoreEnd = follower.pathBuilder().addPath(
                       if (intakeSensor1.getDistance(DistanceUnit.CM) > 15 && intakeSensor2.getDistance(DistanceUnit.CM) > 15) intakeOuter.setPower(-.8);
                       else intakeOuter.setPower(0);
                       if (!follower.isBusy()){
-                          setPathState(State.WALLSCORE);
+                          setPathState(State.SCORE3);
                           follower.followPath(paths.WallScore, true);
                           actionTimer.resetTimer();
                       }
                       break;
                   case SCORE3:
-                      intakeOuter.setPower(-.8);
-                      intakeInner.setPower(.3);
-                      gate.setPosition(.88);
+                      
                       if (follower.isBusy()){
                           actionTimer.resetTimer();
+                      }else{
+                          intakeOuter.setPower(-.8);
+                          intakeInner.setPower(.3);
+                          gate.setPosition(.88);
                       }
                       if (actionTimer.getElapsedTimeSeconds() > 3){
                           gate.setPosition(.5);
