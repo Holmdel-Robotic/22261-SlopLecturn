@@ -289,7 +289,7 @@ ScoreEnd = follower.pathBuilder().addPath(
                       intakeOuter.setPower(-.8);
                       intakeInner.setPower(.3);
                       gate.setPosition(.88);
-                      if (!follower.isBusy()){
+                      if (follower.isBusy()){
                           actionTimer.resetTimer();
                       }
                       if (actionTimer.getElapsedTimeSeconds() > 3) {
@@ -321,7 +321,7 @@ ScoreEnd = follower.pathBuilder().addPath(
                       intakeOuter.setPower(-.8);
                       intakeInner.setPower(.3);
                       gate.setPosition(.88);
-                      if (!follower.isBusy()){
+                      if (follower.isBusy()){
                           actionTimer.resetTimer();
                       }
                       if (actionTimer.getElapsedTimeSeconds() > 3){
