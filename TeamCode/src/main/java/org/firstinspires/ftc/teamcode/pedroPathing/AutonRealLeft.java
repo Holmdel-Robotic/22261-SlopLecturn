@@ -383,6 +383,7 @@ public class AutonRealLeft extends OpMode {
         telemetry.addData("y", follower.getPose().getY());
         telemetry.addData("heading", follower.getPose().getHeading());
         telemetry.addData("count", count);
+
         telemetry.update();
     }
 
