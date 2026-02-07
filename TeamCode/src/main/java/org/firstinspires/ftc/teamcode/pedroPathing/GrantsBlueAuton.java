@@ -16,6 +16,8 @@ package org.firstinspires.ftc.teamcode.pedroPathing;
     import com.qualcomm.robotcore.hardware.DistanceSensor;
     import com.qualcomm.robotcore.hardware.Servo;
 
+    import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
 @Autonomous(name = "Pedro Pathing Autonomous", group = "Autonomous")
     @Configurable // Panels
     public class GrantsBlueAuton extends OpMode {
@@ -235,7 +237,16 @@ ScoreEnd = follower.pathBuilder().addPath(
               switch (state) {
                   case START:
                       flywheelLeft.setVelocity(1600);
+                      flywheelRight.setVelocity(1600);
+                      if (intakeSensor1.getDistance(DistanceUnit.CM) > 15 && intakeSensor2.getDistance(DistanceUnit.CM) > 15) intakeOuter.setPower(-.8);
+                      else intakeOuter.setPower(0);
+                      setPathState(State.SCORE1);
+
+
+
+
               }
+
 
 
           // Add your state machine Here
