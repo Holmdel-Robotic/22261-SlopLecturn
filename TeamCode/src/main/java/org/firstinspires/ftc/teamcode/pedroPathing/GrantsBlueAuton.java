@@ -236,7 +236,9 @@ ScoreEnd = follower.pathBuilder().addPath(
           WALLSCORE,
 
           SCORE3,
-          SCOREEND
+          SCOREEND,
+
+          DUMMY
 
         }
           State state = State.START;
@@ -253,6 +255,7 @@ ScoreEnd = follower.pathBuilder().addPath(
                       else intakeOuter.setPower(0);
                       actionTimer.resetTimer();
                       setPathState(State.SCORE1);
+                      break;
 
 
 
@@ -265,6 +268,7 @@ ScoreEnd = follower.pathBuilder().addPath(
                         follower.followPath(paths.ScoreHuman, true);
                         setPathState(State.SCOREHUMAN);
                       }
+                      break;
                   case SCOREHUMAN:
                       if (intakeSensor1.getDistance(DistanceUnit.CM) > 15 && intakeSensor2.getDistance(DistanceUnit.CM) > 15) intakeOuter.setPower(-.8);
                       else intakeOuter.setPower(0);
@@ -272,6 +276,7 @@ ScoreEnd = follower.pathBuilder().addPath(
                           follower.followPath(paths.HumanScore, true);
                           setPathState(State.HUMANSCORE);
                       }
+                      break;
                   case HUMANSCORE:
                       if (intakeSensor1.getDistance(DistanceUnit.CM) > 15 && intakeSensor2.getDistance(DistanceUnit.CM) > 15) intakeOuter.setPower(-.8);
                       else intakeOuter.setPower(0);
@@ -279,6 +284,7 @@ ScoreEnd = follower.pathBuilder().addPath(
                           setPathState(State.SCORE2);
                           actionTimer.resetTimer();
                       }
+                      break;
                   case SCORE2:
                       intakeOuter.setPower(-.8);
                       intakeInner.setPower(.3);
@@ -291,6 +297,7 @@ ScoreEnd = follower.pathBuilder().addPath(
                           follower.followPath(paths.ScoreGate, true);
                           setPathState(State.SCOREGATE);
                       }
+                      break;
                   case SCOREGATE:
                       if (intakeSensor1.getDistance(DistanceUnit.CM) > 15 && intakeSensor2.getDistance(DistanceUnit.CM) > 15) intakeOuter.setPower(-.8);
                       else intakeOuter.setPower(0);
@@ -300,6 +307,7 @@ ScoreEnd = follower.pathBuilder().addPath(
                           setPathState(State.GATETOWALL);
                           follower.followPath(paths.GateToWall, true);
                       }
+                      break;
                   case GATETOWALL:
                       if (intakeSensor1.getDistance(DistanceUnit.CM) > 15 && intakeSensor2.getDistance(DistanceUnit.CM) > 15) intakeOuter.setPower(-.8);
                       else intakeOuter.setPower(0);
@@ -308,6 +316,7 @@ ScoreEnd = follower.pathBuilder().addPath(
                           follower.followPath(paths.ToWall, true);
                           actionTimer.resetTimer();
                       }
+                      break;
                   case SCORE3:
                       intakeOuter.setPower(-.8);
                       intakeInner.setPower(.3);
@@ -320,9 +329,10 @@ ScoreEnd = follower.pathBuilder().addPath(
                           follower.followPath(paths.ScoreEnd, true);
                           setPathState(State.SCOREEND);
                       }
+                      break;
                   case SCOREEND:
                      if (!follower.isBusy()) {
-                         break;
+                        setPathState(State.DUMMY);
                      }
 
               }
