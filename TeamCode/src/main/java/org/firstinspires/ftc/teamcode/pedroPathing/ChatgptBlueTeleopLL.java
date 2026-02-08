@@ -38,7 +38,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
     private boolean debounceA, debounceX, debounceRightStick, debounceBack, debounceLEFT_TRIGGER;
 
-    private double flywheelVelocity = 1600;
+    private double flywheelVelocity = 1650;
     private double hoodPos;
     private double raxonPos = .48;
     private double laxonPos = .48;
@@ -181,8 +181,10 @@ public class ChatgptBlueTeleopLL extends OpMode {
         double dy = 144 - y;
         distance = Math.sqrt(dy * dy + x * x);
 
-        hoodPos = -0.002005998 * distance + (1 - 0.337882)  ;
-        flywheelVelocity = 2.88 * distance + 1531.52943;
+//        hoodPos = -0.002005998 * distance + (1 - 0.337882)  ;
+        hoodPos = -0.002005998 * distance + (1 - 0.337882);
+//        flywheelVelocity = 2.88 * distance + 1531.52943;
+        flywheelVelocity = 7.75 * (distance) + 1000;
 
         if (hoodPos < .17) hoodPos = .17;
 
