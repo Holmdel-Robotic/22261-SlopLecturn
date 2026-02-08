@@ -168,6 +168,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
             }
         }
         if (!gamepad1.right_stick_button) debounceRightStick = true;
+
     }
 
     /* ================= ROBOT LOGIC ================= */
@@ -188,6 +189,10 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
         if (aprilTagTracking && loopCount % 2 == 0 && !driving) {
             trackAprilTag();
+        }
+
+        if (innerSensor.getDistance(DistanceUnit.CM) < 12) {
+            
         }
 
     }
