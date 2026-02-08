@@ -104,7 +104,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(1);
-        limelight.start();
+        //limelight.start();
 
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(new Pose(144 - 84, 36, Math.toRadians(180)));
