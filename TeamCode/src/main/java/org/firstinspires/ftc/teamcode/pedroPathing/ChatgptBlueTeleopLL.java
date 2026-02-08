@@ -240,7 +240,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
             flywheelOn = true;
             gate.setPosition(.88);
             intakeInner.setPower(.3);
-            intakeOuter.setPower(0);
+            intakeOuter.setPower(-.65);
             indicatorLight1.setPosition(GREEN);
             indicatorLight2.setPosition(GREEN);
         } else if (gateOpen && getRuntime() - savedRuntime < 1 && getRuntime() - savedRuntime > .5) intakeOuter.setPower(0);
