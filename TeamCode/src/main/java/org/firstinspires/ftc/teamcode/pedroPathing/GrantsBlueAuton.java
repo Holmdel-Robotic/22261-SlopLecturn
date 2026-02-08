@@ -329,7 +329,7 @@ ScoreEnd = follower.pathBuilder().addPath(
                       }
                       break;
                   case SCORE3:
-                      
+
                       if (follower.isBusy()){
                           actionTimer.resetTimer();
                       }else{
