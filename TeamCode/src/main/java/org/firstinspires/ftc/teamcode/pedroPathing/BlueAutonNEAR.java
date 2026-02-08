@@ -44,8 +44,8 @@ package org.firstinspires.ftc.teamcode.pedroPathing;
 
     private double FlywheelV = 2000;
     private double hoodPos = .67;
-    private double raxonPos = .6;
-    private double laxonPos = .6;
+    private double raxonPos = .63;
+    private double laxonPos = .63;
 
     private Timer actionTimer = new Timer();
 
