@@ -297,9 +297,9 @@ public class DO_NOT_USEBlueTeleOpLL extends OpMode {
             }
 
             // LL runs continuously when enabled
-            if (aprilTagTracking) {
-                trackAprilTag();
-            }
+//            if (aprilTagTracking) {
+//                trackAprilTag();
+//            }
 
             if (autoTarget) {
 
