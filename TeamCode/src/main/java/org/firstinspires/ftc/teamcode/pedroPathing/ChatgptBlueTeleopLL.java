@@ -144,14 +144,8 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
         if (gamepad1.back && !debounceBack) {
             savedRuntime = getRuntime();
-
+            gateOpen = !gateOpen;
             debounceBack = true;
-        }
-
-        if (gamepad1.back){
-            gateOpen = true;
-        }else{
-            gateOpen = false;
         }
 
         if (gamepad1.a && !debounceA) {
@@ -168,20 +162,31 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
         if (!gamepad1.back) debounceBack = false;
 
+
         if (gamepad1.right_stick_button && debounceRightStick) {
             aprilTagTracking = !aprilTagTracking;
             debounceRightStick = false;
         }
         if (!aprilTagTracking) {
-            if (gamepad1.left_trigger > .01 && debounceLEFT_TRIGGER) {
-                raxonPos = raxon.getPosition() + .03;
-                laxonPos = laxon.getPosition() - .03;
-                laxon.setPosition(laxonPos);
-                raxon.setPosition(raxonPos);
+            raxon.setPosition(raxonPos);
+            laxon.setPosition(laxonPos);
+            stop();
 
-                debounceLEFT_TRIGGER = false;
-            }
         }
+
+        if (!aprilTagTracking && gamepad1.left_trigger > .01 && debounceLEFT_TRIGGER) {
+            raxonPos = raxon.getPosition() + .03;
+            laxonPos = laxon.getPosition() - .03;
+            laxon.setPosition(laxonPos);
+            raxon.setPosition(raxonPos);
+
+            debounceLEFT_TRIGGER = false;
+        }
+
+        if (aprilTagTracking) {
+            trackAprilTag();
+        }
+
         if (!gamepad1.right_stick_button) debounceRightStick = true;
 
     }
@@ -191,7 +196,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
     private void updateRobotState() {
         intake1Dist = intakeSensor1.getDistance(DistanceUnit.CM);
         intake2Dist = intakeSensor2.getDistance(DistanceUnit.CM);
-        intakeFull = intake1Dist < 15 && intake2Dist < 15;
+        intakeFull = intake1Dist < 16 && intake2Dist < 16;
         innerSensorDist = innerSensor.getDistance(DistanceUnit.CM);
 
         pose = follower.getPose();
@@ -204,13 +209,15 @@ public class ChatgptBlueTeleopLL extends OpMode {
 //        hoodPos = -0.002005998 * distance + (1 - 0.337882)  ;
         hoodPos = -0.002005998 * distance + (1 - 0.337882);
 //        flywheelVelocity = 2.88 * distance + 1531.52943;
-        flywheelVelocity = 7.75 * (distance) + 1000;
+        flywheelVelocity = 7.75 * (distance) + 900;
 
         if (hoodPos < .17) hoodPos = .17;
 
-        if (aprilTagTracking && loopCount % 2 == 0 && !driving) {
-            trackAprilTag();
-        }
+        //if (aprilTagTracking && loopCount % 2 == 0 && !driving) {
+        //    trackAprilTag();
+        //}
+
+
 
 
 
@@ -262,6 +269,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
         if ((intakeOn && !intakeFull && !gateOpen)) intakeOuter.setPower(-.8);
         else if (intakeOn && intakeFull && !gateOpen) intakeOuter.setPower(0);
+        else if (!intakeOn) intakeOuter.setPower(0);
 
 
         if (flywheelOn) {
@@ -343,6 +351,9 @@ public class ChatgptBlueTeleopLL extends OpMode {
         telemetry.addData("Distance",distance);
         telemetry.addData("Hood Pos", hood.getPosition());
         telemetry.addData("Inner Dist sensor",innerSensor.getDistance(DistanceUnit.CM));
+        telemetry.addData("intake full?", intakeFull);
+        telemetry.addData("Intake1dist",intake1Dist);
+        telemetry.addData("intake2dist",intake2Dist);
         telemetry.update();
     }
 
