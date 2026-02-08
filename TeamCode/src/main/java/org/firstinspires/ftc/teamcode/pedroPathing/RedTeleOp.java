@@ -42,7 +42,7 @@ public class RedTeleOp extends OpMode {
 
     private PathChain toFarShoot;
     private Pose FarShootPose;
-
+    private double lastLoopTime = System.currentTimeMillis();
     private double GREEN;
     private Follower follower;
 
