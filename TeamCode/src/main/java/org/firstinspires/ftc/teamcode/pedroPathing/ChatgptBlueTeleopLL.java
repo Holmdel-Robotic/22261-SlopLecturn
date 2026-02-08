@@ -144,8 +144,14 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
         if (gamepad1.back && !debounceBack) {
             savedRuntime = getRuntime();
-            gateOpen = !gateOpen;
+
             debounceBack = true;
+        }
+
+        if (gamepad1.back){
+            gateOpen = true;
+        }else{
+            gateOpen = false;
         }
 
         if (gamepad1.a && !debounceA) {
