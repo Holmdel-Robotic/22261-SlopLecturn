@@ -254,7 +254,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
             intakeInner.setPower(0);
           }
 
-        if ((intakeOn && !intakeFull && !gateOpen) || (gateOpen && getRuntime() - savedRuntime > 1)) intakeOuter.setPower(-.8);
+        if ((intakeOn && !intakeFull && !gateOpen)) intakeOuter.setPower(-.8);
         else intakeOuter.setPower(0);
 
 
