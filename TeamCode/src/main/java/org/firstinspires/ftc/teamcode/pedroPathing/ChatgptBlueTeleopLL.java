@@ -19,6 +19,10 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
     private Pose pose;
 
+    double innerSensorDist;
+    double intake1Dist;
+    double intake2Dist;
+    boolean intakeFull;
     private Servo gate, indicatorLight1, indicatorLight2;
     private DcMotorEx frontRightMotor, frontLeftMotor, backRightMotor, backLeftMotor;
     private DcMotorEx flywheelLeft, flywheelRight, intakeOuter, intakeInner;
@@ -178,6 +182,10 @@ public class ChatgptBlueTeleopLL extends OpMode {
     /* ================= ROBOT LOGIC ================= */
 
     private void updateRobotState() {
+        intake1Dist = intakeSensor1.getDistance(DistanceUnit.CM);
+        intake2Dist = intakeSensor2.getDistance(DistanceUnit.CM);
+        intakeFull = intake1Dist < 15 && intake2Dist < 15;
+        innerSensorDist = innerSensor.getDistance(DistanceUnit.CM);
 
         pose = follower.getPose();
         double x = pose.getX();
@@ -203,9 +211,6 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
     private void writeHardware() {
 
-        double intake1Dist = intakeSensor1.getDistance(DistanceUnit.CM);
-        double intake2Dist = intakeSensor2.getDistance(DistanceUnit.CM);
-        boolean intakeFull = intake1Dist < 15 && intake2Dist < 15;
 
         hood.setPosition(hoodPos);
 
@@ -213,14 +218,14 @@ public class ChatgptBlueTeleopLL extends OpMode {
             raxon.setPosition(.48);
             laxon.setPosition(.48);
         }
-        if (innerSensor.getDistance(DistanceUnit.CM) < 12 && gateOpen && !debounceDistance ) {
+        if (innerSensorDist < 12 && gateOpen && !debounceDistance ) {
             intakeInner.setPower(0);
             debounceDistance = true;
             savedRuntime = getRuntime();
-        } else if (debounceDistance && getRuntime() - savedRuntime >= .5 && innerSensor.getDistance(DistanceUnit.CM) < 12) {
+        } else if (debounceDistance && getRuntime() - savedRuntime >= .5 && innerSensorDist < 12) {
             intakeInner.setPower(.3);
 
-        } else if (debounceDistance && getRuntime() - savedRuntime >= .5 && innerSensor.getDistance(DistanceUnit.CM) > 12) {
+        } else if (debounceDistance && getRuntime() - savedRuntime >= .5 && innerSensorDist > 12) {
             debounceDistance = false;
         }
         else if (gateOpen){
