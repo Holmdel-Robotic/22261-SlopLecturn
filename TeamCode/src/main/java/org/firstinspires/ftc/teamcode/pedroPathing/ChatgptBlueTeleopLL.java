@@ -143,6 +143,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
 
         if (gamepad1.back && !debounceBack) {
+            savedRuntime = getRuntime();
             gateOpen = !gateOpen;
             debounceBack = true;
         }
@@ -220,6 +221,8 @@ public class ChatgptBlueTeleopLL extends OpMode {
             raxon.setPosition(.48);
             laxon.setPosition(.48);
         }
+
+        /*
         if (innerSensorDist < 12 && gateOpen && !debounceDistance ) {
             intakeInner.setPower(0);
             debounceDistance = true;
@@ -230,13 +233,17 @@ public class ChatgptBlueTeleopLL extends OpMode {
         } else if (debounceDistance && getRuntime() - savedRuntime >= .5 && innerSensorDist > 12) {
             debounceDistance = false;
         }
-        else if (gateOpen){
+
+        */
+
+        if (gateOpen && getRuntime() - savedRuntime < .5) {
             gate.setPosition(.88);
+            intakeInner.setPower(.3);
+            intakeOuter.setPower(0);
             indicatorLight1.setPosition(GREEN);
             indicatorLight2.setPosition(GREEN);
-            intakeInner.setPower(.3);
-            intakeOuter.setPower(-.65);
-        }
+        } else if (gateOpen && getRuntime() - savedRuntime > .5) intakeOuter.setPower(-.65);
+        
         else{
             gate.setPosition(.5);
             indicatorLight1.setPosition(BLUE);
