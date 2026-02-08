@@ -31,6 +31,8 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
     private boolean gateOpen = false;
 
+    private boolean debounceDistance = false;
+
     private boolean driving;
     private boolean intakeOn = false;
     private boolean flywheelOn = false;
@@ -45,6 +47,8 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
     private int loopCount = 0;
     private long lastLoopTime;
+
+    private double savedRuntime;
 
     private double kP = 0.843;
     private double max = 0.00922;
@@ -191,9 +195,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
             trackAprilTag();
         }
 
-        if (innerSensor.getDistance(DistanceUnit.CM) < 12) {
-            
-        }
+
 
     }
 
@@ -211,25 +213,32 @@ public class ChatgptBlueTeleopLL extends OpMode {
             raxon.setPosition(.48);
             laxon.setPosition(.48);
         }
+        if (innerSensor.getDistance(DistanceUnit.CM) < 12 && gateOpen && !debounceDistance ) {
+            intakeInner.setPower(0);
+            debounceDistance = true;
+            savedRuntime = getRuntime();
+        } else if (debounceDistance && getRuntime() - savedRuntime >= .5 && innerSensor.getDistance(DistanceUnit.CM) < 12) {
+            intakeInner.setPower(.3);
 
-        if (gateOpen){
+        } else if (debounceDistance && getRuntime() - savedRuntime >= .5 && innerSensor.getDistance(DistanceUnit.CM) > 12) {
+            debounceDistance = false;
+        }
+        else if (gateOpen){
             gate.setPosition(.88);
             indicatorLight1.setPosition(GREEN);
             indicatorLight2.setPosition(GREEN);
+            intakeInner.setPower(.3);
+            intakeOuter.setPower(-.65);
         }
         else{
             gate.setPosition(.5);
             indicatorLight1.setPosition(BLUE);
             indicatorLight2.setPosition(BLUE);
+            intakeInner.setPower(0);
         }
         if ((intakeOn && !intakeFull) || gateOpen) intakeOuter.setPower(-.8);
         else intakeOuter.setPower(0);
 
-        if (gateOpen){
-            intakeInner.setPower(.3);
-            intakeOuter.setPower(-.65);
-        }
-        else intakeInner.setPower(0);
 
         if (flywheelOn) {
             flywheelLeft.setVelocity(flywheelVelocity);
@@ -238,6 +247,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
             flywheelLeft.setVelocity(0);
             flywheelRight.setVelocity(0);
         }
+
     }
 
     /* ================= DRIVE ================= */
