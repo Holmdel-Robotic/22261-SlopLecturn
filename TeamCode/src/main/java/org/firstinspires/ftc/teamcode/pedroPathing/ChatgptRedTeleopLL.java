@@ -206,7 +206,7 @@ public class ChatgptRedTeleopLL extends OpMode {
             intake1Dist = intakeSensor1.getDistance(DistanceUnit.CM);
             intake2Dist = intakeSensor2.getDistance(DistanceUnit.CM);
             intakeFull = intake1Dist < 15 && intake2Dist < 15;
-            innerSensorDist = innerSensor.getDistance(DistanceUnit.CM);
+            // innerSensorDist = innerSensor.getDistance(DistanceUnit.CM);
         }
 
         pose = follower.getPose();
@@ -357,7 +357,7 @@ public class ChatgptRedTeleopLL extends OpMode {
         telemetry.addData("FlywheelV", (flywheelLeft.getVelocity() + flywheelRight.getVelocity())/2);
         telemetry.addData("Distance",distance);
         telemetry.addData("Hood Pos", hood.getPosition());
-        telemetry.addData("Inner Dist sensor",innerSensor.getDistance(DistanceUnit.CM));
+        // telemetry.addData("Inner Dist sensor",innerSensorDist);
         telemetry.update();
     }
 
