@@ -202,10 +202,12 @@ public class ChatgptRedTeleopLL extends OpMode {
     /* ================= ROBOT LOGIC ================= */
 
     private void updateRobotState() {
-        intake1Dist = intakeSensor1.getDistance(DistanceUnit.CM);
-        intake2Dist = intakeSensor2.getDistance(DistanceUnit.CM);
-        intakeFull = intake1Dist < 15 && intake2Dist < 15;
-        innerSensorDist = innerSensor.getDistance(DistanceUnit.CM);
+        if(intakeOn) {
+            intake1Dist = intakeSensor1.getDistance(DistanceUnit.CM);
+            intake2Dist = intakeSensor2.getDistance(DistanceUnit.CM);
+            intakeFull = intake1Dist < 15 && intake2Dist < 15;
+            innerSensorDist = innerSensor.getDistance(DistanceUnit.CM);
+        }
 
         pose = follower.getPose();
         double x = 144 - pose.getX();
