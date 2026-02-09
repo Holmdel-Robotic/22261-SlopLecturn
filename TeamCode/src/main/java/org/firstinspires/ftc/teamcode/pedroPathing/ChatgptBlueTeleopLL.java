@@ -121,7 +121,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
         stop();
 
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(144 - 84, 36, Math.toRadians(180)));
+        follower.setStartingPose(new Pose(35, 8, Math.toRadians(180)));
 
         lastLoopTime = System.currentTimeMillis();
 
