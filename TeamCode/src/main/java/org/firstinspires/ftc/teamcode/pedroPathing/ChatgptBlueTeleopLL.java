@@ -68,7 +68,9 @@ public class ChatgptBlueTeleopLL extends OpMode {
     public void init() {
 
 
-
+       gate = new SimpleServo(
+                hardwareMap, "servo_name", 0, 355,
+                AngleUnit.RADIANS);
         gate = hardwareMap.get(Servo.class, "gate");
 
         indicatorLight1 = hardwareMap.get(Servo.class, "lightOne");

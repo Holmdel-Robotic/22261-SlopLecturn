@@ -14,6 +14,9 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.VoltageUnit;
+
+import java.util.List;
 
 import photoncore.PhotonCore;
 
@@ -26,6 +29,7 @@ public class ChatgptRedTeleopLL extends OpMode {
 
     private Pose pose;
 
+    private List allhubs;
     double innerSensorDist;
     double intake1Dist;
     double intake2Dist;
@@ -56,6 +60,7 @@ public class ChatgptRedTeleopLL extends OpMode {
     private double raxonPos = .48;
     private double laxonPos = .48;
 
+
     private int loopCount = 0;
     private long lastLoopTime;
 
@@ -63,6 +68,8 @@ public class ChatgptRedTeleopLL extends OpMode {
 
     private double kP = 0.843;
     private double max = 0.00922;
+
+
 
     private double GREEN = .5;
     private double BLUE = .6;
@@ -112,6 +119,7 @@ public class ChatgptRedTeleopLL extends OpMode {
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(0);
         limelight.start();
+        List<LynxModule> allhubs = hardwareMap.getAll(LynxModule.class);
 
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(new Pose(84, 36, Math.toRadians(0)));
@@ -346,6 +354,10 @@ public class ChatgptRedTeleopLL extends OpMode {
 
     private void updateTelemetry() {
 
+        for(LynxModule hub : allhubs){
+            telemetry.addData("voltage draw", hub.getInputVoltage(VoltageUnit.VOLTS));
+        }
+
         long now = System.currentTimeMillis();
         long loopTime = now - lastLoopTime;
         lastLoopTime = now;
@@ -357,6 +369,7 @@ public class ChatgptRedTeleopLL extends OpMode {
         telemetry.addData("FlywheelV", (flywheelLeft.getVelocity() + flywheelRight.getVelocity())/2);
         telemetry.addData("Distance",distance);
         telemetry.addData("Hood Pos", hood.getPosition());
+
         // telemetry.addData("Inner Dist sensor",innerSensorDist);
         telemetry.update();
     }
