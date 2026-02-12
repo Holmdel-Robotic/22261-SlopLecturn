@@ -18,7 +18,7 @@ package org.firstinspires.ftc.teamcode.pedroPathing;
 
     import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-@Autonomous(name = "BLUEAUTONNEAR", group = "Autonomous")
+@Autonomous(name = "GrantsBlueAutonomous", group = "Autonomous")
     @Configurable // Panels
     public class BlueAutonNEAR extends OpMode {
     private Pose pose;
@@ -27,7 +27,7 @@ package org.firstinspires.ftc.teamcode.pedroPathing;
     private DcMotorEx frontRightMotor, frontLeftMotor, backRightMotor, backLeftMotor;
     private DcMotorEx flywheelLeft, flywheelRight, intakeOuter, intakeInner;
 
-    //private DistanceSensor intakeSensor1, intakeSensor2;
+    private DistanceSensor intakeSensor1, intakeSensor2;
 
     private Servo hood, raxon, laxon;
 
@@ -87,8 +87,8 @@ package org.firstinspires.ftc.teamcode.pedroPathing;
           intakeOuter.setDirection(DcMotor.Direction.REVERSE);
           intakeInner.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-          //intakeSensor1 = hardwareMap.get(DistanceSensor.class, "intakeSensor1");
-          //intakeSensor2 = hardwareMap.get(DistanceSensor.class, "intakeSensor2");
+          intakeSensor1 = hardwareMap.get(DistanceSensor.class, "intakeSensor1");
+          intakeSensor2 = hardwareMap.get(DistanceSensor.class, "intakeSensor2");
 
           hood = hardwareMap.get(Servo.class, "hood");
           raxon = hardwareMap.get(Servo.class, "raxon");
@@ -100,7 +100,7 @@ package org.firstinspires.ftc.teamcode.pedroPathing;
           panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
 
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(60, 8, Math.toRadians(180)));
+        follower.setStartingPose(new Pose(56, 8, Math.toRadians(180)));
 
         paths = new Paths(follower); // Build paths
 
@@ -126,7 +126,7 @@ package org.firstinspires.ftc.teamcode.pedroPathing;
         panelsTelemetry.update(telemetry);
       }
 
-
+      
   public static class Paths {
     public PathChain Start;
 public PathChain ScoreHuman;
@@ -140,9 +140,9 @@ public PathChain ScoreEnd;
     public Paths(Follower follower) {
       Start = follower.pathBuilder().addPath(
           new BezierLine(
-            new Pose(60.000, 8.000),
+            new Pose(56.000, 8.000),
             
-            new Pose(35, 8)
+            new Pose(56.000, 8.000)
           )
         ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
               .setTValueConstraint(.95)
@@ -248,23 +248,106 @@ ScoreEnd = follower.pathBuilder().addPath(
                   case START:
                       raxon.setPosition(raxonPos);
                       laxon.setPosition(laxonPos);
-                      //flywheelLeft.setVelocity(FlywheelV);
-                      //flywheelRight.setVelocity(FlywheelV);
+                      flywheelLeft.setVelocity(FlywheelV);
+                      flywheelRight.setVelocity(FlywheelV);
                       hood.setPosition(hoodPos);
-                      //if (intakeSensor1.getDistance(DistanceUnit.CM) > 15 && intakeSensor2.getDistance(DistanceUnit.CM) > 15) intakeOuter.setPower(-.8);
-
+                      if (intakeSensor1.getDistance(DistanceUnit.CM) > 15 && intakeSensor2.getDistance(DistanceUnit.CM) > 15) intakeOuter.setPower(-.8);
+                      else intakeOuter.setPower(0);
                       actionTimer.resetTimer();
-                      follower.followPath(paths.Start);
-                      setPathState(State.DUMMY);
+                      setPathState(State.SCORE1);
                       break;
 
 
 
-                  case  DUMMY:
+                  case SCORE1:
+                      intakeOuter.setPower(-.8);
+                      intakeInner.setPower(.3);
+                      gate.setPosition(.88);
+                      if (actionTimer.getElapsedTimeSeconds() > 3 && !follower.isBusy()){
+                        gate.setPosition(.5);
+                        follower.followPath(paths.ScoreHuman, true);
+                        setPathState(State.SCOREHUMAN);
+                      }
+                      break;
+                  case SCOREHUMAN:
+                      if (intakeSensor1.getDistance(DistanceUnit.CM) > 15 && intakeSensor2.getDistance(DistanceUnit.CM) > 15) intakeOuter.setPower(-.8);
+                      else intakeOuter.setPower(0);
                       if (!follower.isBusy()){
+                          follower.followPath(paths.HumanScore, true);
+                          setPathState(State.HUMANSCORE);
+                      }
                       break;
+                  case HUMANSCORE:
+                      if (intakeSensor1.getDistance(DistanceUnit.CM) > 15 && intakeSensor2.getDistance(DistanceUnit.CM) > 15) intakeOuter.setPower(-.8);
+                      else intakeOuter.setPower(0);
+                      if (!follower.isBusy()){
+                          setPathState(State.SCORE2);
+                          actionTimer.resetTimer();
+                      }
+                      break;
+                  case SCORE2:
 
-                  }
+                      if (follower.isBusy()){
+                          actionTimer.resetTimer();
+                      }else{
+                          intakeOuter.setPower(-.8);
+                          intakeInner.setPower(.3);
+                          gate.setPosition(.88);
+                      }
+                      if (actionTimer.getElapsedTimeSeconds() > 3) {
+                          gate.setPosition(.5);
+                          follower.followPath(paths.ScoreGate, true);
+                          setPathState(State.SCOREGATE);
+                      }
+                      break;
+                  case SCOREGATE:
+                      if (intakeSensor1.getDistance(DistanceUnit.CM) > 15 && intakeSensor2.getDistance(DistanceUnit.CM) > 15) intakeOuter.setPower(-.8);
+                      else intakeOuter.setPower(0);
+                      if (follower.isBusy()){
+                          actionTimer.resetTimer();
+                      }else if (!follower.isBusy() && actionTimer.getElapsedTimeSeconds() > 3){
+                          setPathState(State.GATETOWALL);
+                          follower.followPath(paths.GateToWall, true);
+                      }
+                      break;
+                  case GATETOWALL:
+                      if (intakeSensor1.getDistance(DistanceUnit.CM) > 15 && intakeSensor2.getDistance(DistanceUnit.CM) > 15) intakeOuter.setPower(-.8);
+                      else intakeOuter.setPower(0);
+                      if (!follower.isBusy()){
+                          setPathState(State.TOWALL);
+                          follower.followPath(paths.ToWall, true);
+                          actionTimer.resetTimer();
+                      }
+                      break;
+                  case TOWALL:
+                      if (intakeSensor1.getDistance(DistanceUnit.CM) > 15 && intakeSensor2.getDistance(DistanceUnit.CM) > 15) intakeOuter.setPower(-.8);
+                      else intakeOuter.setPower(0);
+                      if (!follower.isBusy()){
+                          setPathState(State.SCORE3);
+                          follower.followPath(paths.WallScore, true);
+                          actionTimer.resetTimer();
+                      }
+                      break;
+                  case SCORE3:
+
+                      if (follower.isBusy()){
+                          actionTimer.resetTimer();
+                      }else{
+                          intakeOuter.setPower(-.8);
+                          intakeInner.setPower(.3);
+                          gate.setPosition(.88);
+                      }
+                      if (actionTimer.getElapsedTimeSeconds() > 3){
+                          gate.setPosition(.5);
+                          follower.followPath(paths.ScoreEnd, true);
+                          setPathState(State.SCOREEND);
+                      }
+                      break;
+                  case SCOREEND:
+                     if (!follower.isBusy()) {
+                        setPathState(State.DUMMY);
+                     }
+
               }
 
 
