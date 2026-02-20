@@ -5,15 +5,19 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.VoltageUnit;
+
 
 import java.util.List;
 
@@ -26,7 +30,10 @@ public class ChatgptRedTeleopLL extends OpMode {
 
     private Pose pose;
 
-    private List allhubs;
+
+
+    private VoltageSensor myControlHubVoltageSensor;
+
     double innerSensorDist;
     double intake1Dist;
     double intake2Dist;
@@ -37,7 +44,7 @@ public class ChatgptRedTeleopLL extends OpMode {
 
     private DistanceSensor intakeSensor1, intakeSensor2, innerSensor;
 
-    private Servo hood, raxon, laxon;
+    private Servo hood,raxon,laxon;
 
     private Limelight3A limelight;
 
@@ -76,7 +83,7 @@ public class ChatgptRedTeleopLL extends OpMode {
     public void init() {
 
 
-
+        myControlHubVoltageSensor = hardwareMap.get(VoltageSensor.class, "Control Hub");
         gate = hardwareMap.get(Servo.class, "gate");
 
         indicatorLight1 = hardwareMap.get(Servo.class, "lightOne");
@@ -86,6 +93,11 @@ public class ChatgptRedTeleopLL extends OpMode {
         frontRightMotor = hardwareMap.get(DcMotorEx.class, "fr");
         backLeftMotor = hardwareMap.get(DcMotorEx.class, "bl");
         backRightMotor = hardwareMap.get(DcMotorEx.class, "br");
+
+        frontLeftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        frontRightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        backRightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
         flywheelLeft = hardwareMap.get(DcMotorEx.class, "flyL");
         flywheelRight = hardwareMap.get(DcMotorEx.class, "flyR");
@@ -116,7 +128,7 @@ public class ChatgptRedTeleopLL extends OpMode {
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(0);
         limelight.start();
-        List<LynxModule> allhubs = hardwareMap.getAll(LynxModule.class);
+
 
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(new Pose(84, 36, Math.toRadians(0)));
@@ -128,6 +140,12 @@ public class ChatgptRedTeleopLL extends OpMode {
 
         raxon.setPosition(.48);
         laxon.setPosition(.48);
+
+        List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
+
+        for (LynxModule hub : allHubs) {
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
+        }
 
 
 
@@ -201,14 +219,15 @@ public class ChatgptRedTeleopLL extends OpMode {
     /* ================= ROBOT LOGIC ================= */
 
     private void updateRobotState() {
-        if(intakeOn) {
-            intake1Dist = intakeSensor1.getDistance(DistanceUnit.CM);
-            intake2Dist = intakeSensor2.getDistance(DistanceUnit.CM);
-            intakeFull = intake1Dist < 15 && intake2Dist < 15;
-            // innerSensorDist = innerSensor.getDistance(DistanceUnit.CM);
-        }
+
+        intake1Dist = intakeSensor1.getDistance(DistanceUnit.CM);
+        intake2Dist = intakeSensor2.getDistance(DistanceUnit.CM);
+        intakeFull = intake1Dist < 15 && intake2Dist < 15;
+        // innerSensorDist = innerSensor.getDistance(DistanceUnit.CM);
+
 
         pose = follower.getPose();
+
         double x = 144 - pose.getX();
         double y = pose.getY();
 
@@ -253,8 +272,8 @@ public class ChatgptRedTeleopLL extends OpMode {
         } else if (debounceDistance && getRuntime() - savedRuntime >= .5 && innerSensorDist > 12) {
             debounceDistance = false;
         }
-
         */
+
 
         if (gateOpen && getRuntime() - savedRuntime < .5) {
             flywheelOn = true;
@@ -272,11 +291,12 @@ public class ChatgptRedTeleopLL extends OpMode {
             indicatorLight1.setPosition(BLUE);
             indicatorLight2.setPosition(BLUE);
             intakeInner.setPower(0);
+
           }
 
         if ((intakeOn && !intakeFull && !gateOpen)) intakeOuter.setPower(-.8);
-        else if (intakeOn && intakeFull && !gateOpen) intakeOuter.setPower(0);
-
+        else if (!intakeOn && !intakeFull && !gateOpen) intakeOuter.setPower(0);
+        else if (intakeFull && !gateOpen) intakeOuter.setPower(0);
 
         if (flywheelOn) {
             flywheelLeft.setVelocity(flywheelVelocity);
@@ -345,13 +365,27 @@ public class ChatgptRedTeleopLL extends OpMode {
 
     private void updateTelemetry() {
 
-        for(LynxModule hub : allhubs){
-            telemetry.addData("voltage draw", hub.getInputVoltage(VoltageUnit.VOLTS));
-        }
+
+
+
 
         long now = System.currentTimeMillis();
         long loopTime = now - lastLoopTime;
         lastLoopTime = now;
+        telemetry.addData("FL current", frontLeftMotor.getCurrent(CurrentUnit.AMPS));
+        telemetry.addData("FR current", frontRightMotor.getCurrent(CurrentUnit.AMPS));
+        telemetry.addData("BL current", backLeftMotor.getCurrent(CurrentUnit.AMPS));
+        telemetry.addData("BR current", backRightMotor.getCurrent(CurrentUnit.AMPS));
+
+        telemetry.addData("Flywheel L Current", flywheelLeft.getCurrent(CurrentUnit.AMPS));
+        telemetry.addData("Flywheel R Current", flywheelRight.getCurrent(CurrentUnit.AMPS));
+        telemetry.addData("innerIntake", intakeInner.getCurrent(CurrentUnit.AMPS));
+        telemetry.addData("OuterIntake", intakeOuter.getCurrent(CurrentUnit.AMPS));
+
+
+
+
+        telemetry.addData("voltage draw" ,myControlHubVoltageSensor.getVoltage());
         telemetry.addData("AprilTracking?",aprilTagTracking);
         telemetry.addData("Loop ms", loopTime);
         telemetry.addData("Hz", 1000.0 / loopTime);
@@ -360,6 +394,8 @@ public class ChatgptRedTeleopLL extends OpMode {
         telemetry.addData("FlywheelV", (flywheelLeft.getVelocity() + flywheelRight.getVelocity())/2);
         telemetry.addData("Distance",distance);
         telemetry.addData("Hood Pos", hood.getPosition());
+        telemetry.addData("intake full", intakeFull);
+        telemetry.addData("gate open", gateOpen);
 
         // telemetry.addData("Inner Dist sensor",innerSensorDist);
         telemetry.update();
