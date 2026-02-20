@@ -40,7 +40,7 @@ public class ChatgptRedTeleopLL extends OpMode {
     private DcMotorEx frontRightMotor, frontLeftMotor, backRightMotor, backLeftMotor;
     private DcMotorEx flywheelLeft, flywheelRight, intakeOuter, intakeInner;
 
-    //private DistanceSensor intakeSensor1, intakeSensor2, innerSensor;
+    private DistanceSensor intakeSensor1, intakeSensor2, innerSensor;
 
     private Servo hood, raxon, laxon;
 
@@ -107,9 +107,9 @@ public class ChatgptRedTeleopLL extends OpMode {
         intakeOuter.setDirection(DcMotor.Direction.REVERSE);
         intakeInner.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        //intakeSensor1 = hardwareMap.get(DistanceSensor.class, "intakeSensor1");
-        //intakeSensor2 = hardwareMap.get(DistanceSensor.class, "intakeSensor2");
-        //innerSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
+        intakeSensor1 = hardwareMap.get(DistanceSensor.class, "intakeSensor1");
+        intakeSensor2 = hardwareMap.get(DistanceSensor.class, "intakeSensor2");
+        innerSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
 
         hood = hardwareMap.get(Servo.class, "hood");
         raxon = hardwareMap.get(Servo.class, "raxon");
@@ -222,10 +222,10 @@ public class ChatgptRedTeleopLL extends OpMode {
 
     private void updateRobotState() {
         lastTestMillis = getRuntime();
-        //intake1Dist = intakeSensor1.getDistance(DistanceUnit.CM);
-        //intake2Dist = intakeSensor2.getDistance(DistanceUnit.CM);
-        //intakeFull = intake1Dist < 16 && intake2Dist < 16;
-        //innerSensorDist = innerSensor.getDistance(DistanceUnit.CM);
+        intake1Dist = intakeSensor1.getDistance(DistanceUnit.CM);
+        intake2Dist = intakeSensor2.getDistance(DistanceUnit.CM);
+        intakeFull = intake1Dist < 16 && intake2Dist < 16;
+        innerSensorDist = innerSensor.getDistance(DistanceUnit.CM);
 
         if (getRuntime() - lastUpdateTime > .05) {
             double lastUpdateTime = getRuntime();
@@ -300,9 +300,9 @@ public class ChatgptRedTeleopLL extends OpMode {
             intakeInner.setPower(0);
         }
 
-        if ((intakeOn && !gateOpen)) intakeOuter.setPower(-.8);
-        else if (!intakeOn && !gateOpen) intakeOuter.setPower(0);
-
+        if ((intakeOn && !intakeFull && !gateOpen)) intakeOuter.setPower(-.8);
+        else if (intakeOn && intakeFull && !gateOpen) intakeOuter.setPower(0);
+        else if (!intakeOn) intakeOuter.setPower(0);
 
 
         if (flywheelOn) {
@@ -383,10 +383,10 @@ public class ChatgptRedTeleopLL extends OpMode {
         telemetry.addData("FlywheelV", (flywheelLeft.getVelocity() + flywheelRight.getVelocity())/2);
         telemetry.addData("Distance",distance);
         telemetry.addData("Hood Pos", hood.getPosition());
-        //telemetry.addData("Inner Dist sensor",innerSensor.getDistance(DistanceUnit.CM));
+        telemetry.addData("Inner Dist sensor",innerSensor.getDistance(DistanceUnit.CM));
         telemetry.addData("intake full?", intakeFull);
-        //telemetry.addData("Intake1dist",intake1Dist);
-        //telemetry.addData("intake2dist",intake2Dist);
+        telemetry.addData("Intake1dist",intake1Dist);
+        telemetry.addData("intake2dist",intake2Dist);
         //telemetry.addData("DriveMillis", driveRobotMillis *1000);
         //telemetry.addData("ProcessGamepadMillis", processgamepadMillis *1000);
         //telemetry.addData("writeHardwareMillis", writeHardwareMillis *1000);
