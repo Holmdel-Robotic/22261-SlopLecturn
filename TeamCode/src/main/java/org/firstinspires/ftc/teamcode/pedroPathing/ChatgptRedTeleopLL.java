@@ -5,21 +5,12 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
-import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.VoltageSensor;
-
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import com.qualcomm.robotcore.hardware.*;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-
-
-import java.util.List;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 @Configurable
 @TeleOp
@@ -27,26 +18,43 @@ public class ChatgptRedTeleopLL extends OpMode {
 
     private Follower follower;
 
+    private double testMillis, lastTestMillis = getRuntime();
 
-    private Pose pose;
 
 
+    private double processgamepadMillis;
+
+    private double updateRobotStateMillis;
+
+    private double writeHardwareMillis;
 
     private VoltageSensor myControlHubVoltageSensor;
 
+    private double driveRobotMillis;
+
+    private double lastUpdateTime = getRuntime(), lastProcessgamepadMillis = getRuntime(), lastUpdateRobotStateMillis = getRuntime(), lastWriteHardwareMillis = getRuntime(), lastDriveRobotMillis = getRuntime();
+
+
+
+    private Pose pose;
+
     double innerSensorDist;
     double intake1Dist;
+
+
+
     double intake2Dist;
     boolean intakeFull;
+    boolean autoAim;
     private Servo gate, indicatorLight1, indicatorLight2;
     private DcMotorEx frontRightMotor, frontLeftMotor, backRightMotor, backLeftMotor;
     private DcMotorEx flywheelLeft, flywheelRight, intakeOuter, intakeInner;
 
     private DistanceSensor intakeSensor1, intakeSensor2, innerSensor;
 
-    private Servo hood,raxon,laxon;
+    private Servo hood, raxon, laxon;
 
-    private Limelight3A limelight;
+    //private Limelight3A limelight;
 
     private boolean gateOpen = false;
 
@@ -57,13 +65,12 @@ public class ChatgptRedTeleopLL extends OpMode {
     private boolean flywheelOn = false;
     private boolean aprilTagTracking = false;
 
-    private boolean debounceA, debounceX, debounceRightStick, debounceBack, debounceLEFT_TRIGGER;
+    private boolean debounceA, debounceX, debounceRightStick, debounceBack, debounceLEFT_TRIGGER, debounceY, debounceDpad_up,debounceDpad_down,debounceDpad_left,debbounceDpad_right;
 
     private double flywheelVelocity = 1650;
     private double hoodPos;
     private double raxonPos = .48;
     private double laxonPos = .48;
-
 
     private int loopCount = 0;
     private long lastLoopTime;
@@ -73,8 +80,6 @@ public class ChatgptRedTeleopLL extends OpMode {
     private double kP = 0.843;
     private double max = 0.00922;
 
-
-
     private double GREEN = .5;
     private double BLUE = .6;
 
@@ -82,8 +87,8 @@ public class ChatgptRedTeleopLL extends OpMode {
     @Override
     public void init() {
 
-
         myControlHubVoltageSensor = hardwareMap.get(VoltageSensor.class, "Control Hub");
+
         gate = hardwareMap.get(Servo.class, "gate");
 
         indicatorLight1 = hardwareMap.get(Servo.class, "lightOne");
@@ -93,11 +98,7 @@ public class ChatgptRedTeleopLL extends OpMode {
         frontRightMotor = hardwareMap.get(DcMotorEx.class, "fr");
         backLeftMotor = hardwareMap.get(DcMotorEx.class, "bl");
         backRightMotor = hardwareMap.get(DcMotorEx.class, "br");
-
-        frontLeftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        frontRightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        backRightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        backLeftMotor.setDirection(DcMotor.Direction.REVERSE);
 
         flywheelLeft = hardwareMap.get(DcMotorEx.class, "flyL");
         flywheelRight = hardwareMap.get(DcMotorEx.class, "flyR");
@@ -125,10 +126,12 @@ public class ChatgptRedTeleopLL extends OpMode {
         raxon = hardwareMap.get(Servo.class, "raxon");
         laxon = hardwareMap.get(Servo.class, "laxon");
 
-        limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        limelight.pipelineSwitch(0);
-        limelight.start();
+        autoAim = true;
 
+        //limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        //limelight.pipelineSwitch(1);
+        //limelight.start();
+        stop();
 
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(new Pose(84, 36, Math.toRadians(0)));
@@ -141,12 +144,6 @@ public class ChatgptRedTeleopLL extends OpMode {
         raxon.setPosition(.48);
         laxon.setPosition(.48);
 
-        List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
-
-        for (LynxModule hub : allHubs) {
-            hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
-        }
-
 
 
 
@@ -156,11 +153,18 @@ public class ChatgptRedTeleopLL extends OpMode {
     public void loop() {
 
         loopCount++;
-
+        //lastProcessgamepadMillis = getRuntime();
         processGamepad1();
+        //processgamepadMillis = getRuntime() - lastProcessgamepadMillis;
+        //lastUpdateRobotStateMillis = getRuntime();
         updateRobotState();
+        //updateRobotStateMillis = getRuntime() - lastUpdateRobotStateMillis;
+        //lastWriteHardwareMillis = getRuntime();
         writeHardware();
+        //writeHardwareMillis = getRuntime() - lastWriteHardwareMillis;
+        //lastDriveRobotMillis = getRuntime();
         driveRobot();
+        //driveRobotMillis = getRuntime() - lastDriveRobotMillis;
 
         follower.update();
         updateTelemetry();
@@ -170,18 +174,50 @@ public class ChatgptRedTeleopLL extends OpMode {
 
     private void processGamepad1() {
 
+        if (gamepad1.dpad_up && !autoAim && !debounceDpad_up){
+            flywheelVelocity += 50;
+            debounceDpad_up = true;
+        }
+        if (gamepad1.dpad_down && !autoAim && !debounceDpad_down){
+            flywheelVelocity -= 50;
+            debounceDpad_down = true;
+        }
+        if (gamepad1.dpad_left && !autoAim && !debounceDpad_left){
+            hoodPos += .02;
+            debounceDpad_left = true;
+        }
+        if (gamepad1.dpad_right && !autoAim && !debbounceDpad_right){
+            hoodPos -= .02;
+            debbounceDpad_right = true;
+        }
+        if (!gamepad1.dpad_up){
+            debounceDpad_up = false;
+        }
+        if (!gamepad1.dpad_down){
+            debounceDpad_down = false;
+        }
+        if (!gamepad1.dpad_left){
+            debounceDpad_left = false;
+        }
+        if (!gamepad1.dpad_right){
+            debbounceDpad_right = false;
+        }
+        if (gamepad1.y && !debounceY){
+            autoAim = !autoAim;
+            debounceY = true;
+        }
+        if (!gamepad1.y){
+
+            debounceY = false;
+        }
+
+
 
 
         if (gamepad1.back && !debounceBack) {
             savedRuntime = getRuntime();
-
+            gateOpen = !gateOpen;
             debounceBack = true;
-        }
-
-        if (gamepad1.back){
-            gateOpen = true;
-        }else{
-            gateOpen = false;
         }
 
         if (gamepad1.a && !debounceA) {
@@ -198,20 +234,37 @@ public class ChatgptRedTeleopLL extends OpMode {
 
         if (!gamepad1.back) debounceBack = false;
 
+
         if (gamepad1.right_stick_button && debounceRightStick) {
             aprilTagTracking = !aprilTagTracking;
+
             debounceRightStick = false;
         }
         if (!aprilTagTracking) {
-            if (gamepad1.left_trigger > .01 && debounceLEFT_TRIGGER) {
-                raxonPos = raxon.getPosition() + .03;
-                laxonPos = laxon.getPosition() - .03;
-                laxon.setPosition(laxonPos);
-                raxon.setPosition(raxonPos);
+            raxon.setPosition(raxonPos);
+            laxon.setPosition(laxonPos);
+            //stop();
 
-                debounceLEFT_TRIGGER = false;
-            }
         }
+
+        if (gamepad1.guide){
+            //stop();
+            //limelight.stop();
+        }
+
+        if (!aprilTagTracking && gamepad1.left_trigger > .01 && debounceLEFT_TRIGGER) {
+            raxonPos = raxon.getPosition() + .03;
+            laxonPos = laxon.getPosition() - .03;
+            laxon.setPosition(laxonPos);
+            raxon.setPosition(raxonPos);
+
+            debounceLEFT_TRIGGER = false;
+        }
+
+        if (aprilTagTracking) {
+            trackAprilTag();
+        }
+
         if (!gamepad1.right_stick_button) debounceRightStick = true;
 
     }
@@ -219,31 +272,36 @@ public class ChatgptRedTeleopLL extends OpMode {
     /* ================= ROBOT LOGIC ================= */
 
     private void updateRobotState() {
-
+        lastTestMillis = getRuntime();
         intake1Dist = intakeSensor1.getDistance(DistanceUnit.CM);
         intake2Dist = intakeSensor2.getDistance(DistanceUnit.CM);
-        intakeFull = intake1Dist < 15 && intake2Dist < 15;
-        // innerSensorDist = innerSensor.getDistance(DistanceUnit.CM);
+        intakeFull = intake1Dist < 10 && intake2Dist < 10;
+        innerSensorDist = innerSensor.getDistance(DistanceUnit.CM);
 
+        if (getRuntime() - lastUpdateTime > .05 && autoAim) {
+            double lastUpdateTime = getRuntime();
+            pose = follower.getPose();
+            double x = 144 - pose.getX();
+            double y = pose.getY();
 
-        pose = follower.getPose();
-
-        double x = 144 - pose.getX();
-        double y = pose.getY();
-
-        double dy = 144 - y;
-        distance = Math.sqrt(dy * dy + x * x);
+            double dy = 144 - y;
+            distance = Math.sqrt(dy * dy + x * x);
 
 //        hoodPos = -0.002005998 * distance + (1 - 0.337882)  ;
-        hoodPos = -0.002005998 * distance + (1 - 0.337882);
+            hoodPos = -0.004005998 * distance + (1);
 //        flywheelVelocity = 2.88 * distance + 1531.52943;
-        flywheelVelocity = 7.75 * (distance) + 1000;
-
-        if (hoodPos < .17) hoodPos = .17;
-
-        if (aprilTagTracking && loopCount % 2 == 0 && !driving) {
-            trackAprilTag();
+            flywheelVelocity = 7.75 * (distance) + 925;
+            lastUpdateTime = getRuntime();
         }
+        testMillis = getRuntime() - lastTestMillis;
+
+        if (hoodPos < .4) hoodPos = .4;
+
+        //if (aprilTagTracking && loopCount % 2 == 0 && !driving) {
+        //    trackAprilTag();
+        //}
+
+
 
 
 
@@ -256,10 +314,11 @@ public class ChatgptRedTeleopLL extends OpMode {
 
         hood.setPosition(hoodPos);
 
-        if (driving){
+        if (driving && autoAim){
             raxon.setPosition(.48);
             laxon.setPosition(.48);
         }
+
 
         /*
         if (innerSensorDist < 12 && gateOpen && !debounceDistance ) {
@@ -272,8 +331,8 @@ public class ChatgptRedTeleopLL extends OpMode {
         } else if (debounceDistance && getRuntime() - savedRuntime >= .5 && innerSensorDist > 12) {
             debounceDistance = false;
         }
-        */
 
+        */
 
         if (gateOpen && getRuntime() - savedRuntime < .5) {
             flywheelOn = true;
@@ -291,12 +350,12 @@ public class ChatgptRedTeleopLL extends OpMode {
             indicatorLight1.setPosition(BLUE);
             indicatorLight2.setPosition(BLUE);
             intakeInner.setPower(0);
-
         }
 
         if ((intakeOn && !intakeFull && !gateOpen)) intakeOuter.setPower(-.8);
-        else if (!intakeOn && !intakeFull && !gateOpen) intakeOuter.setPower(0);
-        else if (intakeFull && !gateOpen) intakeOuter.setPower(0);
+        else if (intakeOn && intakeFull && !gateOpen) intakeOuter.setPower(0);
+        else if (!intakeOn) intakeOuter.setPower(0);
+
 
         if (flywheelOn) {
             flywheelLeft.setVelocity(flywheelVelocity);
@@ -323,7 +382,7 @@ public class ChatgptRedTeleopLL extends OpMode {
         double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
 
         frontLeftMotor.setPower((y + x + rx) / denominator);
-        backLeftMotor.setPower((y - x + rx) / denominator);
+        backLeftMotor.setPower(-(y - x + rx) / denominator);
         frontRightMotor.setPower((y - x - rx) / denominator);
         backRightMotor.setPower((y + x - rx) / denominator);
     }
@@ -331,6 +390,7 @@ public class ChatgptRedTeleopLL extends OpMode {
     /* ================= APRILTAG ================= */
 
     private void trackAprilTag() {
+        /*
         LLResult result = limelight.getLatestResult();
 
         if (result != null && result.isValid() && !result.getFiducialResults().isEmpty()) {
@@ -359,19 +419,29 @@ public class ChatgptRedTeleopLL extends OpMode {
         } else {
             telemetry.addData("AT Status", "Searching...");
         }
+
+         */
     }
 
     /* ================= TELEMETRY ================= */
 
     private void updateTelemetry() {
 
-
-
-
-
         long now = System.currentTimeMillis();
         long loopTime = now - lastLoopTime;
         lastLoopTime = now;
+        /*
+
+        telemetry.addData("AprilTracking?",aprilTagTracking);
+        telemetry.addData("FlywheelOn", flywheelOn);
+        telemetry.addData("IntakeOn", intakeOn);
+
+        telemetry.addData("Inner Dist sensor",innerSensor.getDistance(DistanceUnit.CM));
+        telemetry.addData("intake full?", intakeFull);
+        telemetry.addData("Intake1dist",intake1Dist);
+        telemetry.addData("intake2dist",intake2Dist);
+
+
         telemetry.addData("FL current", frontLeftMotor.getCurrent(CurrentUnit.AMPS));
         telemetry.addData("FR current", frontRightMotor.getCurrent(CurrentUnit.AMPS));
         telemetry.addData("BL current", backLeftMotor.getCurrent(CurrentUnit.AMPS));
@@ -382,28 +452,28 @@ public class ChatgptRedTeleopLL extends OpMode {
         telemetry.addData("innerIntake", intakeInner.getCurrent(CurrentUnit.AMPS));
         telemetry.addData("OuterIntake", intakeOuter.getCurrent(CurrentUnit.AMPS));
 
+        //telemetry.addData("DriveMillis", driveRobotMillis *1000);
+        //telemetry.addData("ProcessGamepadMillis", processgamepadMillis *1000);
+        //telemetry.addData("writeHardwareMillis", writeHardwareMillis *1000);
+        //telemetry.addData("updateRobotStateMillis",updateRobotStateMillis *1000);
+        //telemetry.addData("testMillis", testMillis);
 
-
-
-        telemetry.addData("voltage draw" ,myControlHubVoltageSensor.getVoltage());
-        telemetry.addData("AprilTracking?",aprilTagTracking);
+         */
         telemetry.addData("Loop ms", loopTime);
         telemetry.addData("Hz", 1000.0 / loopTime);
-        telemetry.addData("FlywheelOn", flywheelOn);
-        telemetry.addData("IntakeOn", intakeOn);
         telemetry.addData("FlywheelV", (flywheelLeft.getVelocity() + flywheelRight.getVelocity())/2);
         telemetry.addData("Distance",distance);
         telemetry.addData("Hood Pos", hood.getPosition());
-        telemetry.addData("intake full", intakeFull);
-        telemetry.addData("gate open", gateOpen);
-
-        // telemetry.addData("Inner Dist sensor",innerSensorDist);
         telemetry.update();
     }
 
     public void stop(){
+        /*
         try {
             if (limelight != null) limelight.stop();
         } catch (Exception ignored) {}
+
+         */
     }
+
 }
