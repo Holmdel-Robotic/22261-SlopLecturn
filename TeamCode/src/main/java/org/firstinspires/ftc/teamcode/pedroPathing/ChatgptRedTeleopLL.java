@@ -5,12 +5,15 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.*;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+
+import java.util.List;
 
 @Configurable
 @TeleOp
@@ -83,9 +86,13 @@ public class ChatgptRedTeleopLL extends OpMode {
     private double GREEN = .5;
     private double BLUE = .6;
 
+    private List allhubs;
+
     private double distance;
     @Override
     public void init() {
+
+
 
         myControlHubVoltageSensor = hardwareMap.get(VoltageSensor.class, "Control Hub");
 
@@ -143,6 +150,12 @@ public class ChatgptRedTeleopLL extends OpMode {
 
         raxon.setPosition(.48);
         laxon.setPosition(.48);
+
+        List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
+
+        for (LynxModule hub : allHubs) {
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
+        }
 
 
 
