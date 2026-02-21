@@ -213,6 +213,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
         }
         if (gamepad1.y && !debounceY){
             autoAim = !autoAim;
+            flywheelVelocity = 800;
             debounceY = true;
         }
         if (!gamepad1.y){
@@ -302,6 +303,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
             flywheelVelocity = 7.75 * (distance) + 925;
             lastUpdateTime = getRuntime();
         }
+
         testMillis = getRuntime() - lastTestMillis;
 
         if (hoodPos < .4) hoodPos = .4;
@@ -343,16 +345,17 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
         */
 
-        if (gateOpen && getRuntime() - savedRuntime < .5) {
+        if (gateOpen && getRuntime() - savedRuntime < 3) {
             flywheelOn = true;
             gate.setPosition(.88);
             intakeInner.setPower(.3);
             intakeOuter.setPower(-.65);
             indicatorLight1.setPosition(GREEN);
             indicatorLight2.setPosition(GREEN);
-        } else if (gateOpen && getRuntime() - savedRuntime < 1 && getRuntime() - savedRuntime > .5) intakeOuter.setPower(0);
+        }
+//        else if (gateOpen && getRuntime() - savedRuntime < 1 && getRuntime() - savedRuntime > .5) intakeOuter.setPower(0);
 
-        else if (gateOpen && getRuntime() - savedRuntime > 1) intakeOuter.setPower(-.65);
+//        else if (gateOpen && getRuntime() - savedRuntime < 3) intakeOuter.setPower(-.65);
 
         else{
             gate.setPosition(.5);
@@ -473,6 +476,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
         telemetry.addData("FlywheelV", (flywheelLeft.getVelocity() + flywheelRight.getVelocity())/2);
         telemetry.addData("Distance",distance);
         telemetry.addData("Hood Pos", hood.getPosition());
+        telemetry.addData("AutoAim", autoAim);
         telemetry.update();
     }
 

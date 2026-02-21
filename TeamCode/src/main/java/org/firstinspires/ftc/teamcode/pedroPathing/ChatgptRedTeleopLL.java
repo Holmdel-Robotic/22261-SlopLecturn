@@ -217,6 +217,7 @@ public class ChatgptRedTeleopLL extends OpMode {
         }
         if (gamepad1.y && !debounceY){
             autoAim = !autoAim;
+            flywheelVelocity = 800;
             debounceY = true;
         }
         if (!gamepad1.y){
@@ -354,8 +355,9 @@ public class ChatgptRedTeleopLL extends OpMode {
             intakeOuter.setPower(-.65);
             indicatorLight1.setPosition(GREEN);
             indicatorLight2.setPosition(GREEN);
-        } else if (gateOpen && getRuntime() - savedRuntime < 1 && getRuntime() - savedRuntime > .5) intakeOuter.setPower(0);
-
+        }
+//        else if (gateOpen && getRuntime() - savedRuntime < 1 && getRuntime() - savedRuntime > .5) intakeOuter.setPower(0);
+//
         else if (gateOpen && getRuntime() - savedRuntime > 1) intakeOuter.setPower(-.65);
 
         else{
