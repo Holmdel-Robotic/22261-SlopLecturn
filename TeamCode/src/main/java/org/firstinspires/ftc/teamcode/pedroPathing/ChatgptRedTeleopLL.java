@@ -375,6 +375,9 @@ public class ChatgptRedTeleopLL extends OpMode {
         if (flywheelOn) {
             flywheelLeft.setVelocity(flywheelVelocity);
             flywheelRight.setVelocity(flywheelVelocity);
+
+            flywheelLeft.setVelocity(flywheelVelocity);
+            flywheelRight.setVelocity(flywheelVelocity);
         } else {
             flywheelLeft.setVelocity(0);
             flywheelRight.setVelocity(0);
@@ -478,6 +481,7 @@ public class ChatgptRedTeleopLL extends OpMode {
         telemetry.addData("Hz", 1000.0 / loopTime);
         telemetry.addData("FlywheelV", (flywheelLeft.getVelocity() + flywheelRight.getVelocity())/2);
         telemetry.addData("Distance",distance);
+        telemetry.addData("intended flywheel V", flywheelVelocity);
         telemetry.addData("Hood Pos", hood.getPosition());
         telemetry.update();
     }
