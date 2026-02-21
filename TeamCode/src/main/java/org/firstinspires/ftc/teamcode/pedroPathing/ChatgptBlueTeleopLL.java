@@ -70,7 +70,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
     private boolean debounceA, debounceX, debounceRightStick, debounceBack, debounceLEFT_TRIGGER, debounceY, debounceDpad_up,debounceDpad_down,debounceDpad_left,debbounceDpad_right;
 
-    private double flywheelVelocity = 1650;
+    private double flywheelVelocity = 800;
     private double hoodPos;
     private double raxonPos = .48;
     private double laxonPos = .48;
@@ -345,10 +345,10 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
         */
 
-        if (gateOpen && getRuntime() - savedRuntime < 3) {
+        if (gateOpen && getRuntime() - savedRuntime < 2) {
             flywheelOn = true;
             gate.setPosition(.88);
-            intakeInner.setPower(.3);
+            intakeInner.setPower(.4);
             intakeOuter.setPower(-.65);
             indicatorLight1.setPosition(GREEN);
             indicatorLight2.setPosition(GREEN);
@@ -362,6 +362,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
             indicatorLight1.setPosition(BLUE);
             indicatorLight2.setPosition(BLUE);
             intakeInner.setPower(0);
+            gateOpen = !gateOpen;
         }
 
         if ((intakeOn && !intakeFull && !gateOpen)) intakeOuter.setPower(-.8);
