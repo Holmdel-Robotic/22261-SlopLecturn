@@ -263,6 +263,7 @@ public class DO_NOT_USERedTeleOp extends OpMode {
             hood.setPosition((-.00554324 * distance + .96));
 
 
+
 //            angleToRot = (imu.getRobotYawPitchRollAngles().getYaw()) - Math.toDegrees(Math.atan((138-y)/(138-x)));
 //            laxonPos = .5 + (.28/90)*angleToRot; //if not work subtract laxon and act raxon
 //            raxonPos = .5 + (.28/90)*angleToRot;
