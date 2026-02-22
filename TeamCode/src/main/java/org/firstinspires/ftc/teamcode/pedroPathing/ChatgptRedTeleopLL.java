@@ -23,8 +23,12 @@ public class ChatgptRedTeleopLL extends OpMode {
 
     private double testMillis, lastTestMillis = getRuntime();
 
+    private double Posex;
+
+    private double Posey;
 
 
+    private double prevTurnToAngle = -1;
     private double processgamepadMillis;
 
     private double updateRobotStateMillis;
@@ -268,7 +272,7 @@ public class ChatgptRedTeleopLL extends OpMode {
 
         if (!aprilTagTracking && gamepad1.left_trigger > .01 && debounceLEFT_TRIGGER) {
             raxonPos = raxon.getPosition() + .03;
-            laxonPos = laxon.getPosition() - .03;
+            laxonPos = laxon.getPosition() + .03;
             laxon.setPosition(laxonPos);
             raxon.setPosition(raxonPos);
 
@@ -276,8 +280,11 @@ public class ChatgptRedTeleopLL extends OpMode {
         }
 
         if (aprilTagTracking) {
+
             trackAprilTag();
         }
+
+
 
         if (!gamepad1.right_stick_button) debounceRightStick = true;
 
@@ -293,19 +300,24 @@ public class ChatgptRedTeleopLL extends OpMode {
         innerSensorDist = innerSensor.getDistance(DistanceUnit.CM);
 
         if (getRuntime() - lastUpdateTime > .05 && autoAim) {
+
             double lastUpdateTime = getRuntime();
             pose = follower.getPose();
-            double x = 144 - pose.getX();
-            double y = pose.getY();
+            Posex = 144 - pose.getX();
+            Posey = pose.getY();
 
-            double dy = 144 - y;
-            distance = Math.sqrt(dy * dy + x * x);
+            double dy = 144 - Posey;
+            distance = Math.sqrt(dy * dy + Posex * Posex);
 
-//        hoodPos = -0.002005998 * distance + (1 - 0.337882)  ;
-            hoodPos = -0.004005998 * distance + (1);
+//
+            hoodPos = .41;
 //        flywheelVelocity = 2.88 * distance + 1531.52943;
-            flywheelVelocity = 7.75 * (distance) + 925;
+            flywheelVelocity = 2.28303* (distance) +1530.42424;
             lastUpdateTime = getRuntime();
+            if (loopCount % 5 == 0){
+                prevTurnToAngle = PPtarget(prevTurnToAngle);
+            }
+
         }
         testMillis = getRuntime() - lastTestMillis;
 
@@ -400,7 +412,7 @@ public class ChatgptRedTeleopLL extends OpMode {
         double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
 
         frontLeftMotor.setPower((y + x + rx) / denominator);
-        backLeftMotor.setPower(-(y - x + rx) / denominator);
+        backLeftMotor.setPower((y - x + rx) / denominator);
         frontRightMotor.setPower((y - x - rx) / denominator);
         backRightMotor.setPower((y + x - rx) / denominator);
     }
@@ -483,6 +495,8 @@ public class ChatgptRedTeleopLL extends OpMode {
         telemetry.addData("Distance",distance);
         telemetry.addData("intended flywheel V", flywheelVelocity);
         telemetry.addData("Hood Pos", hood.getPosition());
+        telemetry.addData("turntoangle",prevTurnToAngle);
+
         telemetry.update();
     }
 
@@ -493,6 +507,26 @@ public class ChatgptRedTeleopLL extends OpMode {
         } catch (Exception ignored) {}
 
          */
+    }
+
+    public double PPtarget(double prevpos){
+        double Xpose = 144 - follower.getPose().getX();
+        double Ypose = 144 - follower.getPose().getY();
+
+        double turnToAngle = (Math.toDegrees(Math.atan(Ypose/Xpose) + follower.getHeading()));
+        turnToAngle = Math.round(turnToAngle/10);
+        turnToAngle = turnToAngle/18;
+
+
+
+        if (Math.abs(prevpos - turnToAngle) > .1){
+            laxon.setPosition(turnToAngle);
+            raxon.setPosition(turnToAngle);
+            prevpos = turnToAngle;
+        }
+        return prevpos;
+
+
     }
 
 }
