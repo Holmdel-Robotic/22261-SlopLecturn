@@ -183,12 +183,14 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
     private void processGamepad1() {
 
-        if (gamepad1.dpad_up){
+        if (gamepad1.dpad_up && !debounceDpad_up){
             flywheelVelocity = flywheelVelocity + 50;
+            debounceDpad_up = true;
 
         }
-        if (gamepad1.dpad_down){
+        if (gamepad1.dpad_down && !debounceDpad_down){
             flywheelVelocity = flywheelVelocity - 50;
+            debounceDpad_down = true;
 
         }
         if (gamepad1.dpad_left && !autoAim && !debounceDpad_left){
@@ -478,9 +480,12 @@ public class ChatgptBlueTeleopLL extends OpMode {
         telemetry.addData("Distance",distance);
         telemetry.addData("Hood Pos", hood.getPosition());
         telemetry.addData("AutoAim", autoAim);
+        telemetry.addData("dUp", debounceDpad_up);
+        telemetry.addData("dDown", debounceDpad_down);
         telemetry.addData("x: ", follower.getPose().getX());
         telemetry.addData("y: ", follower.getPose().getY());
         telemetry.addData("theta: ", Math.toDegrees(follower.getPose().getHeading()));
+        telemetry.addData("autoFly", getRuntime() - lastUpdateTime > .05 && autoAim);
         telemetry.update();
     }
 
