@@ -76,8 +76,8 @@ public class ChatgptRedTeleopLL extends OpMode {
 
     private double flywheelVelocity = 1650;
     private double hoodPos;
-    private double raxonPos = .48;
-    private double laxonPos = .48;
+    private double raxonPos = .5;
+    private double laxonPos = .5;
 
     private int loopCount = 0;
     private long lastLoopTime;
@@ -152,8 +152,8 @@ public class ChatgptRedTeleopLL extends OpMode {
         indicatorLight1.setPosition(BLUE);
         indicatorLight2.setPosition(BLUE);
 
-        raxon.setPosition(.48);
-        laxon.setPosition(.48);
+        raxon.setPosition(.50);
+        laxon.setPosition(.50);
 
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
 
