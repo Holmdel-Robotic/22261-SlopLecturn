@@ -370,7 +370,7 @@ public class ChatgptRedTeleopLL extends OpMode {
         }
 //        else if (gateOpen && getRuntime() - savedRuntime < 1 && getRuntime() - savedRuntime > .5) intakeOuter.setPower(0);
 //
-        else if (gateOpen && getRuntime() - savedRuntime > 1) intakeOuter.setPower(-.65);
+        else if (gateOpen && getRuntime() - savedRuntime > 3) intakeOuter.setPower(-.65);
 
         else{
             gate.setPosition(.5);
@@ -460,7 +460,7 @@ public class ChatgptRedTeleopLL extends OpMode {
         long now = System.currentTimeMillis();
         long loopTime = now - lastLoopTime;
         lastLoopTime = now;
-        /*
+
 
         telemetry.addData("AprilTracking?",aprilTagTracking);
         telemetry.addData("FlywheelOn", flywheelOn);
@@ -488,7 +488,7 @@ public class ChatgptRedTeleopLL extends OpMode {
         //telemetry.addData("updateRobotStateMillis",updateRobotStateMillis *1000);
         //telemetry.addData("testMillis", testMillis);
 
-         */
+
         telemetry.addData("Loop ms", loopTime);
         telemetry.addData("Hz", 1000.0 / loopTime);
         telemetry.addData("FlywheelV", (flywheelLeft.getVelocity() + flywheelRight.getVelocity())/2);
