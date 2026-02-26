@@ -348,7 +348,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
         if (gateOpen && getRuntime() - savedRuntime < 2) {
             flywheelOn = true;
             gate.setPosition(.88);
-            intakeInner.setPower(.4);
+            intakeInner.setPower(1);
             intakeOuter.setPower(-.65);
             indicatorLight1.setPosition(GREEN);
             indicatorLight2.setPosition(GREEN);
@@ -443,7 +443,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
         long now = System.currentTimeMillis();
         long loopTime = now - lastLoopTime;
         lastLoopTime = now;
-        /*
+
 
         telemetry.addData("AprilTracking?",aprilTagTracking);
         telemetry.addData("FlywheelOn", flywheelOn);
@@ -471,7 +471,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
         //telemetry.addData("updateRobotStateMillis",updateRobotStateMillis *1000);
         //telemetry.addData("testMillis", testMillis);
 
-         */
+
         telemetry.addData("Loop ms", loopTime);
         telemetry.addData("Hz", 1000.0 / loopTime);
         telemetry.addData("FlywheelV", (flywheelLeft.getVelocity() + flywheelRight.getVelocity())/2);
