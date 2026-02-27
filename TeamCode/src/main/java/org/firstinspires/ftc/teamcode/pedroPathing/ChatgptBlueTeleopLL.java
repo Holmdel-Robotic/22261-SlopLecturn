@@ -294,7 +294,8 @@ public class ChatgptBlueTeleopLL extends OpMode {
         innerSensorDist = innerSensor.getDistance(DistanceUnit.CM);
 
         if (getRuntime() - lastUpdateTime > .05 && autoAim) {
-            double lastUpdateTime = getRuntime();
+
+            lastUpdateTime = getRuntime();
             pose = follower.getPose();
             double x = pose.getX();
             double y = pose.getY();
@@ -376,8 +377,8 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
 
         if (flywheelOn) {
-            flywheelLeft.setVelocity(flywheelVelocity);
-            flywheelRight.setVelocity(flywheelVelocity);
+            flywheelLeft.setPower(flywheelVelocity);
+            flywheelRight.setPower(flywheelVelocity);
         } else {
             flywheelLeft.setVelocity(0);
             flywheelRight.setVelocity(0);
