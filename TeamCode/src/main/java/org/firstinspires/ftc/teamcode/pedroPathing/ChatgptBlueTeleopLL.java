@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.pedroPathing;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
@@ -15,13 +16,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 import java.util.List;
 
-@Configurable
+@Config
 @TeleOp
 public class ChatgptBlueTeleopLL extends OpMode {
 
     private Follower follower;
 
-    private double testMillis, lastTestMillis = getRuntime();
+    public double testMillis, lastTestMillis = getRuntime();
 
 
 
@@ -48,7 +49,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
     double intake2Dist;
     boolean intakeFull;
-    boolean autoAim;
+    public static boolean autoAim;
     private Servo gate, indicatorLight1, indicatorLight2;
     private DcMotorEx frontRightMotor, frontLeftMotor, backRightMotor, backLeftMotor;
     private DcMotorEx flywheelLeft, flywheelRight, intakeOuter, intakeInner;
@@ -64,16 +65,18 @@ public class ChatgptBlueTeleopLL extends OpMode {
     private boolean debounceDistance = false;
 
     private boolean driving;
-    private boolean intakeOn = false;
-    private boolean flywheelOn = false;
-    private boolean aprilTagTracking = false;
+    public static boolean intakeOn = false;
+    public static boolean flywheelOn = false;
+    public static boolean aprilTagTracking = false;
 
     private boolean debounceA, debounceX, debounceRightStick, debounceBack, debounceLEFT_TRIGGER, debounceY, debounceDpad_up,debounceDpad_down,debounceDpad_left,debbounceDpad_right;
 
-    private double flywheelVelocity = 800;
-    private double hoodPos;
-    private double raxonPos = .48;
-    private double laxonPos = .48;
+    public static double flywheelVelocity = 800;
+    public static double hoodPos;
+    public static double raxonPos = .48;
+    public static double laxonPos = .48;
+
+    public static double axonPos = .48;
 
     private int loopCount = 0;
     private long lastLoopTime;
@@ -129,7 +132,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
         raxon = hardwareMap.get(Servo.class, "raxon");
         laxon = hardwareMap.get(Servo.class, "laxon");
 
-        autoAim = true;
+        autoAim = false;
 
         //limelight = hardwareMap.get(Limelight3A.class, "limelight");
         //limelight.pipelineSwitch(1);
@@ -251,8 +254,8 @@ public class ChatgptBlueTeleopLL extends OpMode {
             debounceRightStick = false;
         }
         if (!aprilTagTracking) {
-            raxon.setPosition(raxonPos);
-            laxon.setPosition(laxonPos);
+            raxon.setPosition(axonPos);
+            laxon.setPosition(axonPos);
             //stop();
 
         }
@@ -264,7 +267,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
         if (!aprilTagTracking && gamepad1.left_trigger > .01 && debounceLEFT_TRIGGER) {
             raxonPos = raxon.getPosition() + .03;
-            laxonPos = laxon.getPosition() - .03;
+            laxonPos = laxon.getPosition() + .03;
             laxon.setPosition(laxonPos);
             raxon.setPosition(raxonPos);
 
@@ -300,7 +303,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
 //        hoodPos = -0.002005998 * distance + (1 - 0.337882)  ;
             hoodPos = -0.004005998 * distance + (1);
 //        flywheelVelocity = 2.88 * distance + 1531.52943;
-            flywheelVelocity = 7.75 * (distance) + 925;
+            //flywheelVelocity = 7.75 * (distance) + 925;
             lastUpdateTime = getRuntime();
         }
 
@@ -326,8 +329,8 @@ public class ChatgptBlueTeleopLL extends OpMode {
         hood.setPosition(hoodPos);
 
         if (driving && autoAim){
-            raxon.setPosition(.48);
-            laxon.setPosition(.48);
+            raxon.setPosition(axonPos);
+            laxon.setPosition(axonPos);
         }
 
 
@@ -348,7 +351,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
         if (gateOpen && getRuntime() - savedRuntime < 2) {
             flywheelOn = true;
             gate.setPosition(.88);
-            intakeInner.setPower(1);
+            intakeInner.setPower(.65);
             intakeOuter.setPower(-.65);
             indicatorLight1.setPosition(GREEN);
             indicatorLight2.setPosition(GREEN);
@@ -361,7 +364,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
             gate.setPosition(.5);
             indicatorLight1.setPosition(BLUE);
             indicatorLight2.setPosition(BLUE);
-            intakeInner.setPower(0);
+            intakeInner.setPower(.65);
             gateOpen = !gateOpen;
         }
 
@@ -377,6 +380,9 @@ public class ChatgptBlueTeleopLL extends OpMode {
             flywheelLeft.setVelocity(0);
             flywheelRight.setVelocity(0);
         }
+
+        raxon.setPosition(axonPos);
+        laxon.setPosition(axonPos);
 
     }
 
@@ -474,7 +480,9 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
         telemetry.addData("Loop ms", loopTime);
         telemetry.addData("Hz", 1000.0 / loopTime);
-        telemetry.addData("FlywheelV", (flywheelLeft.getVelocity() + flywheelRight.getVelocity())/2);
+        telemetry.addData("FlywheelV L", (flywheelLeft.getVelocity()));
+        telemetry.addData("FlywheelV R", (flywheelRight.getVelocity()));
+        telemetry.addData("flyWheel V intended", flywheelVelocity);
         telemetry.addData("Distance",distance);
         telemetry.addData("Hood Pos", hood.getPosition());
         telemetry.addData("AutoAim", autoAim);
@@ -492,5 +500,10 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
          */
     }
+
+    public void trackTarget(){
+
+    }
+
 
 }
