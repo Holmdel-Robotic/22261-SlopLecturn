@@ -18,8 +18,12 @@ import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
+import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
@@ -27,11 +31,38 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 @Configurable // Panels
 public class OptimizedBlue_IN_PROGRESS extends OpMode {
 
+    private Servo hood;
+
+    private Servo raxon;
+
+    private Servo laxon;
+
+    private DcMotorEx flywheelLeft;
+
+    private DcMotorEx flywheelRight;
+
+    private DcMotorEx IntakeInner;
+
+    private DcMotorEx IntakeOuter;
+    private Servo kicker;
     private TelemetryManager panelsTelemetry; // Panels Telemetry instance
     public Follower follower; // Pedro Pathing follower instance
-    private int pathState; // Current autonomous path state (state machine)
-    private ElapsedTime pathTimer; // Timer for path state machine
+    private State pathState; // Current autonomous path state (state machine)
+    private ElapsedTime pathTimer;
+
+    private Timer actionTimer;// Timer for path state machine
     private Paths paths; // Paths defined in the Paths class
+
+    private enum State{
+        START,
+        SCORE,
+        PICKUP1,
+        PICKUP2,
+        PICKUP3,
+        PICKUP4,
+        END
+    }
+    public int count = 0;
 
     @Override
     public void init() {
@@ -39,6 +70,35 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
         // ...
         panelsTelemetry.debug("Status", "Initialized");
         panelsTelemetry.update(telemetry);
+        flywheelLeft = hardwareMap.get(DcMotorEx.class, "flyL");
+        flywheelRight = hardwareMap.get(DcMotorEx.class, "flyR");
+        flywheelRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        flywheelLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        flywheelRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        flywheelLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        flywheelLeft.setDirection(DcMotor.Direction.REVERSE);
+        flywheelRight.setDirection(DcMotor.Direction.FORWARD);
+
+        raxon = hardwareMap.get(Servo.class,"raxon");
+        laxon = hardwareMap.get(Servo.class,"laxon");
+
+        IntakeInner = hardwareMap.get(DcMotorEx.class, "intInner");
+        IntakeOuter = hardwareMap.get(DcMotorEx.class, "intOuter");
+        kicker = hardwareMap.get(Servo.class, "blocker");
+        IntakeInner.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        IntakeOuter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        IntakeInner.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        IntakeOuter.setDirection(DcMotor.Direction.REVERSE);
+        IntakeInner.setDirection(DcMotor.Direction.FORWARD);
+        IntakeOuter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+
+        hood = hardwareMap.get(Servo.class, "hood");
+
+
+        raxon.setPosition(.63);
+        laxon.setPosition(.63);
+        kicker.setPosition(.5);
 
         follower = Constants.createFollower(hardwareMap);
         // Determine starting heading: prefer geometric heading when a path exists, otherwise fall back to explicit startPoint values
@@ -51,7 +111,7 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
     @Override
     public void loop() {
         follower.update(); // Update Pedro Pathing
-        pathState = autonomousPathUpdate(); // Update autonomous state machine
+        State pathState = autonomousPathUpdate(); // Update autonomous state machine
 
         // Log values to Panels and Driver Station
         panelsTelemetry.debug("Path State", pathState);
@@ -73,6 +133,7 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
         public PathChain Path8;
         public PathChain Path9;
         public PathChain Path10;
+
 
         public Paths(Follower follower) {
             Path1 = follower
@@ -165,108 +226,191 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
         }
     }
 
-    public int autonomousPathUpdate() {
+    public State autonomousPathUpdate() {
         switch (pathState) {
-            case 0:
-                follower.followPath(paths.Path1, true);
-                setPathState(1);
+            case START:
+                if(!follower.isBusy())
+                {
+                    flywheelLeft.setVelocity(-1675);
+                    flywheelRight.setVelocity(-1675);
+                    hood.setPosition(.67);
+                    kicker.setPosition(.3);
+                    IntakeOuter.setPower(-.8);
+                    IntakeInner.setPower(-.4);
+
+                    actionTimer.resetTimer();
+                    follower.followPath(paths.Path1, true);
+                    setPathState(State.SCORE);
+                    break;
+                }
+
+            case SCORE:
+                if(follower.isBusy())
+                {
+                    actionTimer.resetTimer();
+                }
+                else if (!follower.isBusy())
+                {
+
+                    if(actionTimer.getElapsedTimeSeconds() <= 1){
+
+
+                        hood.setPosition(.67);
+                        // && flywheelRight.getVelocity() > 1650 && flywheelLeft.getVelocity() > 1650 &&
+                    } else if (actionTimer.getElapsedTimeSeconds() >= 1 && actionTimer.getElapsedTimeSeconds() <= 3) {
+
+                        IntakeOuter.setPower(-.8);
+                        IntakeInner.setPower(-.4);
+                        kicker.setPosition(.5);
+
+
+                    }
+                    else if (actionTimer.getElapsedTimeSeconds() >= 3 && actionTimer.getElapsedTimeSeconds() <= 3.1) {
+                        kicker.setPosition(.3);
+
+
+                    }
+                    else {
+
+                        //IntakeInner.setVelocity(0);
+                        //IntakeOuter.setVelocity(0);
+//                        flywheelLeft.setVelocity(-.01);
+//                        flywheelRight.setVelocity(-.01);
+                        if (count == 1) {
+
+                            follower.followPath(paths.Path2, true);
+                            setPathState(State.PICKUP1);
+                            count++;
+                        } else if (count == 2) {
+                            follower.followPath(paths.Path4, true);
+                            setPathState(State.PICKUP2);
+                            count++;
+                        } else if (count == 3) {
+                            follower.followPath(paths.Path6, true);
+                            setPathState(State.PICKUP3);
+                            count++;
+
+                        }
+                        else if(count == 4)
+                        {
+                            follower.followPath(paths.Path8, true);
+                            setPathState(State.PICKUP4);
+                            count++;
+                        }
+                        else
+                        {
+                            follower.followPath(paths.Path10, true);
+                            setPathState(State.END);
+                        }
+
+                    }
+                }
+
+
                 break;
-            case 1:
-                if (!follower.isBusy()) {
-                    setPathState(2);
+            case PICKUP1:
+                if(!follower.isBusy()) {
+                    follower.followPath(paths.Path3, true);
+
+                    setPathState(State.SCORE);
                 }
                 break;
-            case 2:
-                follower.followPath(paths.Path2, true);
-                setPathState(3);
-                break;
-            case 3:
+            case PICKUP2:
                 if (!follower.isBusy()) {
-                    setPathState(4);
+                    follower.followPath(paths.Path5);
+                    setPathState(State.SCORE);
                 }
                 break;
-            case 4:
-                follower.followPath(paths.Path3, true);
-                setPathState(5);
+            case PICKUP3:
+                if(!follower.isBusy()){
+                    follower.followPath(paths.Path7, true);
+                    setPathState(State.SCORE);
+                }
+
                 break;
-            case 5:
+            case PICKUP4:
                 if (!follower.isBusy()) {
-                    setPathState(6);
+                    follower.followPath(paths.Path9, true);
+                    setPathState(State.SCORE);
                 }
                 break;
-            case 6:
-                follower.followPath(paths.Path4, true);
-                setPathState(7);
-                break;
-            case 7:
-                if (!follower.isBusy()) {
-                    setPathState(8);
+            case END:
+                if(!follower.isBusy()){
+                    requestOpModeStop();
                 }
-                break;
-            case 8:
-                follower.followPath(paths.Path5, true);
-                setPathState(9);
-                break;
-            case 9:
-                if (!follower.isBusy()) {
-                    setPathState(10);
-                }
-                break;
-            case 10:
-                follower.followPath(paths.Path6, true);
-                setPathState(11);
-                break;
-            case 11:
-                if (!follower.isBusy()) {
-                    setPathState(12);
-                }
-                break;
-            case 12:
-                follower.followPath(paths.Path7, true);
-                setPathState(13);
-                break;
-            case 13:
-                if (!follower.isBusy()) {
-                    setPathState(14);
-                }
-                break;
-            case 14:
-                follower.followPath(paths.Path8, true);
-                setPathState(15);
-                break;
-            case 15:
-                if (!follower.isBusy()) {
-                    setPathState(16);
-                }
-                break;
-            case 16:
-                follower.followPath(paths.Path9, true);
-                setPathState(17);
-                break;
-            case 17:
-                if (!follower.isBusy()) {
-                    setPathState(18);
-                }
-                break;
-            case 18:
-                follower.followPath(paths.Path10, true);
-                setPathState(19);
-                break;
-            case 19:
-                if (!follower.isBusy()) {
-                    setPathState(20);
-                }
-                break;
-            case 20:
-                requestOpModeStop();
-                pathState = -1;
-                break;
+//            case 6:
+//                follower.followPath(paths.Path4, true);
+//                setPathState(7);
+//                break;
+//            case 7:
+//                if (!follower.isBusy()) {
+//                    setPathState(8);
+//                }
+//                break;
+//            case 8:
+//                follower.followPath(paths.Path5, true);
+//                setPathState(9);
+//                break;
+//            case 9:
+//                if (!follower.isBusy()) {
+//                    setPathState(10);
+//                }
+//                break;
+//            case 10:
+//                follower.followPath(paths.Path6, true);
+//                setPathState(11);
+//                break;
+//            case 11:
+//                if (!follower.isBusy()) {
+//                    setPathState(12);
+//                }
+//                break;
+//            case 12:
+//                follower.followPath(paths.Path7, true);
+//                setPathState(13);
+//                break;
+//            case 13:
+//                if (!follower.isBusy()) {
+//                    setPathState(14);
+//                }
+//                break;
+//            case 14:
+//                follower.followPath(paths.Path8, true);
+//                setPathState(15);
+//                break;
+//            case 15:
+//                if (!follower.isBusy()) {
+//                    setPathState(16);
+//                }
+//                break;
+//            case 16:
+//                follower.followPath(paths.Path9, true);
+//                setPathState(17);
+//                break;
+//            case 17:
+//                if (!follower.isBusy()) {
+//                    setPathState(18);
+//                }
+//                break;
+//            case 18:
+//                follower.followPath(paths.Path10, true);
+//                setPathState(19);
+//                break;
+//            case 19:
+//                if (!follower.isBusy()) {
+//                    setPathState(20);
+//                }
+//                break;
+//            case 20:
+//                requestOpModeStop();
+//                pathState = -1;
+//                break;
         }
         return pathState;
     }
 
-    public void setPathState(int pState) {
-        pathState = pState;
+    public void setPathState(State pState) {
+        State pathState = pState;
         pathTimer.reset();
     }
 }
