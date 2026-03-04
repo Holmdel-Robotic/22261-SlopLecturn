@@ -52,9 +52,10 @@ public class ChatBlueTeleopTest extends OpMode {
     public static boolean flywheelOn = false;
     public static boolean aprilTagTracking = false;
 
+    // Added debounceStart for the start button turn trigger
     private boolean debounceA, debounceX, debounceRightStick, debounceBack,
             debounceLEFT_TRIGGER, debounceY, debounceDpad_up, debounceDpad_down,
-            debounceDpad_left, debbounceDpad_right;
+            debounceDpad_left, debbounceDpad_right, debounceStart;
 
     public static double flywheelVelocity = 800;
     public static double hoodPos;
@@ -147,7 +148,7 @@ public class ChatBlueTeleopTest extends OpMode {
         updateRobotState();
         writeHardware();
 
-        // Turn over driver input & control automatically when done
+        // Turn takes priority over driver input — hands back control automatically when done
         if (isTurning) {
             updateTurn();
         } else {
@@ -233,6 +234,12 @@ public class ChatBlueTeleopTest extends OpMode {
             trackAprilTag();
         }
 
+        // Start button snaps robot back to its starting heading (180°)
+        if (gamepad1.start && !debounceStart) {
+            startTurnToAngle(180);
+            debounceStart = true;
+        }
+        if (!gamepad1.start) debounceStart = false;
     }
 
     /* ================= ROBOT LOGIC ================= */
@@ -320,16 +327,18 @@ public class ChatBlueTeleopTest extends OpMode {
         backRightMotor.setPower((y + x - rx) / denominator);
     }
 
+    /* ================= TURN TO ANGLE ================= */
+
     public void startTurnToAngle(double targetDegrees) {
         turnTargetDegrees = targetDegrees;
         isTurning = true;
     }
 
-     //while isTurning is true
     private void updateTurn() {
         double currentDeg = Math.toDegrees(follower.getPose().getHeading());
         double error = turnTargetDegrees - currentDeg;
 
+        // Normalize to [-180, 180]
         while (error > 180)  error -= 360;
         while (error < -180) error += 360;
 
@@ -339,9 +348,8 @@ public class ChatBlueTeleopTest extends OpMode {
             backLeftMotor.setPower(turnPower);
             frontRightMotor.setPower(-turnPower);
             backRightMotor.setPower(-turnPower);
-        }
-
-        else {
+        } else {
+            // stop and hand control back to driver
             frontLeftMotor.setPower(0);
             backLeftMotor.setPower(0);
             frontRightMotor.setPower(0);
