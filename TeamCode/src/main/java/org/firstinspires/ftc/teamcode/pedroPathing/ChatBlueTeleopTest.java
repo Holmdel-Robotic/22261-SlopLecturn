@@ -62,7 +62,12 @@ public class ChatBlueTeleopTest extends OpMode {
     public static double laxonPos = .48;
     public static double axonPos = .48;
     private double currentFlywheelVelocity = 0;
-    private static final double FLYWHEEL_RAMP_STEP = 50; // ticks/sec per loop (idk if this is right)
+    private static final double FLYWHEEL_RAMP_STEP = 50;
+
+    // ---- Turn-to-angle state ----
+    private boolean isTurning = false;
+    private double turnTargetDegrees = 0;
+    // ----------------------------
 
     private int loopCount = 0;
     private long lastLoopTime;
@@ -141,7 +146,14 @@ public class ChatBlueTeleopTest extends OpMode {
         processGamepad1();
         updateRobotState();
         writeHardware();
-        driveRobot();
+
+        // Turn over driver input & control automatically when done
+        if (isTurning) {
+            updateTurn();
+        } else {
+            driveRobot();
+        }
+
         follower.update();
         updateTelemetry();
     }
@@ -204,7 +216,6 @@ public class ChatBlueTeleopTest extends OpMode {
         }
         if (!gamepad1.right_stick_button) debounceRightStick = true;
 
-        // there was two writes for raxon and laxon that was also at bottom of writeHardware()
         if (!aprilTagTracking) {
             raxon.setPosition(axonPos);
             laxon.setPosition(axonPos);
@@ -221,6 +232,7 @@ public class ChatBlueTeleopTest extends OpMode {
         if (aprilTagTracking) {
             trackAprilTag();
         }
+
     }
 
     /* ================= ROBOT LOGIC ================= */
@@ -264,19 +276,17 @@ public class ChatBlueTeleopTest extends OpMode {
             indicatorLight1.setPosition(GREEN);
             indicatorLight2.setPosition(GREEN);
         } else if (gateOpen && getRuntime() - savedRuntime >= 2) {
-            // close gate, reset lights — do NOT flip gateOpen here
             gate.setPosition(.5);
             indicatorLight1.setPosition(BLUE);
             indicatorLight2.setPosition(BLUE);
             intakeInner.setPower(.65);
-            gateOpen = false; // set false, not toggle
+            gateOpen = false;
         }
 
         if (intakeOn && !intakeFull && !gateOpen)       intakeOuter.setPower(-.8);
         else if (intakeOn && intakeFull && !gateOpen)   intakeOuter.setPower(0);
         else if (!intakeOn)                             intakeOuter.setPower(0);
 
-        // Ramp flywheel velocity instead of jumping to target.
         if (flywheelOn) {
             if (currentFlywheelVelocity < flywheelVelocity) {
                 currentFlywheelVelocity = Math.min(currentFlywheelVelocity + FLYWHEEL_RAMP_STEP, flywheelVelocity);
@@ -284,24 +294,21 @@ public class ChatBlueTeleopTest extends OpMode {
                 currentFlywheelVelocity = Math.max(currentFlywheelVelocity - FLYWHEEL_RAMP_STEP, flywheelVelocity);
             }
         } else {
-            // Ramp down instead of hard-stopping to reduce mechanical stress
             currentFlywheelVelocity = Math.max(currentFlywheelVelocity - FLYWHEEL_RAMP_STEP, 0);
         }
         flywheelLeft.setVelocity(currentFlywheelVelocity);
         flywheelRight.setVelocity(currentFlywheelVelocity);
-
-        // It is now only written in processGamepad1() where it belongs.
     }
+
+    /* ================= DRIVE ================= */
 
     private void driveRobot() {
         double y = -gamepad1.left_stick_y;
-        double x = gamepad1.left_stick_x *1.2;
-        // dampening rotation a lot less
-        double rx = gamepad1.right_stick_x *.7 ;
+        double x = gamepad1.left_stick_x * 1.2;
+        double rx = gamepad1.right_stick_x * .7;
 
         driving = Math.abs(y) > .03 || Math.abs(x) > .03 || Math.abs(rx) > .03;
 
-        // only normalize if sum exceeds 1.0, don't divide when under threshold
         double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
 
         frontLeftMotor.setPower((y + x + rx) / denominator);
@@ -310,10 +317,40 @@ public class ChatBlueTeleopTest extends OpMode {
         backRightMotor.setPower((y + x - rx) / denominator);
     }
 
+    public void startTurnToAngle(double targetDegrees) {
+        turnTargetDegrees = targetDegrees;
+        isTurning = true;
+    }
+
+     //while isTurning is true
+    private void updateTurn() {
+        double currentDeg = Math.toDegrees(follower.getPose().getHeading());
+        double error = turnTargetDegrees - currentDeg;
+
+        while (error > 180)  error -= 360;
+        while (error < -180) error += 360;
+
+        if (Math.abs(error) > 5) {
+            double turnPower = error > 0 ? .3 : -.3;
+            frontLeftMotor.setPower(turnPower);
+            backLeftMotor.setPower(turnPower);
+            frontRightMotor.setPower(-turnPower);
+            backRightMotor.setPower(-turnPower);
+        }
+        
+        else {
+            frontLeftMotor.setPower(0);
+            backLeftMotor.setPower(0);
+            frontRightMotor.setPower(0);
+            backRightMotor.setPower(0);
+            isTurning = false;
+        }
+    }
+
     /* ================= APRILTAG ================= */
 
     private void trackAprilTag() {
-        // re-enable if we get it done
+
     }
 
     /* ================= TELEMETRY ================= */
@@ -327,14 +364,16 @@ public class ChatBlueTeleopTest extends OpMode {
         telemetry.addData("y: ", follower.getPose().getY());
         telemetry.addData("Flywheel target", flywheelVelocity);
         telemetry.addData("Flywheel actual", currentFlywheelVelocity);
+        telemetry.addData("Turning", isTurning);
+        telemetry.addData("Turn target", turnTargetDegrees);
         telemetry.update();
     }
 
     public void stop() {
-        // re-enable if we get it done
+
     }
 
     public void trackTarget() {
-        // Placeholder
+
     }
 }
