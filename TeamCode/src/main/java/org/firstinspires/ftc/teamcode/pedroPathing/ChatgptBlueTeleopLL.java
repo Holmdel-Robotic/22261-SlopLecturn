@@ -505,15 +505,12 @@ public class ChatgptBlueTeleopLL extends OpMode {
       //  telemetry.addData("dDown", debounceDpad_down);
         telemetry.addData("x: ", follower.getPose().getX());
         telemetry.addData("y: ", follower.getPose().getY());
-<<<<<<< HEAD
        // telemetry.addData("theta: ", Math.toDegrees(follower.getPose().getHeading()));
        // telemetry.addData("autoFly", getRuntime() - lastUpdateTime > .05 && autoAim);
-=======
+
         telemetry.addData("theta: ", Math.toDegrees(follower.getPose().getHeading()));
         telemetry.addData("autoFly", getRuntime() - lastUpdateTime > .05 && autoAim);
 
-
->>>>>>> 90bfd74a7cd3cfb9071719b2ed0171974293502a
         telemetry.update();
     }
 
