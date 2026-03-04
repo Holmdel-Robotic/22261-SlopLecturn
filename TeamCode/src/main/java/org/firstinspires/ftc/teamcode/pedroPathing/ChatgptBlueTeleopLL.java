@@ -190,7 +190,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
     private void processGamepad1() {
 
         if (gamepad1.start){
-            turnToAngle(Math.toDegrees(Math.atan(((144 -follower.getPose().getY())/-follower.getPose().getX()))));
+            turnToAngle(Math.toDegrees(Math.atan(((144 -follower.getPose().getY())/follower.getPose().getX()))) + 90);
             // fiugre out the right formula
         }
 
@@ -525,7 +525,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
     public void turnToAngle(double TargetToDegrees){
         if (TargetToDegrees - Math.toDegrees(robotHeading) > 0){
-            while (Math.abs(Math.toDegrees(follower.getPose().getHeading()) - TargetToDegrees) > 5){
+            while (Math.abs(Math.toDegrees(follower.getPose().getHeading()) - TargetToDegrees) > 10){
                 frontLeftMotor.setPower(.3);
                 backLeftMotor.setPower(.3);
                 frontRightMotor.setPower(-.3);
@@ -534,7 +534,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
             }
 
         } else {
-            while (Math.abs(Math.toDegrees(follower.getPose().getHeading()) - TargetToDegrees) > 5) {
+            while (Math.abs(Math.toDegrees(follower.getPose().getHeading()) - TargetToDegrees) > 10) {
                 frontLeftMotor.setPower(-.3);
                 backLeftMotor.setPower(-.3);
                 frontRightMotor.setPower(.3);
