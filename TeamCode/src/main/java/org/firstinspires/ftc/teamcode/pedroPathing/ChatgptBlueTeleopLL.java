@@ -453,25 +453,25 @@ public class ChatgptBlueTeleopLL extends OpMode {
         lastLoopTime = now;
 
 
-        telemetry.addData("AprilTracking?",aprilTagTracking);
-        telemetry.addData("FlywheelOn", flywheelOn);
-        telemetry.addData("IntakeOn", intakeOn);
+        //telemetry.addData("AprilTracking?",aprilTagTracking);
+        //telemetry.addData("FlywheelOn", flywheelOn);
+        //telemetry.addData("IntakeOn", intakeOn);
 
-        telemetry.addData("Inner Dist sensor",innerSensor.getDistance(DistanceUnit.CM));
-        telemetry.addData("intake full?", intakeFull);
-        telemetry.addData("Intake1dist",intake1Dist);
-        telemetry.addData("intake2dist",intake2Dist);
+       // telemetry.addData("Inner Dist sensor",innerSensor.getDistance(DistanceUnit.CM));
+       // telemetry.addData("intake full?", intakeFull);
+      // telemetry.addData("Intake1dist",intake1Dist);
+      //  telemetry.addData("intake2dist",intake2Dist);
 
 
-        telemetry.addData("FL current", frontLeftMotor.getCurrent(CurrentUnit.AMPS));
-        telemetry.addData("FR current", frontRightMotor.getCurrent(CurrentUnit.AMPS));
-        telemetry.addData("BL current", backLeftMotor.getCurrent(CurrentUnit.AMPS));
-        telemetry.addData("BR current", backRightMotor.getCurrent(CurrentUnit.AMPS));
+       // telemetry.addData("FL current", frontLeftMotor.getCurrent(CurrentUnit.AMPS));
+       // telemetry.addData("FR current", frontRightMotor.getCurrent(CurrentUnit.AMPS));
+       // telemetry.addData("BL current", backLeftMotor.getCurrent(CurrentUnit.AMPS));
+       // telemetry.addData("BR current", backRightMotor.getCurrent(CurrentUnit.AMPS));
 
-        telemetry.addData("Flywheel L Current", flywheelLeft.getCurrent(CurrentUnit.AMPS));
-        telemetry.addData("Flywheel R Current", flywheelRight.getCurrent(CurrentUnit.AMPS));
-        telemetry.addData("innerIntake", intakeInner.getCurrent(CurrentUnit.AMPS));
-        telemetry.addData("OuterIntake", intakeOuter.getCurrent(CurrentUnit.AMPS));
+       // telemetry.addData("Flywheel L Current", flywheelLeft.getCurrent(CurrentUnit.AMPS));
+        //telemetry.addData("Flywheel R Current", flywheelRight.getCurrent(CurrentUnit.AMPS));
+       // telemetry.addData("innerIntake", intakeInner.getCurrent(CurrentUnit.AMPS));
+       // telemetry.addData("OuterIntake", intakeOuter.getCurrent(CurrentUnit.AMPS));
 
         //telemetry.addData("DriveMillis", driveRobotMillis *1000);
         //telemetry.addData("ProcessGamepadMillis", processgamepadMillis *1000);
@@ -480,20 +480,20 @@ public class ChatgptBlueTeleopLL extends OpMode {
         //telemetry.addData("testMillis", testMillis);
 
 
-        telemetry.addData("Loop ms", loopTime);
-        telemetry.addData("Hz", 1000.0 / loopTime);
-        telemetry.addData("FlywheelV L", (flywheelLeft.getVelocity()));
-        telemetry.addData("FlywheelV R", (flywheelRight.getVelocity()));
-        telemetry.addData("flyWheel V intended", flywheelVelocity);
-        telemetry.addData("Distance",distance);
-        telemetry.addData("Hood Pos", hood.getPosition());
-        telemetry.addData("AutoAim", autoAim);
-        telemetry.addData("dUp", debounceDpad_up);
-        telemetry.addData("dDown", debounceDpad_down);
+      //  telemetry.addData("Loop ms", loopTime);
+      //  telemetry.addData("Hz", 1000.0 / loopTime);
+      //  telemetry.addData("FlywheelV L", (flywheelLeft.getVelocity()));
+      //  telemetry.addData("FlywheelV R", (flywheelRight.getVelocity()));
+       // telemetry.addData("flyWheel V intended", flywheelVelocity);
+      //  telemetry.addData("Distance",distance);
+       // telemetry.addData("Hood Pos", hood.getPosition());
+       // telemetry.addData("AutoAim", autoAim);
+       // telemetry.addData("dUp", debounceDpad_up);
+      //  telemetry.addData("dDown", debounceDpad_down);
         telemetry.addData("x: ", follower.getPose().getX());
         telemetry.addData("y: ", follower.getPose().getY());
-        telemetry.addData("theta: ", Math.toDegrees(follower.getPose().getHeading()));
-        telemetry.addData("autoFly", getRuntime() - lastUpdateTime > .05 && autoAim);
+       // telemetry.addData("theta: ", Math.toDegrees(follower.getPose().getHeading()));
+       // telemetry.addData("autoFly", getRuntime() - lastUpdateTime > .05 && autoAim);
         telemetry.update();
     }
 
