@@ -20,6 +20,9 @@ import java.util.List;
 @TeleOp
 public class ChatgptBlueTeleopLL extends OpMode {
 
+    private double flV, blV, frV, brV;
+
+    private double robotXPos, robotYPos, robotHeading;
     private Follower follower;
 
     public double testMillis, lastTestMillis = getRuntime();
@@ -186,6 +189,11 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
     private void processGamepad1() {
 
+        if (gamepad1.start){
+            turnToAngle(Math.toDegrees(Math.atan(((144 -follower.getPose().getY())/follower.getPose().getX()))));
+            // fiugre out the right formula
+        }
+
         if (gamepad1.dpad_up && !debounceDpad_up){
             flywheelVelocity = flywheelVelocity + 50;
             debounceDpad_up = true;
@@ -296,11 +304,12 @@ public class ChatgptBlueTeleopLL extends OpMode {
         if (getRuntime() - lastUpdateTime > .05 && autoAim) {
             lastUpdateTime = getRuntime();
             pose = follower.getPose();
-            double x = pose.getX();
-            double y = pose.getY();
+            robotXPos = pose.getX();
+            robotYPos = pose.getY();
+            robotHeading = pose.getHeading();
 
-            double dy = 144 - y;
-            distance = Math.sqrt(dy * dy + x * x);
+            double dy = 144 - robotYPos;
+            distance = Math.sqrt(dy * dy + robotXPos * robotXPos);
 
 //        hoodPos = -0.002005998 * distance + (1 - 0.337882)  ;
             hoodPos = -0.004005998 * distance + (1);
@@ -394,7 +403,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
         double y = -gamepad1.left_stick_y;
         double x = gamepad1.left_stick_x * 1.1;
-        double rx = gamepad1.right_stick_x * .4;
+        double rx = gamepad1.right_stick_x * .8;
 
         if (y < .03 && x < .03 && rx < .03) driving = false;
         else driving = true;
@@ -402,10 +411,14 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
         double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
 
-        frontLeftMotor.setPower((y + x + rx) / denominator);
-        backLeftMotor.setPower((y - x + rx) / denominator);
-        frontRightMotor.setPower((y - x - rx) / denominator);
-        backRightMotor.setPower((y + x - rx) / denominator);
+        frontLeftMotor.setVelocity(2200 * (y + x + rx) / denominator);
+        flV = (y + x + rx) / denominator;
+        backLeftMotor.setVelocity(2200 * (y - x + rx) / denominator);
+        blV = (y - x + rx) / denominator;
+        frontRightMotor.setVelocity(2200 * (y - x - rx) / denominator);
+        frV = (y - x - rx) / denominator;
+        backRightMotor.setVelocity(2200 *(y + x - rx) / denominator);
+        brV = (y + x - rx) / denominator;
     }
 
     /* ================= APRILTAG ================= */
@@ -492,8 +505,15 @@ public class ChatgptBlueTeleopLL extends OpMode {
       //  telemetry.addData("dDown", debounceDpad_down);
         telemetry.addData("x: ", follower.getPose().getX());
         telemetry.addData("y: ", follower.getPose().getY());
+<<<<<<< HEAD
        // telemetry.addData("theta: ", Math.toDegrees(follower.getPose().getHeading()));
        // telemetry.addData("autoFly", getRuntime() - lastUpdateTime > .05 && autoAim);
+=======
+        telemetry.addData("theta: ", Math.toDegrees(follower.getPose().getHeading()));
+        telemetry.addData("autoFly", getRuntime() - lastUpdateTime > .05 && autoAim);
+
+
+>>>>>>> 90bfd74a7cd3cfb9071719b2ed0171974293502a
         telemetry.update();
     }
 
@@ -504,6 +524,33 @@ public class ChatgptBlueTeleopLL extends OpMode {
         } catch (Exception ignored) {}
 
          */
+    }
+
+    public void turnToAngle(double TargetToDegrees){
+        if (TargetToDegrees - Math.toDegrees(robotHeading) > 0){
+            while (Math.abs(Math.toDegrees(follower.getPose().getHeading()) - TargetToDegrees) > 5){
+                frontLeftMotor.setPower(.3);
+                backLeftMotor.setPower(.3);
+                frontRightMotor.setPower(-.3);
+                backRightMotor.setPower(-.3);
+                follower.update();
+            }
+
+        } else {
+            while (Math.abs(Math.toDegrees(follower.getPose().getHeading()) - TargetToDegrees) > 5) {
+                frontLeftMotor.setPower(-.3);
+                backLeftMotor.setPower(-.3);
+                frontRightMotor.setPower(.3);
+                backRightMotor.setPower(.3);
+                follower.update();
+            }
+
+        }
+
+        frontLeftMotor.setPower(0);
+        backLeftMotor.setPower(0);
+        frontRightMotor.setPower(0);
+        backRightMotor.setPower(0);
     }
 
     public void trackTarget(){
