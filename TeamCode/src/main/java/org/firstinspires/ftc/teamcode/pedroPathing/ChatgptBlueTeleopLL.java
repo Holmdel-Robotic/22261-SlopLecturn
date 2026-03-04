@@ -523,20 +523,20 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
     public void turnToAngle(double TargetToDegrees){
         if (TargetToDegrees - Math.toDegrees(robotHeading) > 0){
-            while (Math.abs(Math.toDegrees(follower.getPose().getHeading()) - TargetToDegrees) > 1){
-                frontLeftMotor.setPower(.5);
-                backLeftMotor.setPower(.5);
-                frontRightMotor.setPower(-.5);
-                backRightMotor.setPower(-.5);
+            while (Math.abs(Math.toDegrees(follower.getPose().getHeading()) - TargetToDegrees) > 5){
+                frontLeftMotor.setPower(.3);
+                backLeftMotor.setPower(.3);
+                frontRightMotor.setPower(-.3);
+                backRightMotor.setPower(-.3);
                 follower.update();
             }
 
         } else {
-            while (Math.abs(Math.toDegrees(follower.getPose().getHeading()) - TargetToDegrees) > 1) {
-                frontLeftMotor.setPower(-.5);
-                backLeftMotor.setPower(-.5);
-                frontRightMotor.setPower(.5);
-                backRightMotor.setPower(.5);
+            while (Math.abs(Math.toDegrees(follower.getPose().getHeading()) - TargetToDegrees) > 5) {
+                frontLeftMotor.setPower(-.3);
+                backLeftMotor.setPower(-.3);
+                frontRightMotor.setPower(.3);
+                backRightMotor.setPower(.3);
                 follower.update();
             }
 
