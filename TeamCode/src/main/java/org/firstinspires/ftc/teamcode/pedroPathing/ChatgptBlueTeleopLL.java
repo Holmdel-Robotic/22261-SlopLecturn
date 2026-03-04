@@ -190,7 +190,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
     private void processGamepad1() {
 
         if (gamepad1.start){
-            turnToAngle(Math.toDegrees(Math.atan(((144 -follower.getPose().getY())/follower.getPose().getX()))));
+            turnToAngle(Math.toDegrees(Math.atan(((144 -follower.getPose().getY())/-follower.getPose().getX()))));
             // fiugre out the right formula
         }
 
