@@ -283,9 +283,12 @@ public class ChatBlueTeleopTest extends OpMode {
             gateOpen = false;
         }
 
-        if (intakeOn && !intakeFull && !gateOpen)       intakeOuter.setPower(-.8);
-        else if (intakeOn && intakeFull && !gateOpen)   intakeOuter.setPower(0);
-        else if (!intakeOn)                             intakeOuter.setPower(0);
+        if (intakeOn && !intakeFull && !gateOpen)
+            intakeOuter.setPower(-.8);
+        else if (intakeOn && intakeFull && !gateOpen)
+            intakeOuter.setPower(0);
+        else if (!intakeOn)
+            intakeOuter.setPower(0);
 
         if (flywheelOn) {
             if (currentFlywheelVelocity < flywheelVelocity) {
@@ -337,7 +340,7 @@ public class ChatBlueTeleopTest extends OpMode {
             frontRightMotor.setPower(-turnPower);
             backRightMotor.setPower(-turnPower);
         }
-        
+
         else {
             frontLeftMotor.setPower(0);
             backLeftMotor.setPower(0);
