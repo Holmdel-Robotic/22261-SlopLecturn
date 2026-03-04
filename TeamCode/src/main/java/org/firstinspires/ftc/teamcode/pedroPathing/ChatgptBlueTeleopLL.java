@@ -109,6 +109,12 @@ public class ChatgptBlueTeleopLL extends OpMode {
         backRightMotor = hardwareMap.get(DcMotorEx.class, "br");
         backLeftMotor.setDirection(DcMotor.Direction.REVERSE);
 
+        frontLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+
         flywheelLeft = hardwareMap.get(DcMotorEx.class, "flyL");
         flywheelRight = hardwareMap.get(DcMotorEx.class, "flyR");
         flywheelRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -510,6 +516,8 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
         telemetry.addData("theta: ", Math.toDegrees(follower.getPose().getHeading()));
         telemetry.addData("autoFly", getRuntime() - lastUpdateTime > .05 && autoAim);
+        telemetry.addData("desired angle", Math.toDegrees(Math.atan(((144 -follower.getPose().getY())/follower.getPose().getX()))) + 90);
+        telemetry.addData("Angular distance to target", Math.abs(Math.toDegrees(follower.getPose().getHeading()) - (Math.toDegrees(Math.atan(((144 -follower.getPose().getY())/follower.getPose().getX()))) + 90)));
 
         telemetry.update();
     }
@@ -524,21 +532,21 @@ public class ChatgptBlueTeleopLL extends OpMode {
     }
 
     public void turnToAngle(double TargetToDegrees){
-        if (TargetToDegrees - Math.toDegrees(robotHeading) > 0){
+        if (TargetToDegrees - follower.getPose().getHeading() < 0){
             while (Math.abs(Math.toDegrees(follower.getPose().getHeading()) - TargetToDegrees) > 10){
-                frontLeftMotor.setPower(.3);
-                backLeftMotor.setPower(.3);
-                frontRightMotor.setPower(-.3);
-                backRightMotor.setPower(-.3);
+                frontLeftMotor.setPower(.2);
+                backLeftMotor.setPower(.2);
+                frontRightMotor.setPower(-.2);
+                backRightMotor.setPower(-.2);
                 follower.update();
             }
 
         } else {
             while (Math.abs(Math.toDegrees(follower.getPose().getHeading()) - TargetToDegrees) > 10) {
-                frontLeftMotor.setPower(-.3);
-                backLeftMotor.setPower(-.3);
-                frontRightMotor.setPower(.3);
-                backRightMotor.setPower(.3);
+                frontLeftMotor.setPower(-.2);
+                backLeftMotor.setPower(-.2);
+                frontRightMotor.setPower(.2);
+                backRightMotor.setPower(.2);
                 follower.update();
             }
 
