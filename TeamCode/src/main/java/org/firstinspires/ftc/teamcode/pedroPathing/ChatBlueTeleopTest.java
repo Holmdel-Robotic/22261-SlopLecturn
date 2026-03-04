@@ -118,7 +118,7 @@ public class ChatBlueTeleopTest extends OpMode {
         autoAim = false;
 
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(144 - 84, 36, Math.toRadians(180)));
+        follower.setStartingPose(new Pose(144-84, 36, Math.toRadians(180)));
 
         lastLoopTime = System.currentTimeMillis();
 
