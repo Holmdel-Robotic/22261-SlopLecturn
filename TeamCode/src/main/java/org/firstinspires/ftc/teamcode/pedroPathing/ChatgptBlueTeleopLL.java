@@ -190,7 +190,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
     private void processGamepad1() {
 
         if (gamepad1.start){
-            turnToAngle(Math.toDegrees(Math.atan(((144 -follower.getPose().getY())/-follower.getPose().getX()))));
+            turnToAngle(Math.toDegrees(Math.atan(((144 -follower.getPose().getY())/follower.getPose().getX())) + 90));
             // fiugre out the right formula
         }
 
@@ -505,15 +505,14 @@ public class ChatgptBlueTeleopLL extends OpMode {
       //  telemetry.addData("dDown", debounceDpad_down);
         telemetry.addData("x: ", follower.getPose().getX());
         telemetry.addData("y: ", follower.getPose().getY());
-<<<<<<< HEAD
+
        // telemetry.addData("theta: ", Math.toDegrees(follower.getPose().getHeading()));
        // telemetry.addData("autoFly", getRuntime() - lastUpdateTime > .05 && autoAim);
-=======
+
         telemetry.addData("theta: ", Math.toDegrees(follower.getPose().getHeading()));
         telemetry.addData("autoFly", getRuntime() - lastUpdateTime > .05 && autoAim);
 
 
->>>>>>> 90bfd74a7cd3cfb9071719b2ed0171974293502a
         telemetry.update();
     }
 
@@ -528,7 +527,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
     public void turnToAngle(double TargetToDegrees){
         if (TargetToDegrees - Math.toDegrees(robotHeading) > 0){
-            while (Math.abs(Math.toDegrees(follower.getPose().getHeading()) - TargetToDegrees) > 5){
+            while (Math.abs(Math.toDegrees(follower.getPose().getHeading()) - TargetToDegrees) > 10){
                 frontLeftMotor.setPower(.3);
                 backLeftMotor.setPower(.3);
                 frontRightMotor.setPower(-.3);
@@ -537,7 +536,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
             }
 
         } else {
-            while (Math.abs(Math.toDegrees(follower.getPose().getHeading()) - TargetToDegrees) > 5) {
+            while (Math.abs(Math.toDegrees(follower.getPose().getHeading()) - TargetToDegrees) > 10) {
                 frontLeftMotor.setPower(-.3);
                 backLeftMotor.setPower(-.3);
                 frontRightMotor.setPower(.3);
