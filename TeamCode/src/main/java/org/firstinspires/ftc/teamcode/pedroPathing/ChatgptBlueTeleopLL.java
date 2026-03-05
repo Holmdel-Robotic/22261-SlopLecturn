@@ -557,10 +557,11 @@ public class ChatgptBlueTeleopLL extends OpMode {
                 telemetry.addData("Normalized Angular distance to target", (Math.abs(Math.toDegrees(fHeading) - target)));
                 follower.update();
                 telemetry.update();
+                fHeading = follower.getHeading();
             }
 
         } else {
-            while (Math.abs(Math.toDegrees(follower.getPose().getHeading()) - TargetToDegrees) > 10) {
+            while (Math.abs(Math.toDegrees(fHeading) - TargetToDegrees) > 10) {
                 frontLeftMotor.setPower(-.2);
                 backLeftMotor.setPower(-.2);
                 frontRightMotor.setPower(.2);
@@ -571,6 +572,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
                 telemetry.addData("Angular distance to target", Math.abs(Math.toDegrees(follower.getPose().getHeading()) - (Math.toDegrees(Math.atan(((144)))))));
                 follower.update();
                 telemetry.update();
+                fHeading = follower.getHeading();
             }
 
         }
