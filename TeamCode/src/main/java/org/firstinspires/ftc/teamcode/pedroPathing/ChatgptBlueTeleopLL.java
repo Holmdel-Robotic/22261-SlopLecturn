@@ -196,7 +196,7 @@ public class ChatgptBlueTeleopLL extends OpMode {
     private void processGamepad1() {
 
         if (gamepad1.start){
-            turnToAngle(Math.toDegrees(Math.atan(((144 -follower.getPose().getY())/follower.getPose().getX()))) + 90);
+            turnToAngle(Math.toDegrees(Math.atan((144-robotYPos)/-robotXPos))+ 180);
             // fiugre out the right formula
         }
 
@@ -532,13 +532,31 @@ public class ChatgptBlueTeleopLL extends OpMode {
     }
 
     public void turnToAngle(double TargetToDegrees){
-        if (TargetToDegrees - follower.getPose().getHeading() < 0){
-            while (Math.abs(Math.toDegrees(follower.getPose().getHeading()) - TargetToDegrees) > 10){
+
+        double target = TargetToDegrees;
+        double fHeading = follower.getPose().getHeading();
+        if(TargetToDegrees < 1)
+        {
+            target = 360 + TargetToDegrees;
+        }
+        if(follower.getPose().getHeading() < 1)
+        {
+            fHeading = 360 + follower.getPose().getHeading();
+        }
+        if (target - fHeading < 180){
+            while (Math.abs(Math.toDegrees(fHeading) - target) > 10){
                 frontLeftMotor.setPower(.2);
                 backLeftMotor.setPower(.2);
                 frontRightMotor.setPower(-.2);
                 backRightMotor.setPower(-.2);
+
+                telemetry.addData("theta: ", Math.toDegrees(follower.getPose().getHeading()));
+                telemetry.addData("autoFly", getRuntime() - lastUpdateTime > .05 && autoAim);
+                telemetry.addData("desired angle", Math.toDegrees(Math.atan(((144 -follower.getPose().getY())/follower.getPose().getX()))) + 90);
+                telemetry.addData("Angular distance to target", Math.abs(Math.toDegrees(follower.getPose().getHeading()) - (Math.toDegrees(Math.atan(((144)))))));
+                telemetry.addData("Normalized Angular distance to target", (Math.abs(Math.toDegrees(fHeading) - target)));
                 follower.update();
+                telemetry.update();
             }
 
         } else {
@@ -547,7 +565,12 @@ public class ChatgptBlueTeleopLL extends OpMode {
                 backLeftMotor.setPower(-.2);
                 frontRightMotor.setPower(.2);
                 backRightMotor.setPower(.2);
+                telemetry.addData("theta: ", Math.toDegrees(follower.getPose().getHeading()));
+                telemetry.addData("autoFly", getRuntime() - lastUpdateTime > .05 && autoAim);
+                telemetry.addData("desired angle", Math.toDegrees(Math.atan(((144 -follower.getPose().getY())/follower.getPose().getX()))) + 90);
+                telemetry.addData("Angular distance to target", Math.abs(Math.toDegrees(follower.getPose().getHeading()) - (Math.toDegrees(Math.atan(((144)))))));
                 follower.update();
+                telemetry.update();
             }
 
         }
