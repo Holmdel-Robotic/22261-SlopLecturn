@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.pedroPathing;
+package org.firstinspires.ftc.teamcode.OpModes.Auto;
     import com.pedropathing.util.Timer;
     import com.qualcomm.hardware.limelightvision.Limelight3A;
     import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -17,6 +17,7 @@ package org.firstinspires.ftc.teamcode.pedroPathing;
     import com.qualcomm.robotcore.hardware.Servo;
 
     import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+    import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 @Autonomous(name = "GrantsBlueAutonomous", group = "Autonomous")
     @Configurable // Panels

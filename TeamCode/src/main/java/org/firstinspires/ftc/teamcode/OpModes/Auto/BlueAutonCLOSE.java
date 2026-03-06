@@ -1,23 +1,22 @@
-package org.firstinspires.ftc.teamcode.pedroPathing;
-
+package org.firstinspires.ftc.teamcode.OpModes.Auto;
 import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
-import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
-import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
-/*
-New Pathing for Auton Left
- */
-@Autonomous(name = "AutonNearPrototype", group = "Examples")
-public class DO_NOT_USE_AutonNearPrototype extends OpMode {
+// make sure this aligns with class location
+import com.pedropathing.paths.Path;
+import com.pedropathing.util.Timer;
+
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+
+@Autonomous(name = "AutonBlue", group = "Examples")
+public class BlueAutonCLOSE extends OpMode {
 
     private Servo hood;
 
@@ -38,25 +37,20 @@ public class DO_NOT_USE_AutonNearPrototype extends OpMode {
     private Timer pathTimer, actionTimer, opmodeTimer;
 
     private int count;
-    private final Pose sidePose = new Pose(10, 8, Math.toRadians(180)); // Start Pose of our robot.
-    private final Pose scorePose = new Pose(56, 8, Math.toRadians(180)); // Scoring Pose of our robot. It is facing the wall.
-    private final Pose pickup1Pose = new Pose(24, 36, Math.toRadians(180)); // Highest (First Set) of Artifacts.
+    private final Pose startPose = new Pose(23.687, 119.835, Math.toRadians(180)); // Start Pose of our robot.
+    private final Pose scorePose = new Pose(58, 85, Math.toRadians(180)); // Scoring Pose of our robot. It is facing the wall.
+    private final Pose pickup1Pose = new Pose(20, 83, Math.toRadians(180)); // Highest (First Set) of Artifacts.
 //    private final Pose pickup3Pose = new Pose(42, 60, Math.toRadians(180)); // Middle (Second Set) of Artifacts from the Spike Mark.
-    private final Pose cPose = new Pose(24,0, Math.toRadians(180));
 
-    //private final Pose pickup1C2Pose = new Pose(48,98, Math.toRadians(0));
-    private final Pose pickup2Pose = new Pose(24, 72, Math.toRadians(180)); // Second Row of Artifacts from the Spike Mark.
-    private final Pose leverPose = new Pose(12,72, Math.toRadians(180));
+    private final Pose pickup2Pose = new Pose(20, 60, Math.toRadians(180)); // Second Row of Artifacts from the Spike Mark.
 
-    //private final Pose pickup2C2Pose = new Pose(50,97, Math.toRadians(0));
+    private final Pose pickup3CPose = new Pose(60, 36, Math.toRadians(180));
 
-    private final Pose pickup3Pose = new Pose(24, 84, Math.toRadians(180));
-
-    private final Pose endPose = new Pose(24,10, Math.toRadians(180));
-
+    private final Pose pickup3Pose = new Pose(20, 36, Math.toRadians(180));
+    private final Pose pickup2CPose = new Pose(60,60,Math.toRadians(180)); // Adithiya's Bezier curve control point yay
     private Path scorePreload;
 
-    private PathChain leverPush, score1, grab2, score2, grab3, score3,grab4, score4, end;
+    private PathChain grabPickup1, scorePickup1, grabPickup2, scorePickup2, grabPickup3, grabPickup4, grabPickup5, scorePickup3 ;
 
     private Servo kicker;
 
@@ -73,17 +67,15 @@ public class DO_NOT_USE_AutonNearPrototype extends OpMode {
         PICKUP5,
 
         SCORING,
-        LEVERPUSH,
-
         END
 
-    }
+    }//
 
-    State state = State.SCORING;
+    State state = State.START;
     public void buildPaths() {
         /* This is our scorePreload path. We are using a BezierLine, which is a straight line. */
-        scorePreload = new Path(new BezierLine(scorePose, sidePose));
-        scorePreload.setConstantHeadingInterpolation(Math.toRadians(180));
+        scorePreload = new Path(new BezierLine(startPose, scorePose));
+        scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading());
 
         flywheelLeft = hardwareMap.get(DcMotorEx.class, "flyL");
         flywheelRight = hardwareMap.get(DcMotorEx.class, "flyR");
@@ -111,9 +103,9 @@ public class DO_NOT_USE_AutonNearPrototype extends OpMode {
         hood = hardwareMap.get(Servo.class, "hood");
 
 
-        raxon.setPosition(.3389);
-        laxon.setPosition(.3389);
-        kicker.setPosition(.4);
+        raxon.setPosition(.63);
+        laxon.setPosition(.63);
+        kicker.setPosition(.5);
     /* Here is an example for Constant Interpolation
     scorePreload.setConstantInterpolation(startPose.getHeading()); *
 
@@ -126,20 +118,16 @@ public class DO_NOT_USE_AutonNearPrototype extends OpMode {
     //AxonRot = .2705/90
      */
         /* This is our grabPickup1 PathChain. We are using a single path with a BezierLine, which is a straight line. */
-        score1 = follower.pathBuilder()
-                .addPath(new BezierLine(sidePose, scorePose))
-                .setConstantHeadingInterpolation(Math.toRadians(90))
-                .build();
-
-        grab2 = follower.pathBuilder()
-                .addPath(new BezierCurve(scorePose, cPose, pickup1Pose))
-                .setConstantHeadingInterpolation(Math.toRadians(90))
+        grabPickup1 = follower.pathBuilder()
+                .addPath(new BezierLine(scorePose, pickup1Pose))
+                .setLinearHeadingInterpolation(scorePose.getHeading(), pickup1Pose.getHeading())
+                .setVelocityConstraint(0.01)
                 .build();
 
         /* This is our scorePickup1 PathChain. We are using a single path with a BezierLine, which is a straight line. */
-        score2 = follower.pathBuilder()
+        scorePickup1 = follower.pathBuilder()
                 .addPath(new BezierLine(pickup1Pose, scorePose))
-                .setConstantHeadingInterpolation(Math.toRadians(90))
+                .setLinearHeadingInterpolation(pickup1Pose.getHeading(), scorePose.getHeading())
                 .build();
 
         /* This is our grabPickup2 PathChain. We are using a single path with a BezierLine, which is a straight line. */
@@ -149,11 +137,15 @@ public class DO_NOT_USE_AutonNearPrototype extends OpMode {
 //                .setLinearHeadingInterpolation(scorePose.getHeading(), pickup2Pose.getHeading())
 //                .setVelocityConstraint(0.01)
 //                .build();
-        grab3 = follower.pathBuilder()
-                .addPath(new BezierCurve(scorePose, cPose, pickup2Pose))
-                .setConstantHeadingInterpolation(Math.toRadians(90))
+        grabPickup2 = follower.pathBuilder()
+                .addPath(new BezierLine(scorePose, pickup2CPose))
+                .setLinearHeadingInterpolation(scorePose.getHeading(), pickup2CPose.getHeading())
                 .build();
 
+        grabPickup3 = follower.pathBuilder()
+                .addPath(new BezierLine(pickup2CPose, pickup2Pose))
+                .setLinearHeadingInterpolation(pickup2CPose.getHeading(), pickup2Pose.getHeading())
+                .build();
         /* This is our scorePickup2 PathChain. We are using a single path with a BezierLine, which is a straight line. */
 //        scorePickup2 = follower.pathBuilder()
 //                .addPath(new BezierLine(pickup2Pose, pickup3Pose))
@@ -168,42 +160,45 @@ public class DO_NOT_USE_AutonNearPrototype extends OpMode {
                 .build();
 
         /* This is our scorePickup3 PathChain. We are using a single path with a BezierLine, which is a straight line. */
-        leverPush = follower.pathBuilder()
-                .addPath(new BezierLine(pickup2Pose, leverPose))
-                .setConstantHeadingInterpolation(Math.toRadians(90))
-                .build();
-
-        score3 = follower.pathBuilder()
+        scorePickup2 = follower.pathBuilder()
                 .addPath(new BezierLine(pickup2Pose, scorePose))
-                .setConstantHeadingInterpolation(Math.toRadians(90))
+                .setLinearHeadingInterpolation(pickup2Pose.getHeading(), scorePose.getHeading())
+                .setVelocityConstraint(.01)
                 .build();
 
-        grab4 = follower.pathBuilder()
-                .addPath(new BezierCurve(scorePose, cPose, pickup3Pose))
-                .setConstantHeadingInterpolation(Math.toRadians(90))
+        grabPickup4 = follower.pathBuilder()
+                .addPath(new BezierLine(scorePose, pickup3CPose))
+                .setLinearHeadingInterpolation(scorePose.getHeading(), pickup3CPose.getHeading())
                 .build();
 
-        score4 = follower.pathBuilder()
+        grabPickup5 = follower.pathBuilder()
+                .addPath(new BezierLine(pickup3CPose, pickup3Pose))
+                .setLinearHeadingInterpolation(pickup3CPose.getHeading(), pickup3Pose.getHeading())
+                .build();
+
+        scorePickup3 = follower.pathBuilder()
                 .addPath(new BezierLine(pickup3Pose, scorePose))
-                .setConstantHeadingInterpolation(Math.toRadians(90))
-                .build();
-        end = follower.pathBuilder()
-                .addPath(new BezierLine(scorePose,endPose ))
-                .setConstantHeadingInterpolation(Math.toRadians(90))
+                .setLinearHeadingInterpolation(pickup3Pose.getHeading(), scorePose.getHeading())
+                .setVelocityConstraint(.01)
                 .build();
     }
 
     public void autonomousPathUpdate() {
         switch (state) {
-            case LEVERPUSH:
-                if(!follower.isBusy())
-                {
-                    follower.setMaxPower(0.9);
-                    follower.followPath(score3);
-                    setPathState(State.SCORING);
-                    actionTimer.resetTimer();
-                }
+            case START:
+                //flywheelLeft.setVelocity(1700);
+                //flywheelRight.setVelocity(1700);
+                flywheelLeft.setVelocity(-1675);
+                flywheelRight.setVelocity(-1675);
+                hood.setPosition(.67);
+                kicker.setPosition(.3);
+                IntakeOuter.setPower(-.8);
+                IntakeInner.setPower(-.4);
 
+                follower.setMaxPower(0.8);
+                follower.followPath(scorePreload);
+                setPathState(State.SCORING);
+                actionTimer.resetTimer();
 
 
                 break;
@@ -218,10 +213,8 @@ public class DO_NOT_USE_AutonNearPrototype extends OpMode {
 
                     if(actionTimer.getElapsedTimeSeconds() <= 1){
 
-                        flywheelLeft.setVelocity(-1800);
-                        flywheelRight.setVelocity(-1800);
 
-                        hood.setPosition(.57);
+                        hood.setPosition(.67);
                         // && flywheelRight.getVelocity() > 1650 && flywheelLeft.getVelocity() > 1650 &&
                     } else if (actionTimer.getElapsedTimeSeconds() >= 1 && actionTimer.getElapsedTimeSeconds() <= 3) {
 
@@ -240,33 +233,27 @@ public class DO_NOT_USE_AutonNearPrototype extends OpMode {
 
                         //IntakeInner.setVelocity(0);
                         //IntakeOuter.setVelocity(0);
-                        flywheelLeft.setVelocity(-.01);
-                        flywheelRight.setVelocity(-.01);
+//                        flywheelLeft.setVelocity(-.01);
+//                        flywheelRight.setVelocity(-.01);
                         if (count == 1) {
 
-                            follower.followPath(grab2, true);
-                            setPathState(State.PICKUP2);
+                            follower.followPath(grabPickup1, true);
+                            setPathState(State.PICKUP1);
                             count++;
                         } else if (count == 2) {
-                            follower.followPath(grab3, true);
-                            setPathState(State.PICKUP3);
+                            follower.followPath(grabPickup2, true);
+                            setPathState(State.PICKUP2);
                             count++;
                         } else if (count == 3) {
-                            follower.followPath(grab4);
+                            follower.followPath(grabPickup4);
                             setPathState(State.PICKUP4);
                             count++;
 
                         }
                         else if(count == 4)
                         {
-                            follower.followPath(end);
+                            follower.followPath(grabPickup4);
                             setPathState(State.END);
-                        }
-                        else if(count == 0)
-                        {
-                            follower.followPath(scorePreload);
-                            setPathState(State.START);
-                            count++;
                         }
 
                     }
@@ -282,7 +269,7 @@ public class DO_NOT_USE_AutonNearPrototype extends OpMode {
                     /* Grab Sample */
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
 
-                    follower.followPath(score1,true);
+                    follower.followPath(scorePickup1,true);
                     setPathState(State.SCORING);
                     //IntakeInner.setVelocity(300);
                     //IntakeOuter.setVelocity(-300);
@@ -317,8 +304,8 @@ public class DO_NOT_USE_AutonNearPrototype extends OpMode {
 
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
                     follower.setMaxPower(.75);
-                    follower.followPath(score2, true);
-                    setPathState(State.SCORING);
+                    follower.followPath(grabPickup3, true);
+                    setPathState(State.PICKUP3);
                 }
                 break;
             case PICKUP3:
@@ -327,8 +314,8 @@ public class DO_NOT_USE_AutonNearPrototype extends OpMode {
 
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
                     follower.setMaxPower(.9);
-                    follower.followPath(leverPush, true);
-                    setPathState(State.LEVERPUSH);
+                    follower.followPath(scorePickup2, true);
+                    setPathState(State.SCORING);
                     //IntakeInner.setVelocity(300);
                     //IntakeOuter.setVelocity(-300);
 
@@ -337,17 +324,17 @@ public class DO_NOT_USE_AutonNearPrototype extends OpMode {
             case PICKUP4:
                 if(!follower.isBusy()){
 
-                    follower.followPath(score4);
+                    follower.followPath(grabPickup5);
+                    setPathState(State.PICKUP5);
+                }
+                break;
+            case PICKUP5:
+                if(!follower.isBusy()){
+
+                    follower.followPath(scorePickup3);
                     setPathState(State.SCORING);
                 }
                 break;
-//            case PICKUP5:
-//                if(!follower.isBusy()){
-//
-//                    follower.followPath(scorePickup3);
-//                    setPathState(State.SCORING);
-//                }
-//                break;
 
 
             case END:
@@ -383,6 +370,7 @@ public class DO_NOT_USE_AutonNearPrototype extends OpMode {
         telemetry.addData("y", follower.getPose().getY());
         telemetry.addData("heading", follower.getPose().getHeading());
         telemetry.addData("count", count);
+
         telemetry.update();
     }
 
@@ -393,11 +381,11 @@ public class DO_NOT_USE_AutonNearPrototype extends OpMode {
         opmodeTimer = new Timer();
         actionTimer = new Timer();
         opmodeTimer.resetTimer();
-        count = 0;
+        count = 1;
 
         follower = Constants.createFollower(hardwareMap);
         buildPaths();
-        follower.setStartingPose(scorePose);
+        follower.setStartingPose(startPose);
 
 
 
@@ -412,7 +400,7 @@ public class DO_NOT_USE_AutonNearPrototype extends OpMode {
     @Override
     public void start() {
         opmodeTimer.resetTimer();
-        setPathState(State.SCORING);
+        setPathState(State.START);
     }
 
     /** We do not use this because everything should automatically disable **/

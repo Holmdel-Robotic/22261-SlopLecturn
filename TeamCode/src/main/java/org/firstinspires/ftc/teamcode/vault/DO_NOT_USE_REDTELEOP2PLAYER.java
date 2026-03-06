@@ -1,5 +1,4 @@
-
-package org.firstinspires.ftc.teamcode.pedroPathing;
+package org.firstinspires.ftc.teamcode.vault;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
@@ -17,39 +16,38 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import java.util.function.Supplier;
 
 @Configurable
 @TeleOp
-public class TrainingTeleOp extends OpMode {
+public class DO_NOT_USE_REDTELEOP2PLAYER extends OpMode {
     private Follower follower;
 
+    private boolean readyToRotate;
     private boolean debounceA;
     private Timer pathTimer;
 
     private  Timer actiontimer;
 
-    private  Timer timerA;
+    private  Timer aTimer;
 
-    private CRServo raxon;
+    private Servo raxon;
 
     private  Servo gate;
-    private CRServo laxon;
+    private Servo laxon;
     private Servo blocker;
     private Servo hood;
 
     private double x;
     private double y;
 
-    double ballsPassed;
     private double distance;
     private boolean debounceB;
 
@@ -82,12 +80,20 @@ public class TrainingTeleOp extends OpMode {
     private  boolean debounceBACK;
 
     private boolean debounceStart;
+    private boolean debounceRIGHT_TRIGGER;
+    private boolean debounceLEFT_TRIGGER;
     private boolean debounceGUIDE;
 
-    private boolean debounceLEFT_TRIGGER;
-    private boolean debounceRIGHT_TRIGGER;
+    private boolean dLT1, dLT2;
+    private boolean dRT1, dRT2;
 
-    private double flywheelVelocity;
+    private boolean dLB1, dRB1, dLB2, dRB2;
+    private boolean dA, dB, dX, dY, dG;
+
+    private boolean dUp, dDown;
+
+
+    private double flywheelVelocity, intakeVelocity;
     private boolean feederOn;
     private DcMotorEx intakeInner;
 
@@ -99,7 +105,6 @@ public class TrainingTeleOp extends OpMode {
     private double laxonPos;
     private double slowModeMultiplier = 0.5;
     private double angleToRot;
-
 
     private PathChain parkingSpace, scoringSpot;
 
@@ -141,24 +146,30 @@ public class TrainingTeleOp extends OpMode {
         hood = hardwareMap.get(Servo.class, "hood");
         blocker = hardwareMap.get(Servo.class, "blocker");
 
-        flywheelVelocity = 1600;
+        flywheelVelocity = 1800;
         intakeOn = false;
         flywheelOn = false;
         feederOn = false;
         kickerpos = true;
-        debounceA = false;
-        debounceB = false;
-        debounceX = false;
-        debounce_dpad_up = false;
-        debounce_dpad_down = false;
-        debounceY = false;
-        debounceBACK = false;
+        dA = false;
+        dB = false;
+        dX = false;
+        dUp = false;
+        dDown = false;
+        dY = false;
+        dG = false;
+        dLB1 = false;
+        dRB2 = false;
+        dLB2 = false;
+        dRB1 = false;
 
-
+        aTimer = new Timer();
         actiontimer = new Timer();
 
-        raxon = hardwareMap.get(CRServo.class,"raxon");
-        laxon = hardwareMap.get(CRServo.class,"laxon");
+        raxon = hardwareMap.get(Servo.class,"raxon");
+        laxon = hardwareMap.get(Servo.class,"laxon");
+        laxon.setDirection(Servo.Direction.FORWARD);
+        raxon.setDirection(Servo.Direction.FORWARD);
 
 
         pathChain = () -> follower.pathBuilder() //Lazy Curve Generation
@@ -180,16 +191,16 @@ public class TrainingTeleOp extends OpMode {
         follower.startTeleopDrive();
         follower.setMaxPower(.8);
         blocker.setPosition(.3);
-
-
+        raxon.setPosition(.5);
+        laxon.setPosition(.5);
         hood.setPosition(.5694);
         imu.resetYaw();
-        //Parallel: .4889
-        //Min Values: .1894
+        //Parallel: .5
+        //Min Values: .1
         //Max Values: 1
-        //R45 = .3389
-        //B45 = .6094
-        //AxonRot CCW = .2705/90
+        //R45 = .36
+        //B45 = .64
+        //AxonRot CCW = .28/90
 
     }
     @Override
@@ -198,33 +209,25 @@ public class TrainingTeleOp extends OpMode {
 
 
 
-        if(autoTarget)
+
+
+        if(autoTarget && aTimer.getElapsedTime() > 500)
         {
+
+
             x = follower.getPose().getX();
             y = follower.getPose().getY();
-            angleToRot = Math.toDegrees(Math.atan((138-y)/(138-x)));
-
-            if (Math.abs((imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) - angleToRot)) > 5 ) {
-                                if ((imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) < angleToRot)){
-                    laxon.setDirection(DcMotorSimple.Direction.FORWARD);
-                    raxon.setDirection(DcMotorSimple.Direction.REVERSE);
-                }else if((imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) > angleToRot)){
-                    laxon.setDirection(DcMotorSimple.Direction.REVERSE);
-                    raxon.setDirection(DcMotorSimple.Direction.FORWARD);
-                }
-                laxon.setPower(.2);
-                laxon.setPower(.2);
-
-            }else{
-                laxon.setPower(0);
-                laxon.setPower(0);
-            }
-
-
-
+            angleToRot = (imu.getRobotYawPitchRollAngles().getYaw()) - Math.toDegrees(Math.atan((138-y)/(138-x)));
+            laxonPos = .5 + (.28/90)*angleToRot;
+            raxonPos = .5 + (.28/90)*angleToRot;
+            raxon.setPosition(raxonPos);
+            laxon.setPosition(laxonPos);
+            aTimer.resetTimer();
         }
 
-
+        /* hypothetical hood stuff
+        hoodPos = Math.atan(38.75/distance) * .01684
+         */
 
 
         //
@@ -232,41 +235,46 @@ public class TrainingTeleOp extends OpMode {
         //laxonPos = (.5-(.57/180)*(Math.toDegrees(Math.atan((144-y)/(144-x)))) - (.57/180)*(imu.getRobotYawPitchRollAngles().getYaw()));
 
         distance = Math.sqrt(Math.pow(144-y,2) + Math.pow(144-x,2));
+        //change 144 to 138
 
 
 
-
+        //flywheelVelocity = .0701544 * Math.pow(distance,2) - 3.07502 * distance + 1626.87017;
         //hood.setPosition(.259228 * Math.sin(.03483 * distance + .48236) + .752718);
-        if (gamepad1.left_stick_button){
-            gate.setPosition(0);
-        }
-        if ( gamepad1.right_stick_button){
-            gate.setPosition(.2);
+        if (gamepad1.a && !dA){
+            if(gate.getPosition() != 0)
+            {
+                gate.setPosition(0);
+            }
+            else
+            {
+                gate.setPosition(.2);
+            }
+            dA = false;
         }
 
         if(raxonPos > 1)
         {
             raxonPos = 1;
         }
-        if(raxonPos < .1894)
+        if(raxonPos < .1)
        {
-            raxonPos = .1894;
+            raxonPos = .1;
         }
-        if(laxonPos < .1894)
+        if(laxonPos < .1)
         {
-            laxonPos = .1894;
+            laxonPos = .1;
         }
         if(laxonPos > 1)
         {
             laxonPos = 1;
         }
 
-        //raxon.setPosition(raxonPos);
-        //laxon.setPosition(laxonPos);
 
-        if(!gamepad1.back){
 
-            debounceBACK = true;
+        if(!gamepad2.b){
+
+            dB = true;
         }
 
         if (actiontimer.getElapsedTimeSeconds() > 4){
@@ -276,7 +284,7 @@ public class TrainingTeleOp extends OpMode {
 
 
         }
-//        if (gamepad1.back && debounceBACK && kickerpos){
+//        if (gamepad2.b && dB && kickerpos){
 //            kickerpos = false;
 //            blocker.setPosition(.3);
 //            actiontimer.resetTimer();
@@ -285,49 +293,80 @@ public class TrainingTeleOp extends OpMode {
 //
 //
 //        }
-        if (gamepad1.back && debounceBACK && !kickerpos){
+        if (gamepad2.b && dB && !kickerpos){
             blocker.setPosition(.50 );
             kickerpos = true;
-            debounceBACK = false;
+            dB = false;
             actiontimer.resetTimer();
         }
 
-        if (gamepad1.a && !intakeOn && !debounceA){
-            debounceA = true;
+        if (gamepad1.x && !intakeOn && !dX){
+            dX = true;
             intakeOn = true;
-            intakeOuter.setPower(-.8);
-            intakeInner.setPower(.4);
+            intakeOuter.setVelocity(intakeVelocity);
+            intakeInner.setVelocity(-intakeVelocity);
         }
-        if (gamepad1.a && intakeOn && !debounceA){
-            debounceA = true;
+        if(gamepad1.right_trigger > .01&& !dRT1)
+        {
+            dRT1 = false;
+            intakeVelocity += 50;
+            intakeOuter.setVelocity(intakeVelocity);
+            intakeInner.setVelocity(-intakeVelocity);
+        }
+        if(gamepad1.left_trigger > .01 && !dLT1)
+        {
+            dLT1 = false;
+            intakeVelocity -= 50;
+            intakeOuter.setVelocity(intakeVelocity);
+            intakeInner.setVelocity(-intakeVelocity);
+        }
+        if(gamepad1.right_bumper && !dRB1)
+        {
+            intakeVelocity *= -1;
+            dRB1 = false;
+        }
+        if(gamepad1.left_trigger < .01)
+        {
+            dLT1 = true;
+        }
+        if(gamepad1.right_trigger < .01)
+        {
+            dRT1 = true;
+        }
+        if(!gamepad1.right_bumper)
+        {
+            dRB1 = true;
+        }
+        if (gamepad1.x && intakeOn && !dX){
+            dX = true;
             intakeOn = false;
             intakeOuter.setPower(0);
             intakeInner.setPower(0);
         }
-        if (gamepad1.b && !feederOn && !debounceB){
-            debounceB = true;
-            feederOn = true;
-            intakeOuter.setVelocity(900);
-            intakeInner.setVelocity(-900);
-//            feederL.setPower(-1);
-//            feederR.setPower(1);
-        }
+//        if (gamepad1.b && !feederOn && !debounceB){
+//            debounceB = true;
+//            feederOn = true;
+//            intakeOuter.setVelocity(900);
+//            intakeInner.setVelocity(-900);
+////            feederL.setPower(-1);
+////            feederR.setPower(1);
+//        }
 
-        if (gamepad1.left_bumper && debounceLB){
+        if (gamepad2.left_bumper && !dLB2){
             hood.setPosition(hood.getPosition()-.05);
-            debounceLB = false;
+            dLB2 = true;
         }
-        if(!gamepad1.left_bumper)
+        if(!gamepad2.left_bumper)
         {
-            debounceLB = true;
+            dLB2 = false;
         }
-        if (gamepad1.right_bumper && debounceRB){
+        if (gamepad2.right_bumper && !dRB2){
             hood.setPosition(hood.getPosition()+.05);
-            debounceRB = false;
+            dRB2 = true;
         }
-        if(!gamepad1.right_bumper)
+        if(!gamepad2.right_bumper)
         {
-            debounceRB = true;
+            dRB2 = false;
         }
 
         if (gamepad1.guide && debounceGUIDE){
@@ -342,156 +381,148 @@ public class TrainingTeleOp extends OpMode {
 
 
 
-        if (gamepad1.b && feederOn && !debounceB){
-            debounceB = true;
-            feederOn = false;
-            intakeOuter.setVelocity(0);
-            intakeInner.setVelocity(0);
-//            feederL.setPower(0);
-//            feederR.setPower(0);
-        }
+//        if (gamepad1.b && feederOn && !debounceB){
+//            debounceB = true;
+//            feederOn = false;
+//            intakeOuter.setVelocity(0);
+//            intakeInner.setVelocity(0);
+////            feederL.setPower(0);
+////            feederR.setPower(0);
+//        }
 
-        if (gamepad1.x && !flywheelOn && !debounceX){
-            debounceX = true;
+        if (gamepad2.y && !flywheelOn && !dY){
+            dY = true;
             flywheelOn = true;
             flywheelLeft.setVelocity(flywheelVelocity);
             flywheelRight.setVelocity(flywheelVelocity);
         }
-        if (gamepad1.x && flywheelOn && !debounceX){
-            debounceX = true;
+        if (gamepad2.y && flywheelOn && !dY){
+            dY = true;
             flywheelOn = false;
             flywheelLeft.setPower(0);
             flywheelRight.setPower(0);
         }
 
-        if (gamepad1.left_trigger > .01 && debounceLEFT_TRIGGER){
-            //raxonPos = raxon.getPosition() +.03;
-            //laxonPos = laxon.getPosition() - .03;
-            //laxon.setPosition(laxonPos);
-            //raxon.setPosition(raxonPos);
+        if (gamepad2.left_trigger > .01 && !dLT2){
+            raxonPos = raxon.getPosition() +.03;
+            laxonPos = laxon.getPosition() + .03;
+            laxon.setPosition(laxonPos);
+            raxon.setPosition(raxonPos);
 
-            debounceLEFT_TRIGGER = false;
+            dLT2 = true;
         }
-        if (gamepad1.right_trigger > .01 && debounceRIGHT_TRIGGER){
-            //raxonPos = raxon.getPosition() - .03;
-            //laxonPos = laxon.getPosition() + .03;
-            //raxon.setPosition(raxonPos);
-            //laxon.setPosition(laxonPos);
-            debounceRIGHT_TRIGGER = false;
+        if (gamepad2.right_trigger > .01 && !dRT2){
+            raxonPos = raxon.getPosition() - .03;
+            laxonPos = laxon.getPosition() - .03;
+            raxon.setPosition(raxonPos);
+            laxon.setPosition(laxonPos);
+            dRT2 = true;
 
         }
 
 
 
 
-        if (gamepad1.left_trigger < .01){
-            debounceLEFT_TRIGGER = true;
+        if (gamepad2.left_trigger < .01){
+            dLT2 = false;
         }
-        if (gamepad1.right_trigger < .01){
-            debounceRIGHT_TRIGGER = true;
+        if (gamepad2.right_trigger < .01){
+            dRT2 = false;
         }
 
 
 
 
         if(!gamepad1.a){
-            debounceA = false;
+            dA = false;
         }
-        if(!gamepad1.b){
-            debounceB = false;
+        if(!gamepad2.b){
+            dB = false;
         }
         if(!gamepad1.x){
-            debounceX = false;
+            dX = false;
         }
 
-        if(gamepad1.dpad_left && debounceDL)
+        if(gamepad1.dpad_left && !debounceDL)
         {
-            //laxonPos = laxon.getPosition() + .005;
-            //laxon.setPosition(laxonPos);
-            debounceDL = false;
+            laxonPos = laxon.getPosition() + .005;
+            laxon.setPosition(laxonPos);
+            debounceDL = true;
         }
-        if(gamepad1.dpad_right && debounceDR)
+        if(gamepad1.dpad_right && !debounceDR)
         {
-            //laxonPos = laxon.getPosition() - .005;
-            //laxon.setPosition(laxonPos);
-            debounceDR = false;
+            laxonPos = laxon.getPosition() - .005;
+            laxon.setPosition(laxonPos);
+            debounceDR = true;
         }
         if(!gamepad1.dpad_left)
         {
-            debounceDL = true;
+            debounceDL = false;
         }
         if(!gamepad1.dpad_right)
         {
-            debounceDR = true;
+            debounceDR = false;
         }
         //Call this once per loop
         follower.update();
         telemetryM.update();
 
 
-        if(gamepad1.dpad_up && flywheelOn && !debounce_dpad_up){
+        if(gamepad2.dpad_up && flywheelOn && !dUp){
             flywheelVelocity += 200;
             flywheelLeft.setVelocity(flywheelVelocity);
             flywheelRight.setVelocity(flywheelVelocity);
-            debounce_dpad_up = true;
+            dUp = true;
         }
-        if(gamepad1.dpad_down && flywheelOn && !debounce_dpad_down){
+        if(gamepad2.dpad_down && flywheelOn && !dDown){
             flywheelVelocity -= 200;
             flywheelLeft.setVelocity(flywheelVelocity);
             flywheelRight.setVelocity(flywheelVelocity);
-            debounce_dpad_down = true;
+            dDown = true;
         }
 
-        if(!gamepad1.dpad_up){
-            debounce_dpad_up = false;
+        if(!gamepad2.dpad_up){
+            dUp = false;
         }
-        if(!gamepad1.dpad_down){
-            debounce_dpad_down = false;
+        if(!gamepad2.dpad_down){
+            dDown = false;
         }
-        if(gamepad1.y && debounceY)
+        if(gamepad2.guide && !dG)
         {
             autoTarget = !autoTarget;
-            laxonPos = .3389;
-            raxonPos = .3389;
-            debounceY = false;
+            laxonPos = .5;
+            raxonPos = .5;
+            dG = true;
         }
-        if(!gamepad1.y)
+        if(!gamepad2.y)
         {
-            debounceY = true;
+            dY = false;
+        }
+        if(!gamepad2.guide)
+        {
+            dG = false;
         }
 
-        if(gamepad1.start && debounceStart){
+        if(gamepad2.start && debounceStart){
           //code here!
             blocker.setPosition(.3);
             debounceStart = false;
-            ballsPassed = 0;
+            double ballsPassed = 0;
             flywheelOn = true;
-            boolean debounceSensor = true;
             flywheelLeft.setVelocity(flywheelVelocity);
             flywheelRight.setVelocity(flywheelVelocity);
             actiontimer.resetTimer();
             double OgHoodPos = hood.getPosition();
-            while (ballsPassed < 3 && actiontimer.getElapsedTimeSeconds() < 6){
+            while (ballsPassed < 3 && actiontimer.getElapsedTimeSeconds() < 4){
                 blocker.setPosition(5);
-                if (actiontimer.getElapsedTimeSeconds() >= 4){
+                if (actiontimer.getElapsedTimeSeconds() >= 2){
                     //loop through balls here
                     intakeOuter.setPower(-.8);
                     intakeInner.setPower(.4);
 
-                    if (distanceSensor.getDistance(DistanceUnit.CM) < 10 && debounceSensor){
-                        timerA.resetTimer();
-                        while (timerA.getElapsedTimeSeconds() < .2){
-
-                        }
-                        hood.setPosition(hood.getPosition() + .05);
+                    if (distanceSensor.getDistance(DistanceUnit.CM) < 10){
+                        hood.setPosition(hood.getPosition() + .02);
                         ballsPassed++;
-                        debounceSensor = false;
-
-
-
-                    }
-                    else if (distanceSensor.getDistance(DistanceUnit.CM) > 10 ){
-                        debounceSensor = true;
                     }
 
 
@@ -501,13 +532,10 @@ public class TrainingTeleOp extends OpMode {
             blocker.setPosition(.3);
             intakeOuter.setPower(0);
             intakeInner.setPower(0);
-            flywheelLeft.setVelocity(-1);
-            flywheelRight.setVelocity(-1);
-            hood.setPosition(OgHoodPos);
 
 
         }
-        if(!gamepad1.start){
+        if(!gamepad2.start){
             debounceStart = true;
         }
 
@@ -521,8 +549,8 @@ public class TrainingTeleOp extends OpMode {
 
             //This is the normal version to use in the TeleOp
             if (!slowMode) follower.setTeleOpDrive(
-                    -gamepad1.left_stick_y , 
-                    -gamepad1.left_stick_x ,
+                    -gamepad1.left_stick_y,
+                    -gamepad1.left_stick_x,
                     -gamepad1.right_stick_x,
                     true // Robot Centric
             );
@@ -553,8 +581,8 @@ public class TrainingTeleOp extends OpMode {
 
          telemetry.addData("blocker pos",blocker.getPosition());
         telemetry.addData("Hood position", hood.getPosition());
-        //telemetry.addData("raxon",raxon.getPosition());
-        //telemetry.addData("laxon",laxon.getPosition());
+        telemetry.addData("raxon",raxon.getPosition());
+        telemetry.addData("laxon",laxon.getPosition());
         telemetry.addData("atr", angleToRot);
         telemetry.addData("flywheel velocity",flywheelLeft.getVelocity());
         telemetry.addData("debounce y", debounceY);
@@ -568,8 +596,6 @@ public class TrainingTeleOp extends OpMode {
         telemetry.addData("distance", distance);
         telemetry.addData("Distance Sensor", distanceSensor.getDistance(DistanceUnit.CM));
         telemetry.addData("gate", gate.getPosition() );
-        telemetry.addData("balls shot this burst" ,ballsPassed );
 
     }
 }
-

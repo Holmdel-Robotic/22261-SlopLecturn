@@ -1,20 +1,25 @@
-package org.firstinspires.ftc.teamcode.pedroPathing;
+package org.firstinspires.ftc.teamcode.vault;
+
 import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
+import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
-// make sure this aligns with class location
-import com.pedropathing.paths.Path;
-import com.pedropathing.util.Timer;
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@Autonomous(name = "AutonBlue", group = "Examples")
-public class BlueAutonCLOSE extends OpMode {
+/*
+New Pathing for Auton Left
+ */
+@Autonomous(name = "AutonBlue2", group = "Examples")
+public class DO_NOT_USE_AutonBlue2 extends OpMode {
 
     private Servo hood;
 
@@ -35,20 +40,20 @@ public class BlueAutonCLOSE extends OpMode {
     private Timer pathTimer, actionTimer, opmodeTimer;
 
     private int count;
-    private final Pose startPose = new Pose(23.687, 119.835, Math.toRadians(180)); // Start Pose of our robot.
-    private final Pose scorePose = new Pose(58, 85, Math.toRadians(180)); // Scoring Pose of our robot. It is facing the wall.
-    private final Pose pickup1Pose = new Pose(20, 83, Math.toRadians(180)); // Highest (First Set) of Artifacts.
+    private final Pose homePose = new Pose(24, 120, Math.toRadians(270)); // Start Pose of our robot.
+    private final Pose pickup1Pose = new Pose(24, 70, Math.toRadians(270)); // Highest (First Set) of Artifacts.
 //    private final Pose pickup3Pose = new Pose(42, 60, Math.toRadians(180)); // Middle (Second Set) of Artifacts from the Spike Mark.
+    private final Pose leverPose = new Pose(20,70,Math.toRadians(270));
+    private final Pose pickup2Pose = new Pose(24, 60, Math.toRadians(270)); // Second Row of Artifacts from the Spike Mark.
+    private final Pose pickup3Pose = new Pose(20, 36, Math.toRadians(270));
+    private final Pose pickup4Pose = new Pose(10,8,Math.toRadians(270));
 
-    private final Pose pickup2Pose = new Pose(20, 60, Math.toRadians(180)); // Second Row of Artifacts from the Spike Mark.
+    private final Pose pickup4CPose = new Pose(53,0,Math.toRadians(270));
 
-    private final Pose pickup3CPose = new Pose(60, 36, Math.toRadians(180));
 
-    private final Pose pickup3Pose = new Pose(20, 36, Math.toRadians(180));
-    private final Pose pickup2CPose = new Pose(60,60,Math.toRadians(180)); // Adithiya's Bezier curve control point yay
-    private Path scorePreload;
+    private Path grabPickup1;
 
-    private PathChain grabPickup1, scorePickup1, grabPickup2, scorePickup2, grabPickup3, grabPickup4, grabPickup5, scorePickup3 ;
+    private PathChain scorePickup1, grabPickup2, leverPush, scorePickup2, grabPickup3, grabPickup4, scorePickup4, scorePickup3 ;
 
     private Servo kicker;
 
@@ -63,17 +68,18 @@ public class BlueAutonCLOSE extends OpMode {
         PICKUP3,
         PICKUP4,
         PICKUP5,
+        LEVER,
 
         SCORING,
         END
 
-    }//
+    }
 
-    State state = State.START;
+    State state = State.SCORING;
     public void buildPaths() {
         /* This is our scorePreload path. We are using a BezierLine, which is a straight line. */
-        scorePreload = new Path(new BezierLine(startPose, scorePose));
-        scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading());
+        grabPickup1 = new Path(new BezierLine(homePose, pickup1Pose));
+        grabPickup1.setConstantHeadingInterpolation(Math.toRadians(270));
 
         flywheelLeft = hardwareMap.get(DcMotorEx.class, "flyL");
         flywheelRight = hardwareMap.get(DcMotorEx.class, "flyR");
@@ -101,9 +107,9 @@ public class BlueAutonCLOSE extends OpMode {
         hood = hardwareMap.get(Servo.class, "hood");
 
 
-        raxon.setPosition(.63);
-        laxon.setPosition(.63);
-        kicker.setPosition(.5);
+        raxon.setPosition(.3389);
+        laxon.setPosition(.3389);
+        kicker.setPosition(.4);
     /* Here is an example for Constant Interpolation
     scorePreload.setConstantInterpolation(startPose.getHeading()); *
 
@@ -116,16 +122,15 @@ public class BlueAutonCLOSE extends OpMode {
     //AxonRot = .2705/90
      */
         /* This is our grabPickup1 PathChain. We are using a single path with a BezierLine, which is a straight line. */
-        grabPickup1 = follower.pathBuilder()
-                .addPath(new BezierLine(scorePose, pickup1Pose))
-                .setLinearHeadingInterpolation(scorePose.getHeading(), pickup1Pose.getHeading())
-                .setVelocityConstraint(0.01)
+        leverPush = follower.pathBuilder()
+                .addPath(new BezierLine(pickup1Pose, leverPose))
+                .setConstantHeadingInterpolation(Math.toRadians(270))
                 .build();
 
         /* This is our scorePickup1 PathChain. We are using a single path with a BezierLine, which is a straight line. */
         scorePickup1 = follower.pathBuilder()
-                .addPath(new BezierLine(pickup1Pose, scorePose))
-                .setLinearHeadingInterpolation(pickup1Pose.getHeading(), scorePose.getHeading())
+                .addPath(new BezierLine(leverPose, homePose))
+                .setConstantHeadingInterpolation(Math.toRadians(270))
                 .build();
 
         /* This is our grabPickup2 PathChain. We are using a single path with a BezierLine, which is a straight line. */
@@ -136,14 +141,15 @@ public class BlueAutonCLOSE extends OpMode {
 //                .setVelocityConstraint(0.01)
 //                .build();
         grabPickup2 = follower.pathBuilder()
-                .addPath(new BezierLine(scorePose, pickup2CPose))
-                .setLinearHeadingInterpolation(scorePose.getHeading(), pickup2CPose.getHeading())
+                .addPath(new BezierLine(homePose, pickup2Pose))
+                .setConstantHeadingInterpolation(Math.toRadians(270))
                 .build();
 
-        grabPickup3 = follower.pathBuilder()
-                .addPath(new BezierLine(pickup2CPose, pickup2Pose))
-                .setLinearHeadingInterpolation(pickup2CPose.getHeading(), pickup2Pose.getHeading())
+        scorePickup2 = follower.pathBuilder()
+                .addPath(new BezierLine(pickup2Pose, homePose))
+                .setConstantHeadingInterpolation(Math.toRadians(270))
                 .build();
+
         /* This is our scorePickup2 PathChain. We are using a single path with a BezierLine, which is a straight line. */
 //        scorePickup2 = follower.pathBuilder()
 //                .addPath(new BezierLine(pickup2Pose, pickup3Pose))
@@ -158,45 +164,40 @@ public class BlueAutonCLOSE extends OpMode {
                 .build();
 
         /* This is our scorePickup3 PathChain. We are using a single path with a BezierLine, which is a straight line. */
-        scorePickup2 = follower.pathBuilder()
-                .addPath(new BezierLine(pickup2Pose, scorePose))
-                .setLinearHeadingInterpolation(pickup2Pose.getHeading(), scorePose.getHeading())
-                .setVelocityConstraint(.01)
-                .build();
 
-        grabPickup4 = follower.pathBuilder()
-                .addPath(new BezierLine(scorePose, pickup3CPose))
-                .setLinearHeadingInterpolation(scorePose.getHeading(), pickup3CPose.getHeading())
-                .build();
-
-        grabPickup5 = follower.pathBuilder()
-                .addPath(new BezierLine(pickup3CPose, pickup3Pose))
-                .setLinearHeadingInterpolation(pickup3CPose.getHeading(), pickup3Pose.getHeading())
+        grabPickup3 = follower.pathBuilder()
+                .addPath(new BezierLine(homePose, pickup3Pose))
+                .setConstantHeadingInterpolation(Math.toRadians(270))
                 .build();
 
         scorePickup3 = follower.pathBuilder()
-                .addPath(new BezierLine(pickup3Pose, scorePose))
-                .setLinearHeadingInterpolation(pickup3Pose.getHeading(), scorePose.getHeading())
-                .setVelocityConstraint(.01)
+                .addPath(new BezierLine(pickup3Pose, homePose))
+                .setConstantHeadingInterpolation(Math.toRadians(270))
+                .build();
+
+        grabPickup4 = follower.pathBuilder()
+                .addPath(new BezierCurve(homePose, pickup4CPose, pickup4Pose))
+                .setLinearHeadingInterpolation(Math.toRadians(270),Math.toRadians(180))
+                .build();
+
+        scorePickup4 = follower.pathBuilder()
+                .addPath(new BezierLine(pickup4Pose, homePose))
+                .setLinearHeadingInterpolation(Math.toRadians(180),Math.toRadians(270))
                 .build();
     }
 
     public void autonomousPathUpdate() {
         switch (state) {
-            case START:
-                //flywheelLeft.setVelocity(1700);
-                //flywheelRight.setVelocity(1700);
-                flywheelLeft.setVelocity(-1675);
-                flywheelRight.setVelocity(-1675);
-                hood.setPosition(.67);
-                kicker.setPosition(.3);
-                IntakeOuter.setPower(-.8);
-                IntakeInner.setPower(-.4);
+            case PICKUP1:
 
-                follower.setMaxPower(0.8);
-                follower.followPath(scorePreload);
-                setPathState(State.SCORING);
-                actionTimer.resetTimer();
+                if(!follower.isBusy())
+                {
+                    follower.setMaxPower(0.9);
+                    follower.followPath(leverPush, true);
+                    setPathState(State.LEVER);
+                    actionTimer.resetTimer();
+                }
+
 
 
                 break;
@@ -211,8 +212,10 @@ public class BlueAutonCLOSE extends OpMode {
 
                     if(actionTimer.getElapsedTimeSeconds() <= 1){
 
+                        flywheelLeft.setVelocity(-1800);
+                        flywheelRight.setVelocity(-1800);
 
-                        hood.setPosition(.67);
+                        hood.setPosition(.59);
                         // && flywheelRight.getVelocity() > 1650 && flywheelLeft.getVelocity() > 1650 &&
                     } else if (actionTimer.getElapsedTimeSeconds() >= 1 && actionTimer.getElapsedTimeSeconds() <= 3) {
 
@@ -231,8 +234,8 @@ public class BlueAutonCLOSE extends OpMode {
 
                         //IntakeInner.setVelocity(0);
                         //IntakeOuter.setVelocity(0);
-//                        flywheelLeft.setVelocity(-.01);
-//                        flywheelRight.setVelocity(-.01);
+                        flywheelLeft.setVelocity(-.01);
+                        flywheelRight.setVelocity(-.01);
                         if (count == 1) {
 
                             follower.followPath(grabPickup1, true);
@@ -243,14 +246,20 @@ public class BlueAutonCLOSE extends OpMode {
                             setPathState(State.PICKUP2);
                             count++;
                         } else if (count == 3) {
-                            follower.followPath(grabPickup4);
-                            setPathState(State.PICKUP4);
+                            follower.followPath(grabPickup3, true);
+                            setPathState(State.PICKUP3);
                             count++;
 
                         }
                         else if(count == 4)
                         {
-                            follower.followPath(grabPickup4);
+                            follower.followPath(grabPickup4, true);
+                            setPathState(State.PICKUP4);
+                            count++;
+                        }
+                        else if(count == 5)
+                        {
+                            follower.followPath(grabPickup1, true);
                             setPathState(State.END);
                         }
 
@@ -260,14 +269,19 @@ public class BlueAutonCLOSE extends OpMode {
 
                 break;
 
-
-            case PICKUP1:
+            case LEVER:
+                if(!follower.isBusy())
+                {
+                    follower.followPath(scorePickup1,true);
+                    setPathState(State.SCORING);
+                }
+            case PICKUP2:
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup1Pose's position */
                 if(!follower.isBusy()) {
                     /* Grab Sample */
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
 
-                    follower.followPath(scorePickup1,true);
+                    follower.followPath(scorePickup2,true);
                     setPathState(State.SCORING);
                     //IntakeInner.setVelocity(300);
                     //IntakeOuter.setVelocity(-300);
@@ -295,44 +309,44 @@ public class BlueAutonCLOSE extends OpMode {
 //                }
 //                break;
 
-            case PICKUP2:
+            case PICKUP3:
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup3Pose's position */
                 if(!follower.isBusy()) {
                     /* Grab Sample */
 
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
                     follower.setMaxPower(.75);
-                    follower.followPath(grabPickup3, true);
-                    setPathState(State.PICKUP3);
+                    follower.followPath(scorePickup3, true);
+                    setPathState(State.SCORING);
                 }
                 break;
-            case PICKUP3:
+            case PICKUP4:
                 if(!follower.isBusy()) {
                     /* Grab Sample */
 
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
                     follower.setMaxPower(.9);
-                    follower.followPath(scorePickup2, true);
+                    follower.followPath(scorePickup4, true);
                     setPathState(State.SCORING);
                     //IntakeInner.setVelocity(300);
                     //IntakeOuter.setVelocity(-300);
 
                 }
                 break;
-            case PICKUP4:
-                if(!follower.isBusy()){
-
-                    follower.followPath(grabPickup5);
-                    setPathState(State.PICKUP5);
-                }
-                break;
-            case PICKUP5:
-                if(!follower.isBusy()){
-
-                    follower.followPath(scorePickup3);
-                    setPathState(State.SCORING);
-                }
-                break;
+//            case PICKUP4:
+//                if(!follower.isBusy()){
+//
+//                    follower.followPath(scorePickup4);
+//                    setPathState(State.SCORING);
+//                }
+//                break;
+//            case PICKUP5:
+//                if(!follower.isBusy()){
+//
+//                    follower.followPath(scorePickup3);
+//                    setPathState(State.SCORING);
+//                }
+//                break;
 
 
             case END:
@@ -368,7 +382,6 @@ public class BlueAutonCLOSE extends OpMode {
         telemetry.addData("y", follower.getPose().getY());
         telemetry.addData("heading", follower.getPose().getHeading());
         telemetry.addData("count", count);
-
         telemetry.update();
     }
 
@@ -383,7 +396,7 @@ public class BlueAutonCLOSE extends OpMode {
 
         follower = Constants.createFollower(hardwareMap);
         buildPaths();
-        follower.setStartingPose(startPose);
+        follower.setStartingPose(homePose);
 
 
 
@@ -398,7 +411,7 @@ public class BlueAutonCLOSE extends OpMode {
     @Override
     public void start() {
         opmodeTimer.resetTimer();
-        setPathState(State.START);
+        setPathState(State.SCORING);
     }
 
     /** We do not use this because everything should automatically disable **/
