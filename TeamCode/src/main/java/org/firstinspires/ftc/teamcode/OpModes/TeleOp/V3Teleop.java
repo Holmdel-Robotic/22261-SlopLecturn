@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.testers;
+package org.firstinspires.ftc.teamcode.OpModes.TeleOp;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -8,10 +8,12 @@ import com.qualcomm.robotcore.hardware.*;
 @TeleOp
 
 
-public class DriveTest extends OpMode {
+public class V3Teleop extends OpMode {
     private DcMotorEx frontRightMotor, frontLeftMotor, backRightMotor, backLeftMotor, intakeOuter,intakeInner, flywheelLeft, flywheelRight;
 
-    private double IntendedFlywheelV = 1600;
+    private Servo hood, raxon, laxon;
+
+    public static double IntendedFlywheelV = 1600, ServoPos = .5;
 
     private boolean debounceDPAD, debounceX, FlywheelOn;
     public static double testPos = 0.5;
@@ -46,6 +48,10 @@ public class DriveTest extends OpMode {
         flywheelLeft.setDirection(DcMotor.Direction.FORWARD);
         flywheelRight.setDirection(DcMotor.Direction.REVERSE);
 
+        hood = hardwareMap.get(Servo.class, "hood");
+        raxon = hardwareMap.get(Servo.class, "raxon");
+        laxon = hardwareMap.get(Servo.class, "laxon");
+
         FlywheelOn = false;
 
 
@@ -54,10 +60,12 @@ public class DriveTest extends OpMode {
     public void loop(){
      HandleInputs();
      driveRobot();
-     InnerIntakeOperation(gamepad1.a);
      OuterIntakeOperation(gamepad1.b);
+     WholeIntakeOperation(gamepad1.a);
      changeFlywheelVelo();
      SetFlywheelVelocity(IntendedFlywheelV);
+     telemetry();
+     smoothServo(ServoPos);
 
 
 
@@ -86,9 +94,10 @@ public class DriveTest extends OpMode {
 
     }
 
-    private void InnerIntakeOperation(boolean gamepad){
+    private void WholeIntakeOperation(boolean gamepad){
         if (gamepad) {
             intakeInner.setPower(.75);
+            intakeOuter.setPower(.75);
         }
         else{
             intakeInner.setPower(0);
@@ -138,6 +147,34 @@ public class DriveTest extends OpMode {
         if (gamepad1.dpad_down && gamepad1.dpad_up){
             debounceDPAD = false;
         }
+
+    }
+
+    private void setServoPos(double pos){
+      laxon.setPosition(pos);
+      raxon.setPosition(pos);
+
+    }
+
+    private void smoothServo(double pos){
+        double lastloopTime = getRuntime();
+        while (Math.abs(pos - laxon.getPosition()) > .04){
+            if (getRuntime() - lastloopTime >= .2){
+                if (pos > laxon.getPosition()){
+                    setServoPos(laxon.getPosition() + .04);
+
+                } else if (pos < laxon.getPosition()) {
+                    setServoPos(laxon.getPosition() - .04);
+                }
+                lastloopTime = getRuntime();
+            }
+        }
+    }
+
+    private void telemetry(){
+        telemetry.addData("laxon pos", laxon.getPosition());
+        telemetry.addData("raxon pos", raxon.getPosition());
+        telemetry.addData("runtime", getRuntime());
 
     }
 
