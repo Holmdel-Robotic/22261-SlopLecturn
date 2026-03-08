@@ -1,24 +1,40 @@
 package org.firstinspires.ftc.teamcode.OpModes.TeleOp;
 import com.acmerobotics.dashboard.config.Config;
+import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.*;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.Pose;
+import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.*;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 @Config
 @TeleOp
 
 
 public class V3Teleop extends OpMode {
+
+
+    private Follower follower;
     private DcMotorEx frontRightMotor, frontLeftMotor, backRightMotor, backLeftMotor, intakeOuter,intakeInner, flywheelLeft, flywheelRight;
 
     private Servo hood, raxon, laxon;
 
-    public static double IntendedFlywheelV = 1600, ServoPos = .5;
+    public static double IntendedFlywheelV = 1600, ServoPos = .5, desiredAngle;
 
-    private boolean debounceDPAD, debounceX, FlywheelOn;
+    private boolean debounceDPAD, debounceX, FlywheelOn, debounceB, outerIntakeOn;
     public static double testPos = 0.5;
 
     public void init(){
+        follower = Constants.createFollower(hardwareMap);
+        follower.setStartingPose(new Pose(144-84, 36, Math.toRadians(180)));
         frontLeftMotor = hardwareMap.get(DcMotorEx.class, "fl");
         frontRightMotor = hardwareMap.get(DcMotorEx.class, "fr");
         backLeftMotor = hardwareMap.get(DcMotorEx.class, "bl");
@@ -65,7 +81,8 @@ public class V3Teleop extends OpMode {
      changeFlywheelVelo();
      SetFlywheelVelocity(IntendedFlywheelV);
      telemetry();
-     smoothServo(ServoPos);
+     calculateCorrectAngle();
+     setServoPos(ServoPos);
 
 
 
@@ -105,11 +122,16 @@ public class V3Teleop extends OpMode {
     }
 
     private void OuterIntakeOperation(boolean gamepad){
-        if (gamepad) {
-            intakeOuter.setPower(.75);
+        if (!gamepad){
+            debounceB = true;
         }
-        else{
-            intakeOuter.setPower(0);
+        if (gamepad && debounceB) {
+            if (outerIntakeOn){
+                intakeOuter.setPower(.75);
+            }else {
+                intakeOuter.setPower(0);
+            }
+            debounceB = false;
         }
     }
 
@@ -175,6 +197,21 @@ public class V3Teleop extends OpMode {
         telemetry.addData("laxon pos", laxon.getPosition());
         telemetry.addData("raxon pos", raxon.getPosition());
         telemetry.addData("runtime", getRuntime());
+        telemetry.addData("desired Pos", ServoPos);
+        telemetry.addData("desired angle", desiredAngle);
+
+    }
+
+    private void calculateCorrectAngle(){
+        follower.update();
+        Pose currPose = follower.getPose();
+        desiredAngle = Math.atan(144 - currPose.getY()/ currPose.getX());
+        telemetry.addData("X dist",currPose.getX() );
+        telemetry.addData("Y dist",currPose.getY() );
+        desiredAngle = 180 - desiredAngle;
+        desiredAngle = desiredAngle - currPose.getHeading();
+        ServoPos = desiredAngle/360;
+
 
     }
 
