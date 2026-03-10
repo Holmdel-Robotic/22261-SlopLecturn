@@ -30,7 +30,9 @@ public class V3Teleop extends OpMode {
 
     public static double IntendedFlywheelV = 1600, ServoPos = .5, desiredAngle, Heading;
 
-    private boolean debounceDPAD, debounceX, FlywheelOn, debounceB, outerIntakeOn, DriveMode = true;
+    public static boolean autoTarget = true;
+
+    private boolean debounceDPAD, debounceX, FlywheelOn, debounceB, outerIntakeOn, DriveMode = true, debounceY;
     public static double testPos = 0.5;
 
     public void init(){
@@ -184,6 +186,12 @@ public class V3Teleop extends OpMode {
     }
 
     private void HandleInputs(){
+
+        if (gamepad1.y && !debounceY){
+            autoTarget = !autoTarget;
+            debounceY = true;
+        }
+
         if (gamepad1.x && !debounceX){
             FlywheelOn = !FlywheelOn;
             debounceX = true;
@@ -192,9 +200,17 @@ public class V3Teleop extends OpMode {
         if (!gamepad1.x){
             debounceX = false;
         }
+
+        if (!gamepad1.y){
+
+            debounceY = false;
+        }
     }
 
     private void changeFlywheelVelo(){
+
+
+
         if (gamepad1.dpad_up && !debounceDPAD){
             IntendedFlywheelV += 50;
             debounceDPAD = true;
@@ -233,7 +249,7 @@ public class V3Teleop extends OpMode {
     private void telemetry(){
         telemetry.addData("laxon pos", laxon.getPosition());
         telemetry.addData("raxon pos", raxon.getPosition());
-        telemetry.addData("flywheel V", (flywheelLeft.getVelocity() + flywheelRight.getVelocity())/2); 
+        telemetry.addData("flywheel V", (flywheelLeft.getVelocity() + flywheelRight.getVelocity())/2);
         telemetry.addData("runtime", getRuntime());
         telemetry.addData("desired Pos", ServoPos);
         telemetry.addData("desired angle", desiredAngle);
@@ -243,22 +259,24 @@ public class V3Teleop extends OpMode {
     }
 
     private void calculateCorrectAngle(){
-        follower.update();
-        Pose currPose = follower.getPose();
-        desiredAngle = Math.atan(144 - currPose.getY()/ currPose.getX());
-        telemetry.addData("X dist",currPose.getX() );
-        telemetry.addData("Y dist",currPose.getY() );
-        Heading = Math.toDegrees(currPose.getHeading());
+        if (autoTarget) {
+            follower.update();
+            Pose currPose = follower.getPose();
+            desiredAngle = Math.atan(144 - currPose.getY() / currPose.getX());
+            telemetry.addData("X dist", currPose.getX());
+            telemetry.addData("Y dist", currPose.getY());
+            Heading = Math.toDegrees(currPose.getHeading());
 
-        if(Heading < 0){
-            Heading = 360 + Heading;
+            if (Heading < 0) {
+                Heading = 360 + Heading;
+            }
+
+
+            desiredAngle = (180 - Math.toDegrees(Math.atan((144 - currPose.getY()) / currPose.getX()))) - Heading;
+            desiredAngle = 180 + (int) desiredAngle;
+            ServoPos = 0.00338889 * desiredAngle - 0.0366667;
+
         }
-
-
-        desiredAngle = (180 - Math.toDegrees(Math.atan((144 - currPose.getY())/ currPose.getX()))) - Heading;
-        desiredAngle = 180 + (int)desiredAngle;
-        ServoPos = 0.00338889 * desiredAngle-0.0366667;
-
 
     }
 
