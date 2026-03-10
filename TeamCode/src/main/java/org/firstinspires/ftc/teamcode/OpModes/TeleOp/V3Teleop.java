@@ -28,7 +28,7 @@ public class V3Teleop extends OpMode {
 
     private Servo hood, raxon, laxon;
 
-    public static double IntendedFlywheelV = 1600, ServoPos = .5, desiredAngle;
+    public static double IntendedFlywheelV = 1600, ServoPos = .5, desiredAngle, Heading;
 
     private boolean debounceDPAD, debounceX, FlywheelOn, debounceB, outerIntakeOn, DriveMode = false;
     public static double testPos = 0.5;
@@ -85,7 +85,7 @@ public class V3Teleop extends OpMode {
      SetFlywheelVelocity(IntendedFlywheelV);
      telemetry();
      calculateCorrectAngle();
-     //setServoPos(ServoPos);
+     setServoPos(ServoPos);
 
 
 
@@ -236,7 +236,8 @@ public class V3Teleop extends OpMode {
         telemetry.addData("runtime", getRuntime());
         telemetry.addData("desired Pos", ServoPos);
         telemetry.addData("desired angle", desiredAngle);
-        telemetry.addData("Robot heading", Math.toDegrees(follower.getPose().getHeading()));
+        telemetry.addData("Robot heading", Heading);
+        telemetry.addData("atan", Math.atan(144 - follower.getPose().getY()/ follower.getPose().getX()));
 
     }
 
@@ -246,7 +247,16 @@ public class V3Teleop extends OpMode {
         desiredAngle = Math.atan(144 - currPose.getY()/ currPose.getX());
         telemetry.addData("X dist",currPose.getX() );
         telemetry.addData("Y dist",currPose.getY() );
-        desiredAngle = (180 - Math.toDegrees(Math.atan(144 - currPose.getY()/ currPose.getX()))) - Math.toDegrees(currPose.getHeading());
+        Heading = Math.toDegrees(currPose.getHeading());
+
+        if(Heading < 0){
+            Heading = 360 + Heading;
+        }
+
+
+        desiredAngle = (180 - Math.toDegrees(Math.atan((144 - currPose.getY())/ currPose.getX()))) - Heading;
+        desiredAngle = 180 + (int)desiredAngle;
+        ServoPos = (desiredAngle/360);
 
 
 
