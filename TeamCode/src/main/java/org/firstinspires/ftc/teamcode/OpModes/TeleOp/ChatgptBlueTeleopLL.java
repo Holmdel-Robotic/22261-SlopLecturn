@@ -21,11 +21,10 @@ public class ChatgptBlueTeleopLL extends OpMode {
     private double flV, blV, frV, brV;
 
     private double robotXPos, robotYPos, robotHeading;
+
     private Follower follower;
 
     public double testMillis, lastTestMillis = getRuntime();
-
-
 
     private double processgamepadMillis;
 
@@ -39,14 +38,10 @@ public class ChatgptBlueTeleopLL extends OpMode {
 
     private double lastUpdateTime = getRuntime(), lastProcessgamepadMillis = getRuntime(), lastUpdateRobotStateMillis = getRuntime(), lastWriteHardwareMillis = getRuntime(), lastDriveRobotMillis = getRuntime();
 
-
-
     private Pose pose;
 
     double innerSensorDist;
     double intake1Dist;
-
-
 
     double intake2Dist;
     boolean intakeFull;
