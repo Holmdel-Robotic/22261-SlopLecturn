@@ -113,7 +113,7 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
     @Override
     public void loop() {
         follower.update(); // Update Pedro Pathing
-        autonomousPathUpdate(); // Update autonomous state machine
+        autonomousPathUpdate(pathState); // Update autonomous state machine
 
         // Log values to Panels and Driver Station
         panelsTelemetry.debug("Path State", pathState);
@@ -228,8 +228,8 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
         }
     }
 
-    public void autonomousPathUpdate() {
-        switch (pathState) {
+    public void autonomousPathUpdate(State state) {
+        switch (state) {
             case START:
                 //if(!follower.isBusy())
                 //{
