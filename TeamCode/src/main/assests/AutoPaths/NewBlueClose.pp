@@ -9,7 +9,7 @@
     "x": 48,
     "y": 10,
     "heading": "linear",
-    "startDeg": -176.49840991746987,
+    "startDeg": 180,
     "endDeg": 180,
     "locked": false
   },
@@ -20,7 +20,7 @@
       "endPoint": {
         "x": 24,
         "y": 36,
-        "heading": "tangential",
+        "heading": "linear",
         "reverse": false,
         "degrees": 180,
         "targetX": 144,
@@ -57,7 +57,8 @@
       "waitBeforeMs": 0,
       "waitAfterMs": 0,
       "waitBeforeName": "",
-      "waitAfterName": ""
+      "waitAfterName": "",
+      "eventMarkers": []
     },
     {
       "id": "mml57mpp-u1cou3",
@@ -75,7 +76,8 @@
       "waitBeforeMs": 0,
       "waitAfterMs": 0,
       "waitBeforeName": "",
-      "waitAfterName": ""
+      "waitAfterName": "",
+      "eventMarkers": []
     },
     {
       "id": "mml57z0y-19jx5d",
@@ -91,7 +93,8 @@
       "waitBeforeMs": 0,
       "waitAfterMs": 0,
       "waitBeforeName": "",
-      "waitAfterName": ""
+      "waitAfterName": "",
+      "eventMarkers": []
     }
   ],
   "sequence": [
