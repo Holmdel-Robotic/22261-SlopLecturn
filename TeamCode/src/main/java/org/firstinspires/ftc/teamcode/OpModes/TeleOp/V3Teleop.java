@@ -28,7 +28,7 @@ public class V3Teleop extends OpMode {
 
     private Servo hood, raxon, laxon;
 
-    public static double IntendedFlywheelV = 1600, ServoPos = .5, desiredAngle, Heading;
+    public static double IntendedFlywheelV = 1600, ServoPos = .5, desiredAngle, Heading, hoodPos = .5;
 
     public static boolean autoTarget = true;
 
@@ -77,7 +77,7 @@ public class V3Teleop extends OpMode {
     }
 
     public void loop(){
-     hood.setPosition(hood.getPosition());
+
      follower.update();
      HandleInputs();
      driveRobot();
@@ -88,7 +88,7 @@ public class V3Teleop extends OpMode {
      telemetry();
      calculateCorrectAngle();
      setServoPos(ServoPos);
-
+     hood.setPosition(hoodPos);
 
 
 
@@ -254,7 +254,10 @@ public class V3Teleop extends OpMode {
         telemetry.addData("desired Pos", ServoPos);
         telemetry.addData("desired angle", desiredAngle);
         telemetry.addData("Robot heading", Heading);
+        telemetry.addData("alt desired angle", desiredAngle/340);
         telemetry.addData("atan", Math.atan(144 - follower.getPose().getY()/ follower.getPose().getX()));
+        telemetry.addData("hood pos", hood.getPosition());
+        telemetry.addData("distance from goal", Math.sqrt(Math.pow((144 - follower.getPose().getY()), 2) + Math.pow((follower.getPose().getX()), 2)));
 
     }
 
