@@ -27,7 +27,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@Autonomous(name = "Pedro Pathing Autonomous", group = "Autonomous")
+@Autonomous(name = "OptimizedBluePathing",   group = "Autonomous")
 @Configurable // Panels
 public class OptimizedBlue_IN_PROGRESS extends OpMode {
 
@@ -91,7 +91,7 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
         IntakeOuter.setDirection(DcMotor.Direction.REVERSE);
         IntakeInner.setDirection(DcMotor.Direction.FORWARD);
         IntakeOuter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
+        pathState = State.START;
 
         hood = hardwareMap.get(Servo.class, "hood");
 
@@ -111,7 +111,7 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
     @Override
     public void loop() {
         follower.update(); // Update Pedro Pathing
-        State pathState = autonomousPathUpdate(); // Update autonomous state machine
+        //pathState = autonomousPathUpdate(); // Update autonomous state machine
 
         // Log values to Panels and Driver Station
         panelsTelemetry.debug("Path State", pathState);
@@ -226,7 +226,7 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
         }
     }
 
-    public State autonomousPathUpdate() {
+    public void autonomousPathUpdate() {
         switch (pathState) {
             case START:
                 if(!follower.isBusy())
@@ -406,11 +406,11 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
 //                pathState = -1;
 //                break;
         }
-        return pathState;
+
     }
 
     public void setPathState(State pState) {
-        State pathState = pState;
+        pathState = pState;
         pathTimer.reset();
     }
 }
