@@ -107,6 +107,7 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
         follower.setStartingPose(new Pose(24.000, 120.000, Math.toRadians(90.000)));
 
         pathTimer = new ElapsedTime();
+        actionTimer = new Timer();
         paths = new Paths(follower); // Build paths
     }
 
