@@ -63,7 +63,7 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
         PICKUP4,
         END
     }
-    private State pathState;
+    State pathState;
     public int count = 0;
 
     @Override
@@ -227,6 +227,7 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
                     .build();
         }
     }
+
 
     public void autonomousPathUpdate(State state) {
         switch (state) {
@@ -410,7 +411,6 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
         }
 
     }
-
     public void setPathState(State pState) {
         pathState = pState;
         pathTimer.reset();
