@@ -32,7 +32,7 @@ public class V3Teleop extends OpMode {
 
     public static boolean autoTarget = true;
 
-    private boolean debounceDPAD, debounceX, FlywheelOn, debounceB, outerIntakeOn, DriveMode = true, debounceY;
+    private boolean debounceDPAD, debounceX, FlywheelOn, debounceB, outerIntakeOn, DriveMode = true, debounceY, dLTR, dRTR, dRBR, dLBR;
     public static double testPos = 0.5;
 
     public void init(){
@@ -205,6 +205,42 @@ public class V3Teleop extends OpMode {
 
             debounceY = false;
         }
+
+        if(gamepad1.left_trigger > 0 && !autoTarget && !dLTR){
+            laxon.setPosition(laxon.getPosition() - .02);
+            raxon.setPosition(raxon.getPosition() - .02);
+            dLTR = true;
+        }
+        if(gamepad1.left_trigger == 0)
+        {
+            dLTR = false;
+        }
+        if(gamepad1.right_trigger > 0 && !autoTarget && !dRTR){
+            laxon.setPosition(laxon.getPosition() + .02);
+            raxon.setPosition(raxon.getPosition() + .02);
+            dRTR = true;
+        }
+        if(gamepad1.right_trigger == 0)
+        {
+            dRTR = false;
+        }
+        if(gamepad1.left_bumper && !autoTarget && !dLBR)
+        {
+            hoodPos -= .05;
+        }
+        if(!gamepad1.left_bumper)
+        {
+            dLBR = false;
+        }
+        if(gamepad1.right_bumper && !autoTarget && !dRBR)
+        {
+            hoodPos += .05;
+        }
+        if(!gamepad1.right_bumper)
+        {
+            dRBR = false;
+        }
+
     }
 
     private void changeFlywheelVelo(){
@@ -254,11 +290,12 @@ public class V3Teleop extends OpMode {
         telemetry.addData("desired Pos", ServoPos);
         telemetry.addData("desired angle", desiredAngle);
         telemetry.addData("Robot heading", Heading);
-        telemetry.addData("alt desired angle", desiredAngle/340);
+        telemetry.addData("alt desired pos", desiredAngle/340);
         telemetry.addData("atan", Math.atan(144 - follower.getPose().getY()/ follower.getPose().getX()));
         telemetry.addData("hood pos", hood.getPosition());
         telemetry.addData("distance from goal", Math.sqrt(Math.pow((144 - follower.getPose().getY()), 2) + Math.pow((follower.getPose().getX()), 2)));
-
+        telemetry.addData("flywheelLeft", flywheelLeft.getVelocity());
+        telemetry.addData("flywheelRight", flywheelRight.getVelocity());
     }
 
     private void calculateCorrectAngle(){
