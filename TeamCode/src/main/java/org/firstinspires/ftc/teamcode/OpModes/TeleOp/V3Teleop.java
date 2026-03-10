@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.hardware.*;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
+
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 @Config
@@ -29,7 +30,7 @@ public class V3Teleop extends OpMode {
 
     public static double IntendedFlywheelV = 1600, ServoPos = .5, desiredAngle;
 
-    private boolean debounceDPAD, debounceX, FlywheelOn, debounceB, outerIntakeOn;
+    private boolean debounceDPAD, debounceX, FlywheelOn, debounceB, outerIntakeOn, DriveMode = false;
     public static double testPos = 0.5;
 
     public void init(){
@@ -74,6 +75,8 @@ public class V3Teleop extends OpMode {
     }
 
     public void loop(){
+     hood.setPosition(hood.getPosition());
+     follower.update();
      HandleInputs();
      driveRobot();
      OuterIntakeOperation(gamepad1.b);
@@ -81,7 +84,7 @@ public class V3Teleop extends OpMode {
      changeFlywheelVelo();
      SetFlywheelVelocity(IntendedFlywheelV);
      telemetry();
-     calculateCorrectAngle();
+     //calculateCorrectAngle();
      setServoPos(ServoPos);
 
 
@@ -118,11 +121,9 @@ public class V3Teleop extends OpMode {
             // This button choice was made so that it is hard to hit on accident,
             // it can be freely changed based on preference.
             // The equivalent button is start on Xbox-style controllers.
-            if (gamepad1.options) {
-                imu.resetYaw();
-            }
 
-            double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+
+            double botHeading = follower.getPose().getHeading();
 
             // Rotate the movement direction counter to the bot's rotation
             double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
@@ -145,7 +146,7 @@ public class V3Teleop extends OpMode {
             backRightMotor.setPower(backRightPower);
         }
         }
-    }
+
 
     private void WholeIntakeOperation(boolean gamepad){
         if (gamepad) {
@@ -235,6 +236,7 @@ public class V3Teleop extends OpMode {
         telemetry.addData("runtime", getRuntime());
         telemetry.addData("desired Pos", ServoPos);
         telemetry.addData("desired angle", desiredAngle);
+        telemetry.addData("Robot heading", Math.toDegrees(follower.getPose().getHeading()));
 
     }
 
@@ -244,12 +246,13 @@ public class V3Teleop extends OpMode {
         desiredAngle = Math.atan(144 - currPose.getY()/ currPose.getX());
         telemetry.addData("X dist",currPose.getX() );
         telemetry.addData("Y dist",currPose.getY() );
-        desiredAngle = 180 - desiredAngle;
-        desiredAngle = desiredAngle - currPose.getHeading();
-        ServoPos = desiredAngle/360;
+        desiredAngle = 180 - Math.toDegrees(desiredAngle) + 90 - Math.toDegrees(currPose.getHeading());
+
+
 
 
     }
 
 }
+
 
