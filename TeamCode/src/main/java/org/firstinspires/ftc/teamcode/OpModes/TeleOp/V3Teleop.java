@@ -26,7 +26,7 @@ public class V3Teleop extends OpMode {
     private Follower follower;
     private DcMotorEx frontRightMotor, frontLeftMotor, backRightMotor, backLeftMotor, intakeOuter,intakeInner, flywheelLeft, flywheelRight;
 
-    private Servo hood, raxon, laxon;
+    private Servo hood, raxon, laxon, innerGate, outerGate;
 
     public static double IntendedFlywheelV = 1600, ServoPos = .5, desiredAngle, Heading, hoodPos = .5;
 
@@ -34,6 +34,8 @@ public class V3Teleop extends OpMode {
 
     private boolean debounceDPAD, debounceX, FlywheelOn, debounceB, outerIntakeOn, DriveMode = true, debounceY, dLTR, dRTR, dRBR, dLBR;
     public static double testPos = 0.5;
+    private double open, close;
+
 
     public void init(){
         follower = Constants.createFollower(hardwareMap);
@@ -70,6 +72,8 @@ public class V3Teleop extends OpMode {
         hood = hardwareMap.get(Servo.class, "hood");
         raxon = hardwareMap.get(Servo.class, "raxon");
         laxon = hardwareMap.get(Servo.class, "laxon");
+        innerGate = hardwareMap.get(Servo.class, "innerGate");
+        outerGate = hardwareMap.get(Servo.class, "outerGate");
 
         FlywheelOn = false;
 
@@ -154,9 +158,13 @@ public class V3Teleop extends OpMode {
         if (gamepad) {
             intakeInner.setPower(.75);
             intakeOuter.setPower(.75);
+            innerGate.setPosition(.575);
+            outerGate.setPosition(.6);
         }
         else{
             intakeInner.setPower(0);
+            innerGate.setPosition(.2);
+            outerGate.setPosition(0);
         }
     }
 
@@ -206,40 +214,8 @@ public class V3Teleop extends OpMode {
             debounceY = false;
         }
 
-        if(gamepad1.left_trigger > 0 && !autoTarget && !dLTR){
-            laxon.setPosition(laxon.getPosition() - .02);
-            raxon.setPosition(raxon.getPosition() - .02);
-            dLTR = true;
-        }
-        if(gamepad1.left_trigger == 0)
-        {
-            dLTR = false;
-        }
-        if(gamepad1.right_trigger > 0 && !autoTarget && !dRTR){
-            laxon.setPosition(laxon.getPosition() + .02);
-            raxon.setPosition(raxon.getPosition() + .02);
-            dRTR = true;
-        }
-        if(gamepad1.right_trigger == 0)
-        {
-            dRTR = false;
-        }
-        if(gamepad1.left_bumper && !autoTarget && !dLBR)
-        {
-            hoodPos -= .05;
-        }
-        if(!gamepad1.left_bumper)
-        {
-            dLBR = false;
-        }
-        if(gamepad1.right_bumper && !autoTarget && !dRBR)
-        {
-            hoodPos += .05;
-        }
-        if(!gamepad1.right_bumper)
-        {
-            dRBR = false;
-        }
+
+
 
     }
 
@@ -316,6 +292,40 @@ public class V3Teleop extends OpMode {
             desiredAngle = 180 + (int) desiredAngle;
             ServoPos = 0.00338889 * desiredAngle - 0.0366667;
 
+        }
+        else{
+            if(gamepad1.left_trigger > 0 && !dLTR){
+                ServoPos -= .02;
+                dLTR = true;
+            }
+            if(gamepad1.left_trigger == 0)
+            {
+                dLTR = false;
+            }
+            if(gamepad1.right_trigger > 0 && !dRTR){
+                ServoPos += .02;
+                dRTR = true;
+            }
+            if(gamepad1.right_trigger == 0)
+            {
+                dRTR = false;
+            }
+            if(gamepad1.left_bumper  && !dLBR)
+            {
+                hoodPos -= .05;
+            }
+            if(!gamepad1.left_bumper)
+            {
+                dLBR = false;
+            }
+            if(gamepad1.right_bumper  && !dRBR)
+            {
+                hoodPos += .05;
+            }
+            if(!gamepad1.right_bumper)
+            {
+                dRBR = false;
+            }
         }
 
     }

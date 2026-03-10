@@ -27,7 +27,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@Autonomous(name = "YummyDemo", group = "Autonomous")
+@Autonomous(name = "Something Something Close Side Pathing", group = "Autonomous")
 @Configurable // Panels
 public class YummyDemo extends OpMode {
 
@@ -46,7 +46,9 @@ public class YummyDemo extends OpMode {
 
         follower = Constants.createFollower(hardwareMap);
         // Determine starting heading: prefer geometric heading when a path exists, otherwise fall back to explicit startPoint values
-        follower.setStartingPose(new Pose(24.000, 120.000, Math.toRadians(90.000)));
+        follower.setStartingPose(
+                new Pose(48.000, 10.000, Math.toRadians(-176.498))
+        );
 
         pathTimer = new ElapsedTime();
         paths = new Paths(follower); // Build paths
@@ -71,69 +73,42 @@ public class YummyDemo extends OpMode {
         public PathChain line2;
         public PathChain line3;
         public PathChain line4;
-        public PathChain line5;
-        public PathChain line6;
-        public PathChain line7;
 
         public Paths(Follower follower) {
             line1 = follower
                     .pathBuilder()
                     .addPath(
-                            new BezierLine(new Pose(24.000, 120.000), new Pose(50.000, 84.000))
+                            new BezierCurve(
+                                    new Pose(48.000, 10.000),
+                                    new Pose(24.000, 8.531),
+                                    new Pose(24.000, 36.000)
+                            )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(180))
+                    .setTangentHeadingInterpolation()
                     .build();
 
             line2 = follower
                     .pathBuilder()
                     .addPath(
-                            new BezierLine(new Pose(50.000, 84.000), new Pose(24.000, 84.000))
+                            new BezierLine(new Pose(24.000, 36.000), new Pose(48.000, 10.000))
                     )
-                    .setConstantHeadingInterpolation(Math.toRadians(180))
+                    .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(180))
                     .build();
 
             line3 = follower
                     .pathBuilder()
                     .addPath(
-                            new BezierLine(new Pose(24.000, 84.000), new Pose(60.000, 75.000))
+                            new BezierLine(new Pose(48.000, 10.000), new Pose(10.000, 10.000))
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(135))
+                    .setConstantHeadingInterpolation(Math.toRadians(180))
                     .build();
 
             line4 = follower
                     .pathBuilder()
                     .addPath(
-                            new BezierCurve(
-                                    new Pose(60.000, 75.000),
-                                    new Pose(60.000, 60.000),
-                                    new Pose(24.000, 60.000)
-                            )
+                            new BezierLine(new Pose(10.000, 10.000), new Pose(48.000, 10.000))
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(135), Math.toRadians(180))
-                    .build();
-
-            line5 = follower
-                    .pathBuilder()
-                    .addPath(
-                            new BezierLine(new Pose(24.000, 60.000), new Pose(56.000, 82.000))
-                    )
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(135))
-                    .build();
-
-            line6 = follower
-                    .pathBuilder()
-                    .addPath(
-                            new BezierLine(new Pose(56.000, 82.000), new Pose(10.000, 60.000))
-                    )
-                    .setConstantHeadingInterpolation(Math.toRadians(135))
-                    .build();
-
-            line7 = follower
-                    .pathBuilder()
-                    .addPath(
-                            new BezierLine(new Pose(10.000, 60.000), new Pose(56.000, 82.000))
-                    )
-                    .setConstantHeadingInterpolation(Math.toRadians(135))
+                    .setConstantHeadingInterpolation(Math.toRadians(180))
                     .build();
         }
     }
@@ -177,33 +152,6 @@ public class YummyDemo extends OpMode {
                 }
                 break;
             case 8:
-                follower.followPath(paths.line5, true);
-                setPathState(9);
-                break;
-            case 9:
-                if (!follower.isBusy()) {
-                    setPathState(10);
-                }
-                break;
-            case 10:
-                follower.followPath(paths.line6, true);
-                setPathState(11);
-                break;
-            case 11:
-                if (!follower.isBusy()) {
-                    setPathState(12);
-                }
-                break;
-            case 12:
-                follower.followPath(paths.line7, true);
-                setPathState(13);
-                break;
-            case 13:
-                if (!follower.isBusy()) {
-                    setPathState(14);
-                }
-                break;
-            case 14:
                 requestOpModeStop();
                 pathState = -1;
                 break;
