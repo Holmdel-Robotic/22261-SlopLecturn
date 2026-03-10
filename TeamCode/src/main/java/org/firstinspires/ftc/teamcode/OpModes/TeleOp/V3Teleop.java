@@ -30,7 +30,7 @@ public class V3Teleop extends OpMode {
 
     public static double IntendedFlywheelV = 1600, ServoPos = .5, desiredAngle, Heading;
 
-    private boolean debounceDPAD, debounceX, FlywheelOn, debounceB, outerIntakeOn, DriveMode = false;
+    private boolean debounceDPAD, debounceX, FlywheelOn, debounceB, outerIntakeOn, DriveMode = true;
     public static double testPos = 0.5;
 
     public void init(){
@@ -233,6 +233,7 @@ public class V3Teleop extends OpMode {
     private void telemetry(){
         telemetry.addData("laxon pos", laxon.getPosition());
         telemetry.addData("raxon pos", raxon.getPosition());
+        telemetry.addData("flywheel V", (flywheelLeft.getVelocity() + flywheelRight.getVelocity())/2); 
         telemetry.addData("runtime", getRuntime());
         telemetry.addData("desired Pos", ServoPos);
         telemetry.addData("desired angle", desiredAngle);
@@ -256,8 +257,7 @@ public class V3Teleop extends OpMode {
 
         desiredAngle = (180 - Math.toDegrees(Math.atan((144 - currPose.getY())/ currPose.getX()))) - Heading;
         desiredAngle = 180 + (int)desiredAngle;
-        ServoPos = (desiredAngle/360);
-
+        ServoPos = 0.00338889 * desiredAngle-0.0366667;
 
 
     }
