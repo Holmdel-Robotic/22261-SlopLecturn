@@ -47,7 +47,8 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
     private Servo kicker;
     private TelemetryManager panelsTelemetry; // Panels Telemetry instance
     public Follower follower; // Pedro Pathing follower instance
-    private State pathState; // Current autonomous path state (state machine)
+
+     // Current autonomous path state (state machine)
     private ElapsedTime pathTimer;
 
     private Timer actionTimer;// Timer for path state machine
@@ -62,6 +63,7 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
         PICKUP4,
         END
     }
+    private State pathState;
     public int count = 0;
 
     @Override
@@ -111,7 +113,7 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
     @Override
     public void loop() {
         follower.update(); // Update Pedro Pathing
-        //pathState = autonomousPathUpdate(); // Update autonomous state machine
+        autonomousPathUpdate(); // Update autonomous state machine
 
         // Log values to Panels and Driver Station
         panelsTelemetry.debug("Path State", pathState);
