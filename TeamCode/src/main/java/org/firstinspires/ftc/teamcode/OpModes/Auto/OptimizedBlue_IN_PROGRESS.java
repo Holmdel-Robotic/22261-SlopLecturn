@@ -231,8 +231,8 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
     public void autonomousPathUpdate() {
         switch (pathState) {
             case START:
-                if(!follower.isBusy())
-                {
+                //if(!follower.isBusy())
+                //{
                     flywheelLeft.setVelocity(-1675);
                     flywheelRight.setVelocity(-1675);
                     hood.setPosition(.67);
@@ -244,7 +244,7 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
                     follower.followPath(paths.Path1, true);
                     setPathState(State.SCORE);
                     break;
-                }
+                //}
 
             case SCORE:
                 if(follower.isBusy())
