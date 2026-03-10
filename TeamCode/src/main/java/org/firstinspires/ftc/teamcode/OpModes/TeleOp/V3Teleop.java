@@ -84,8 +84,8 @@ public class V3Teleop extends OpMode {
      changeFlywheelVelo();
      SetFlywheelVelocity(IntendedFlywheelV);
      telemetry();
-     //calculateCorrectAngle();
-     setServoPos(ServoPos);
+     calculateCorrectAngle();
+     //setServoPos(ServoPos);
 
 
 
@@ -246,8 +246,7 @@ public class V3Teleop extends OpMode {
         desiredAngle = Math.atan(144 - currPose.getY()/ currPose.getX());
         telemetry.addData("X dist",currPose.getX() );
         telemetry.addData("Y dist",currPose.getY() );
-        desiredAngle = 180 - Math.toDegrees(desiredAngle) + 90 - Math.toDegrees(currPose.getHeading());
-
+        desiredAngle = (180 - Math.toDegrees(Math.atan(144 - currPose.getY()/ currPose.getX()))) - Math.toDegrees(currPose.getHeading());
 
 
 
