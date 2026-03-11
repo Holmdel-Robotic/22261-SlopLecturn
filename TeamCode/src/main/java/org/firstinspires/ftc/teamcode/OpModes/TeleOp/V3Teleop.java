@@ -28,7 +28,7 @@ public class V3Teleop extends OpMode {
 
     private Servo hood, raxon, laxon, innerGate, outerGate;
 
-    public static double IntendedFlywheelV = 1600, ServoPos = .5, desiredAngle, Heading, hoodPos = .5, XOffset = 16;
+    public static double IntendedFlywheelV = 1600, ServoPos = .5, desiredAngle, Heading, hoodPos = .5, XOffset = 16, distanceToGoal;
 
     public static boolean autoTarget = true;
 
@@ -74,6 +74,7 @@ public class V3Teleop extends OpMode {
         laxon = hardwareMap.get(Servo.class, "laxon");
         innerGate = hardwareMap.get(Servo.class, "innerGate");
         outerGate = hardwareMap.get(Servo.class, "outerGate");
+        hood.setDirection(Servo.Direction.REVERSE);
 
         FlywheelOn = false;
 
@@ -156,8 +157,8 @@ public class V3Teleop extends OpMode {
 
     private void WholeIntakeOperation(boolean gamepad){
         if (gamepad) {
-            intakeInner.setPower(.75);
-            intakeOuter.setPower(.75);
+            intakeInner.setPower(.9);
+            intakeOuter.setPower(.9);
             innerGate.setPosition(.575);
             outerGate.setPosition(.6);
         }
@@ -259,6 +260,7 @@ public class V3Teleop extends OpMode {
         telemetry.addData("distance from goal", Math.sqrt(Math.pow((144 - follower.getPose().getY()), 2) + Math.pow((follower.getPose().getX()), 2)));
         telemetry.addData("flywheelLeft", flywheelLeft.getVelocity());
         telemetry.addData("flywheelRight", flywheelRight.getVelocity());
+        telemetry.addData("distance to goal", distanceToGoal);
     }
 
     private void calculateCorrectAngle(){
@@ -278,6 +280,9 @@ public class V3Teleop extends OpMode {
             desiredAngle = (180 - Math.toDegrees(Math.atan((144 - currPose.getY()) / (currPose.getX() - XOffset)))) - Heading;
             desiredAngle = 180 + (int) desiredAngle;
             ServoPos = 0.00338889 * desiredAngle - 0.0366667;
+            distanceToGoal = Math.sqrt(Math.pow(144-currPose.getY(),2) + Math.pow(currPose.getX(),2));
+            IntendedFlywheelV = .037793 * Math.pow(distanceToGoal,2) -0.153573 * distanceToGoal+1199.55171;
+            hoodPos = 0.00103696 * distanceToGoal+0.132336;
 
         }
         else{
