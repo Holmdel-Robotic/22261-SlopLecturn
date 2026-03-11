@@ -288,7 +288,7 @@ public class V3Teleop extends OpMode {
             }
 
 
-            desiredAngle = (180 - Math.toDegrees(Math.atan((144 - currPose.getY()) / currPose.getX()))) - Heading;
+            desiredAngle = (180 - Math.toDegrees(Math.atan((144 - currPose.getY()) / (currPose.getX() - 8)))) - Heading;
             desiredAngle = 180 + (int) desiredAngle;
             ServoPos = 0.00338889 * desiredAngle - 0.0366667;
 
