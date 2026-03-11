@@ -28,7 +28,7 @@ public class V3Teleop extends OpMode {
 
     private Servo hood, raxon, laxon, innerGate, outerGate;
 
-    public static double IntendedFlywheelV = 1600, ServoPos = .5, desiredAngle, Heading, hoodPos = .5;
+    public static double IntendedFlywheelV = 1600, ServoPos = .5, desiredAngle, Heading, hoodPos = .5, XOffset = 16;
 
     public static boolean autoTarget = true;
 
@@ -243,20 +243,7 @@ public class V3Teleop extends OpMode {
 
     }
 
-    private void smoothServo(double pos){
-        double lastloopTime = getRuntime();
-        while (Math.abs(pos - laxon.getPosition()) > .04){
-            if (getRuntime() - lastloopTime >= .2){
-                if (pos > laxon.getPosition()){
-                    setServoPos(laxon.getPosition() + .04);
 
-                } else if (pos < laxon.getPosition()) {
-                    setServoPos(laxon.getPosition() - .04);
-                }
-                lastloopTime = getRuntime();
-            }
-        }
-    }
 
     private void telemetry(){
         telemetry.addData("laxon pos", laxon.getPosition());
@@ -288,7 +275,7 @@ public class V3Teleop extends OpMode {
             }
 
 
-            desiredAngle = (180 - Math.toDegrees(Math.atan((144 - currPose.getY()) / (currPose.getX() - 8)))) - Heading;
+            desiredAngle = (180 - Math.toDegrees(Math.atan((144 - currPose.getY()) / (currPose.getX() - XOffset)))) - Heading;
             desiredAngle = 180 + (int) desiredAngle;
             ServoPos = 0.00338889 * desiredAngle - 0.0366667;
 
