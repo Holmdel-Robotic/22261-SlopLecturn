@@ -343,10 +343,12 @@ public class V3Teleop extends OpMode {
             }
             if(!gamepad1.left_bumper)
             {
+
                 dLBR = false;
             }
             if(gamepad1.right_bumper  && !dRBR)
             {
+
                 hoodPos += .05;
             }
             if(!gamepad1.right_bumper)
