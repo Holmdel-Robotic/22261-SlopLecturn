@@ -224,6 +224,7 @@ public class YummyDemo extends OpMode {
                     else {
                         follower.followPath(paths.line4, true);
                         setPathState(State.SCORE);
+
                     }
 
                 }
