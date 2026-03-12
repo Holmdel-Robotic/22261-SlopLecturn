@@ -291,7 +291,7 @@ public class V3Teleop extends OpMode {
         follower.update();
         Pose currPose = follower.getPose();
         distanceToGoal = Math.sqrt(Math.pow(144-currPose.getY(),2) + Math.pow(currPose.getX(),2));
-        //hoodPos = .00347222 * distanceToGoal;
+        hoodPos = .00225 * distanceToGoal + .63;
 
         if (autoTarget) {
             if ((currPose.getY() < 30 && currPose.getX() > 42 && currPose.getX() < 103) || (currPose.getY() > 70)){
@@ -310,7 +310,7 @@ public class V3Teleop extends OpMode {
             ServoPos = 0.00338889 * desiredAngle - 0.0366667;
             distanceToGoal = Math.sqrt(Math.pow(144 - currPose.getY(), 2) + Math.pow(currPose.getX(), 2));
             IntendedFlywheelV = .037793 * Math.pow(distanceToGoal, 2) - 0.153573 * distanceToGoal + 1199.55171;
-            hoodPos = .3 + .001667 * distanceToGoal;
+
 
 
             }
