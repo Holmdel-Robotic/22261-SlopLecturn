@@ -196,6 +196,8 @@ public class V3Teleop extends OpMode {
 
     private void HandleInputs(){
 
+
+
         if (gamepad1.y && !debounceY){
             autoTarget = !autoTarget;
             debounceY = true;
@@ -213,6 +215,22 @@ public class V3Teleop extends OpMode {
         if (!gamepad1.y){
 
             debounceY = false;
+        }
+        if (gamepad1.left_trigger > .2){
+            innerGate.setPosition(.2);
+            intakeInner.setPower(.9);
+            intakeOuter.setPower(.9);
+        }
+
+
+        if(gamepad1.left_trigger == 0)
+        {
+            dLTR = false;
+        }
+
+        if(gamepad1.right_trigger == 0)
+        {
+            dRTR = false;
         }
 
 
@@ -286,18 +304,23 @@ public class V3Teleop extends OpMode {
 
         }
         else{
+            /*
             if(gamepad1.left_trigger > 0 && !dLTR){
                 ServoPos -= .02;
                 dLTR = true;
             }
+            */
             if(gamepad1.left_trigger == 0)
             {
                 dLTR = false;
             }
+            /*
             if(gamepad1.right_trigger > 0 && !dRTR){
                 ServoPos += .02;
                 dRTR = true;
             }
+
+             */
             if(gamepad1.right_trigger == 0)
             {
                 dRTR = false;
