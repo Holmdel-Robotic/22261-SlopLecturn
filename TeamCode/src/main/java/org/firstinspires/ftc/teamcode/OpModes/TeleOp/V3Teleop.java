@@ -306,10 +306,12 @@ public class V3Teleop extends OpMode {
 
 
             desiredAngle = (180 - Math.toDegrees(Math.atan((144 - currPose.getY()) / (currPose.getX() - XOffset)))) - Heading;
-            desiredAngle = 170 + (int) desiredAngle;
+            desiredAngle = 180 + (int) desiredAngle;
             ServoPos = 0.00338889 * desiredAngle - 0.0366667;
             distanceToGoal = Math.sqrt(Math.pow(144 - currPose.getY(), 2) + Math.pow(currPose.getX(), 2));
             IntendedFlywheelV = .037793 * Math.pow(distanceToGoal, 2) - 0.153573 * distanceToGoal + 1199.55171;
+            hoodPos = .3 + .001667 * distanceToGoal;
+
 
             }
         }
