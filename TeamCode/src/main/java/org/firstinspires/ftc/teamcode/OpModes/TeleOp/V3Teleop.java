@@ -227,6 +227,7 @@ public class V3Teleop extends OpMode {
         {
             dLTR = false;
         }
+        //bait
 
         if(gamepad1.right_trigger == 0)
         {
