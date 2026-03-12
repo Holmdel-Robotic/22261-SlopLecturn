@@ -86,8 +86,8 @@ public class YummyDemo extends OpMode {
         intakeOuter.setDirection(DcMotor.Direction.REVERSE);
         intakeInner.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        intakeSensor1 = hardwareMap.get(DistanceSensor.class, "intakeSensor1");
-        intakeSensor2 = hardwareMap.get(DistanceSensor.class, "intakeSensor2");
+        //intakeSensor1 = hardwareMap.get(DistanceSensor.class, "intakeSensor1");
+       // intakeSensor2 = hardwareMap.get(DistanceSensor.class, "intakeSensor2");
 
         hood = hardwareMap.get(Servo.class, "hood");
         raxon = hardwareMap.get(Servo.class, "raxon");
@@ -189,10 +189,10 @@ public class YummyDemo extends OpMode {
                 }else{
                     intakeOuter.setPower(-.8);
                     intakeInner.setPower(.3);
-                    gate.setPosition(.88);
+                   // gate.setPosition(.88);
                 }
                 if (actionTimer.getElapsedTimeSeconds() > 3) {
-                    gate.setPosition(.5);
+                    //gate.setPosition(.5);
                     if(getLine) {
                         follower.followPath(paths.line1, true);
                         setPathState(State.PICKUP1);
