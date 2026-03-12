@@ -294,7 +294,7 @@ public class V3Teleop extends OpMode {
         //hoodPos = .00347222 * distanceToGoal;
 
         if (autoTarget) {
-            if ((currPose.getY() < 30 && currPose.getX() > 42 && currPose.getX() < 103)){
+            if ((currPose.getY() < 30 && currPose.getX() > 42 && currPose.getX() < 103) || (currPose.getY() > 70)){
                 desiredAngle = Math.atan(144 - currPose.getY() / currPose.getX());
             telemetry.addData("X dist", currPose.getX());
             telemetry.addData("Y dist", currPose.getY());
