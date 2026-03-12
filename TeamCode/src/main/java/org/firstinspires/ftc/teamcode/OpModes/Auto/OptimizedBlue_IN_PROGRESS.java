@@ -27,7 +27,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@Autonomous(name = "OptimizedBluePathing",   group = "Autonomous")
+@Autonomous(name = "OptimizedBluePathing")
 @Configurable // Panels
 public class OptimizedBlue_IN_PROGRESS extends OpMode {
 
