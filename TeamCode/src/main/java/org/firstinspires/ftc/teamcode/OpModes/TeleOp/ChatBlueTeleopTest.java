@@ -68,9 +68,6 @@ public class ChatBlueTeleopTest extends OpMode {
     private long lastLoopTime;
     private double savedRuntime;
 
-    private double kP = 0.843;
-    private double max = 0.00922;
-
     private double GREEN = .5;
     private double BLUE = .6;
     private double distance;
@@ -141,12 +138,6 @@ public class ChatBlueTeleopTest extends OpMode {
         processGamepad1();
         updateRobotState();
         writeHardware();
-//added turn idk if this is how it's supposed to go
-        if (isTurning) {
-            updateTurn();
-        } else {
-            driveRobot();
-        }
 
         follower.update();
         updateTelemetry();
@@ -210,10 +201,10 @@ public class ChatBlueTeleopTest extends OpMode {
         }
         if (!gamepad1.right_stick_button) debounceRightStick = true;
 
-        if (!aprilTagTracking) {
-            raxon.setPosition(axonPos);
-            laxon.setPosition(axonPos);
-        }
+//        if (!aprilTagTracking) {
+//            raxon.setPosition(axonPos);
+//            laxon.setPosition(axonPos);
+//        }
 
         if (!aprilTagTracking && gamepad1.left_trigger > .01 && debounceLEFT_TRIGGER) {
             raxonPos = raxon.getPosition() + .03;
@@ -222,14 +213,13 @@ public class ChatBlueTeleopTest extends OpMode {
             raxon.setPosition(raxonPos);
             debounceLEFT_TRIGGER = false;
         }
-
-        if (aprilTagTracking) {
-            trackAprilTag();
-        }
+//
+//        if (aprilTagTracking) {
+//            trackAprilTag();
+//        }
 
         if (gamepad1.start && !debounceStart) {
-            turnToAngle(Math.toDegrees(Math.atan(((144 -follower.getPose().getY())/follower.getPose().getX()))) + 90);
-            debounceStart = true;
+
         }
         if (!gamepad1.start) debounceStart = false;
     }
@@ -320,34 +310,7 @@ public class ChatBlueTeleopTest extends OpMode {
         backRightMotor.setPower((y + x - rx) / denominator);
     }
 
-    /* ================= TURN TO ANGLE ================= */
 
-    public void turnToAngle(double targetDegrees) {
-        turnTargetDegrees = targetDegrees;
-        isTurning = true;
-    }
-
-    private void updateTurn() {
-        double currentDeg = Math.toDegrees(follower.getPose().getHeading());
-        double error = turnTargetDegrees - currentDeg;
-
-        while (error > 180)  error -= 360;
-        while (error < -180) error += 360;
-
-        if (Math.abs(error) > 5) {
-            double turnPower = .3;
-            frontLeftMotor.setPower(turnPower);
-            backLeftMotor.setPower(turnPower);
-            frontRightMotor.setPower(-turnPower);
-            backRightMotor.setPower(-turnPower);
-        } else {
-            frontLeftMotor.setPower(0);
-            backLeftMotor.setPower(0);
-            frontRightMotor.setPower(0);
-            backRightMotor.setPower(0);
-            isTurning = false;
-        }
-    }
 
     /* ================= APRILTAG ================= */
 

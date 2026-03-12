@@ -27,7 +27,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@Autonomous(name = "Pedro Pathing Autonomous", group = "Autonomous")
+@Autonomous(name = "OptimizedBluePathing",   group = "Autonomous")
 @Configurable // Panels
 public class OptimizedBlue_IN_PROGRESS extends OpMode {
 
@@ -47,7 +47,8 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
     private Servo kicker;
     private TelemetryManager panelsTelemetry; // Panels Telemetry instance
     public Follower follower; // Pedro Pathing follower instance
-    private State pathState; // Current autonomous path state (state machine)
+
+     // Current autonomous path state (state machine)
     private ElapsedTime pathTimer;
 
     private Timer actionTimer;// Timer for path state machine
@@ -62,6 +63,7 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
         PICKUP4,
         END
     }
+    State pathState;
     public int count = 0;
 
     @Override
@@ -91,7 +93,7 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
         IntakeOuter.setDirection(DcMotor.Direction.REVERSE);
         IntakeInner.setDirection(DcMotor.Direction.FORWARD);
         IntakeOuter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
+        pathState = State.START;
 
         hood = hardwareMap.get(Servo.class, "hood");
 
@@ -105,13 +107,14 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
         follower.setStartingPose(new Pose(24.000, 120.000, Math.toRadians(90.000)));
 
         pathTimer = new ElapsedTime();
+        actionTimer = new Timer();
         paths = new Paths(follower); // Build paths
     }
 
     @Override
     public void loop() {
         follower.update(); // Update Pedro Pathing
-        State pathState = autonomousPathUpdate(); // Update autonomous state machine
+        autonomousPathUpdate(pathState); // Update autonomous state machine
 
         // Log values to Panels and Driver Station
         panelsTelemetry.debug("Path State", pathState);
@@ -226,11 +229,12 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
         }
     }
 
-    public State autonomousPathUpdate() {
-        switch (pathState) {
+
+    public void autonomousPathUpdate(State state) {
+        switch (state) {
             case START:
-                if(!follower.isBusy())
-                {
+                //if(!follower.isBusy())
+                //{
                     flywheelLeft.setVelocity(-1675);
                     flywheelRight.setVelocity(-1675);
                     hood.setPosition(.67);
@@ -242,7 +246,7 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
                     follower.followPath(paths.Path1, true);
                     setPathState(State.SCORE);
                     break;
-                }
+                //}
 
             case SCORE:
                 if(follower.isBusy())
@@ -406,11 +410,10 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
 //                pathState = -1;
 //                break;
         }
-        return pathState;
-    }
 
+    }
     public void setPathState(State pState) {
-        State pathState = pState;
+        pathState = pState;
         pathTimer.reset();
     }
 }
