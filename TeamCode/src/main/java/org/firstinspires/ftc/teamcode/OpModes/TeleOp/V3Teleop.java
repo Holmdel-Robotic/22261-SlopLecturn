@@ -84,10 +84,11 @@ public class V3Teleop extends OpMode {
     public void loop(){
 
      follower.update();
+        OuterIntakeOperation(gamepad1.b);
+        WholeIntakeOperation(gamepad1.a);
      HandleInputs();
      driveRobot();
-     OuterIntakeOperation(gamepad1.b);
-     WholeIntakeOperation(gamepad1.a);
+
      changeFlywheelVelo();
      SetFlywheelVelocity(IntendedFlywheelV);
      telemetry();
@@ -217,6 +218,7 @@ public class V3Teleop extends OpMode {
             debounceY = false;
         }
         if (gamepad1.left_trigger > .2){
+            outerGate.setPosition(.575);
             innerGate.setPosition(.2);
             intakeInner.setPower(.9);
             intakeOuter.setPower(.9);
