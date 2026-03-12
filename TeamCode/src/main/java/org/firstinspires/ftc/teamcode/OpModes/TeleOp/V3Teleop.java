@@ -29,8 +29,8 @@ public class V3Teleop extends OpMode {
 
     public static double IntendedFlywheelV = 1600, ServoPos = .5, desiredAngle;
 
-    private boolean debounceDPAD, debounceX, FlywheelOn, debounceB, outerIntakeOn;
-    public static double testPos = 0.5;
+    private boolean debounceDPAD, debounceX, FlywheelOn, debounceB, outerIntakeOn, DriveMode = false;
+    public static double testPos = 0.22;
 
     public void init(){
         follower = Constants.createFollower(hardwareMap);
@@ -74,16 +74,16 @@ public class V3Teleop extends OpMode {
     }
 
     public void loop(){
+     follower.update();
      HandleInputs();
      driveRobot();
      OuterIntakeOperation(gamepad1.b);
      WholeIntakeOperation(gamepad1.a);
      changeFlywheelVelo();
      SetFlywheelVelocity(IntendedFlywheelV);
-     telemetry();
      calculateCorrectAngle();
-     setServoPos(ServoPos);
-
+     //setServoPos(ServoPos);
+     telemetry();
 
 
 
@@ -118,11 +118,9 @@ public class V3Teleop extends OpMode {
             // This button choice was made so that it is hard to hit on accident,
             // it can be freely changed based on preference.
             // The equivalent button is start on Xbox-style controllers.
-            if (gamepad1.options) {
-                imu.resetYaw();
-            }
 
-            double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+
+            double botHeading = follower.getHeading();
 
             // Rotate the movement direction counter to the bot's rotation
             double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
@@ -144,7 +142,7 @@ public class V3Teleop extends OpMode {
             frontRightMotor.setPower(frontRightPower);
             backRightMotor.setPower(backRightPower);
         }
-        }
+
     }
 
     private void WholeIntakeOperation(boolean gamepad){
@@ -162,6 +160,8 @@ public class V3Teleop extends OpMode {
             debounceB = true;
         }
         if (gamepad && debounceB) {
+
+            outerIntakeOn = !outerIntakeOn;
             if (outerIntakeOn){
                 intakeOuter.setPower(.75);
             }else {
@@ -232,6 +232,7 @@ public class V3Teleop extends OpMode {
     private void telemetry(){
         telemetry.addData("laxon pos", laxon.getPosition());
         telemetry.addData("raxon pos", raxon.getPosition());
+        telemetry.addData("heading", follower.getHeading() * 180/(Math.PI));
         telemetry.addData("runtime", getRuntime());
         telemetry.addData("desired Pos", ServoPos);
         telemetry.addData("desired angle", desiredAngle);
@@ -241,12 +242,15 @@ public class V3Teleop extends OpMode {
     private void calculateCorrectAngle(){
         follower.update();
         Pose currPose = follower.getPose();
-        desiredAngle = Math.atan(144 - currPose.getY()/ currPose.getX());
+        desiredAngle = Math.atan(144 - currPose.getY()/ currPose.getX()) * 180/(Math.PI) ;
         telemetry.addData("X dist",currPose.getX() );
-        telemetry.addData("Y dist",currPose.getY() );
-        desiredAngle = 180 - desiredAngle;
-        desiredAngle = desiredAngle - currPose.getHeading();
+        telemetry.addData("Y dist",144 - currPose.getY() );
+
+        desiredAngle = desiredAngle - (180 - currPose.getHeading() * 180/(Math.PI));
         ServoPos = desiredAngle/360;
+        //ServoPos = ServoPos * 50;
+        //int newServoPos = ((int) (ServoPos))/50;
+        ServoPos = ServoPos;
 
 
     }
