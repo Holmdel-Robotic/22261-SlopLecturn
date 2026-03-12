@@ -56,6 +56,7 @@ public class YummyDemo extends OpMode {
     private Timer actionTimer;
     private Paths paths; // Paths defined in the Paths class
     private enum State{
+        START,
         SCORE,
         PICKUP1,
         HUMANZONE,
@@ -102,7 +103,7 @@ public class YummyDemo extends OpMode {
         pathTimer = new ElapsedTime();
         actionTimer = new Timer();
         paths = new Paths(follower); // Build paths
-        pathState = State.SCORE;
+        pathState = State.START;
         getLine = true;
 
     }
@@ -117,9 +118,10 @@ public class YummyDemo extends OpMode {
         panelsTelemetry.debug("X", follower.getPose().getX());
         panelsTelemetry.debug("Y", follower.getPose().getY());
         panelsTelemetry.debug("Heading", follower.getPose().getHeading());
-        panelsTelemetry.addData("actionTimer", actionTimer.getElapsedTimeSeconds());
-        panelsTelemetry.addData("getLine", getLine);
-        panelsTelemetry.addData("isBusy?", follower.isBusy());
+        panelsTelemetry.debug("actionTimer", actionTimer.getElapsedTimeSeconds());
+        panelsTelemetry.debug("getLine", getLine);
+        panelsTelemetry.debug("isBusy?", follower.isBusy());
+        panelsTelemetry.debug("pathTime", pathTimer.seconds());
         panelsTelemetry.update(telemetry);
     }
 
@@ -180,18 +182,26 @@ public class YummyDemo extends OpMode {
 
     public void autonomousPathUpdate() {
         switch (pathState) {
+            case START:
+//                raxon.setPosition(.5);
+//                laxon.setPosition(.5);
+//                flywheelLeft.setVelocity(2000);
+//                flywheelRight.setVelocity(2000);
+//                hood.setPosition(.5);
+                setPathState(State.SCORE);
+                break;
+
+
             case SCORE:
-                raxon.setPosition(.5);
-                laxon.setPosition(.5);
-                flywheelLeft.setVelocity(2000);
-                flywheelRight.setVelocity(2000);
-                hood.setPosition(.5);
+
 
                 if (follower.isBusy()){
                     actionTimer.resetTimer();
-                }else{
-                    intakeOuter.setPower(-.8);
-                    intakeInner.setPower(.3);
+                }
+                else
+                {
+//                    intakeOuter.setPower(-.8);
+//                    intakeInner.setPower(.3);
                    // gate.setPosition(.88);
                     if (actionTimer.getElapsedTimeSeconds() > 3) {
                         //gate.setPosition(.5);
@@ -216,7 +226,7 @@ public class YummyDemo extends OpMode {
                 break;
             case HUMANZONE:
                 if (!follower.isBusy()) {
-                    if(pathTimer.seconds() < 2)
+                    if(pathTimer.seconds() > 28)
                     {
                         follower.followPath(paths.line5);
                         setPathState(State.END);
