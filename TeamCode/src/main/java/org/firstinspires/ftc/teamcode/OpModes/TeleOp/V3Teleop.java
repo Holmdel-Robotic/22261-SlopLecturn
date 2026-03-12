@@ -28,7 +28,7 @@ public class V3Teleop extends OpMode {
 
     private Servo hood, raxon, laxon, innerGate, outerGate;
 
-    public static double IntendedFlywheelV = 1600, ServoPos = .5, desiredAngle, Heading, hoodPos = .5, XOffset = 16, distanceToGoal;
+    public static double IntendedFlywheelV = 1600, ServoPos = .5, desiredAngle, Heading, hoodPos = .53, XOffset = 16, distanceToGoal;
 
     public static boolean autoTarget = true;
 
@@ -201,6 +201,8 @@ public class V3Teleop extends OpMode {
 
         if (gamepad1.y && !debounceY){
             autoTarget = !autoTarget;
+            IntendedFlywheelV = 1750;
+            hoodPos = .53;
             debounceY = true;
         }
 
@@ -285,10 +287,15 @@ public class V3Teleop extends OpMode {
     }
 
     private void calculateCorrectAngle(){
+
+        follower.update();
+        Pose currPose = follower.getPose();
+        distanceToGoal = Math.sqrt(Math.pow(144-currPose.getY(),2) + Math.pow(currPose.getX(),2));
+        //hoodPos = .00347222 * distanceToGoal;
+
         if (autoTarget) {
-            follower.update();
-            Pose currPose = follower.getPose();
-            desiredAngle = Math.atan(144 - currPose.getY() / currPose.getX());
+            if ((currPose.getY() < 30 && currPose.getX() > 42 && currPose.getX() < 103)){
+                desiredAngle = Math.atan(144 - currPose.getY() / currPose.getX());
             telemetry.addData("X dist", currPose.getX());
             telemetry.addData("Y dist", currPose.getY());
             Heading = Math.toDegrees(currPose.getHeading());
@@ -299,12 +306,12 @@ public class V3Teleop extends OpMode {
 
 
             desiredAngle = (180 - Math.toDegrees(Math.atan((144 - currPose.getY()) / (currPose.getX() - XOffset)))) - Heading;
-            desiredAngle = 180 + (int) desiredAngle;
+            desiredAngle = 170 + (int) desiredAngle;
             ServoPos = 0.00338889 * desiredAngle - 0.0366667;
-            distanceToGoal = Math.sqrt(Math.pow(144-currPose.getY(),2) + Math.pow(currPose.getX(),2));
-            IntendedFlywheelV = .037793 * Math.pow(distanceToGoal,2) -0.153573 * distanceToGoal+1199.55171;
-            hoodPos = 0.00103696 * distanceToGoal+0.132336;
+            distanceToGoal = Math.sqrt(Math.pow(144 - currPose.getY(), 2) + Math.pow(currPose.getX(), 2));
+            IntendedFlywheelV = .037793 * Math.pow(distanceToGoal, 2) - 0.153573 * distanceToGoal + 1199.55171;
 
+            }
         }
         else{
             /*
