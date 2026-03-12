@@ -117,6 +117,9 @@ public class YummyDemo extends OpMode {
         panelsTelemetry.debug("X", follower.getPose().getX());
         panelsTelemetry.debug("Y", follower.getPose().getY());
         panelsTelemetry.debug("Heading", follower.getPose().getHeading());
+        panelsTelemetry.addData("actionTimer", actionTimer.getElapsedTimeSeconds());
+        panelsTelemetry.addData("getLine", getLine);
+        panelsTelemetry.addData("isBusy?", follower.isBusy());
         panelsTelemetry.update(telemetry);
     }
 
@@ -190,20 +193,20 @@ public class YummyDemo extends OpMode {
                     intakeOuter.setPower(-.8);
                     intakeInner.setPower(.3);
                    // gate.setPosition(.88);
-                }
-                if (actionTimer.getElapsedTimeSeconds() > 3) {
-                    //gate.setPosition(.5);
-                    if(getLine) {
-                        follower.followPath(paths.line1, true);
-                        setPathState(State.PICKUP1);
-                        getLine = false;
-                    }
-                    else
-                    {
-                        follower.followPath(paths.line3, true);
-                        setPathState(State.HUMANZONE);
-                    }
+                    if (actionTimer.getElapsedTimeSeconds() > 3) {
+                        //gate.setPosition(.5);
+                        if(getLine) {
+                            follower.followPath(paths.line1, true);
+                            setPathState(State.PICKUP1);
+                            getLine = false;
+                        }
+                        else
+                        {
+                            follower.followPath(paths.line3, true);
+                            setPathState(State.HUMANZONE);
+                        }
 
+                    }
                 }
             case PICKUP1:
                 if (!follower.isBusy()) {
