@@ -123,9 +123,9 @@ public class YummyFar_DEMO extends OpMode {
             line6 = follower
                     .pathBuilder()
                     .addPath(
-                            new BezierLine(new Pose(56.000, 82.000), new Pose(10.000, 60.000))
+                            new BezierLine(new Pose(56.000, 82.000), new Pose(10.000, 64.000))
                     )
-                    .setConstantHeadingInterpolation(Math.toRadians(135))
+                    .setConstantHeadingInterpolation(Math.toRadians(160))
                     .build();
 
             line7 = follower

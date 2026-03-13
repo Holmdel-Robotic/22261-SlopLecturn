@@ -244,10 +244,10 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
             case START:
                 //if(!follower.isBusy())
                 //{
-                raxon.setPosition(.5);
-                laxon.setPosition(.5);
-                flywheelLeft.setVelocity(2000);
-                flywheelRight.setVelocity(2000);
+                raxon.setPosition(.42);
+                laxon.setPosition(.42);
+                flywheelLeft.setVelocity(600);
+                flywheelRight.setVelocity(600);
                 intakeOuter.setPower(.9);
 
                     actionTimer.resetTimer();

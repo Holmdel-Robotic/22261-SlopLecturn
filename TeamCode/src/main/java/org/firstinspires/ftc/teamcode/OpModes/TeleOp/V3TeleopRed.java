@@ -285,6 +285,7 @@ public class V3TeleopRed extends OpMode {
         telemetry.addData("flywheelLeft", flywheelLeft.getVelocity());
         telemetry.addData("flywheelRight", flywheelRight.getVelocity());
         telemetry.addData("distance to goal", distanceToGoal);
+
     }
 
     private void calculateCorrectAngle(){
@@ -296,7 +297,7 @@ public class V3TeleopRed extends OpMode {
 
         if (autoTarget) {
             if ((currPose.getY() < 30 && currPose.getX() > 42 && currPose.getX() < 103) || (currPose.getY() > 70)){
-                desiredAngle = Math.atan(144 - currPose.getY() / (currPose.getX()));
+                desiredAngle = Math.atan(144 - currPose.getY() / (144-currPose.getX()));
             telemetry.addData("X dist", currPose.getX());
             telemetry.addData("Y dist", currPose.getY());
             Heading = Math.toDegrees(currPose.getHeading());
