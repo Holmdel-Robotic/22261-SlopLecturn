@@ -25,7 +25,7 @@ public class V3TeleopRed extends OpMode {
 
     private Servo hood, raxon, laxon, innerGate, outerGate;
 
-    public static double IntendedFlywheelV = 1600, ServoPos = .5, desiredAngle, Heading, hoodPos = .53, XOffset = 16, distanceToGoal, DegreeOffset = 0, savedTime = 0;
+    public static double IntendedFlywheelV = 1600, ServoPos = .5, desiredAngle, Heading, hoodPos = .53, XOffset = 0, distanceToGoal, DegreeOffset = 0, savedTime = 0;
 
     public static boolean autoTarget = true;
 
@@ -296,7 +296,7 @@ public class V3TeleopRed extends OpMode {
 
         if (autoTarget) {
             if ((currPose.getY() < 30 && currPose.getX() > 42 && currPose.getX() < 103) || (currPose.getY() > 70)){
-                desiredAngle = Math.atan(144 - currPose.getY() / currPose.getX());
+                desiredAngle = Math.atan(144 - currPose.getY() / (currPose.getX()));
             telemetry.addData("X dist", currPose.getX());
             telemetry.addData("Y dist", currPose.getY());
             Heading = Math.toDegrees(currPose.getHeading());
