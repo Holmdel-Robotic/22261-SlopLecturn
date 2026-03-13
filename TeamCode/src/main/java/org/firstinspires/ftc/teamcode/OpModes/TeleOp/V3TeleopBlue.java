@@ -4,23 +4,17 @@ import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.*;
-import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
-import com.qualcomm.hardware.lynx.LynxModule;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.*;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 //try?
 
-import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 @Config
 @TeleOp
 
 
-public class V3Teleop extends OpMode {
+public class V3TeleopBlue extends OpMode {
 
 
     private Follower follower;
@@ -96,6 +90,7 @@ public class V3Teleop extends OpMode {
      setServoPos(ServoPos);
      hood.setPosition(hoodPos);
      telemetry.addData("looptime", getRuntime() - savedTime);
+     telemetry.addData("offset", DegreeOffset);
      savedTime = getRuntime();
 
 
@@ -177,6 +172,7 @@ public class V3Teleop extends OpMode {
             debounceB = true;
         }
         if (gamepad && debounceB) {
+            outerIntakeOn = !outerIntakeOn;
             if (outerIntakeOn){
                 intakeOuter.setPower(.75);
             }else {
@@ -293,9 +289,10 @@ public class V3Teleop extends OpMode {
         follower.update();
         Pose currPose = follower.getPose();
         distanceToGoal = Math.sqrt(Math.pow(144-currPose.getY(),2) + Math.pow(currPose.getX(),2));
-        hoodPos = .00225 * distanceToGoal + .63;
+
 
         if (autoTarget) {
+            hoodPos = .00263168 * distanceToGoal + .0605263;
             if ((currPose.getY() < 30 && currPose.getX() > 42 && currPose.getX() < 103) || (currPose.getY() > 70)){
                 desiredAngle = Math.atan(144 - currPose.getY() / currPose.getX());
             telemetry.addData("X dist", currPose.getX());
@@ -314,14 +311,18 @@ public class V3Teleop extends OpMode {
             IntendedFlywheelV = .037793 * Math.pow(distanceToGoal, 2) - 0.153573 * distanceToGoal + 1199.55171;
 
             if (gamepad1.dpad_left && !debounceDPAD){
-                DegreeOffset -= 5;
+                DegreeOffset += 5;
                 debounceDPAD = true;
             }
 
             if (gamepad1.dpad_right && ! debounceDPAD){
-                DegreeOffset += 5;
+                DegreeOffset -= 5;
                 debounceDPAD = true;
 
+            }
+
+            if (!gamepad1.dpad_right && !gamepad1.dpad_left && !gamepad1.dpad_up && !gamepad1.dpad_down){
+                debounceDPAD = false;
             }
 
 
