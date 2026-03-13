@@ -183,14 +183,16 @@ public class YummyDemo extends OpMode {
     public void autonomousPathUpdate() {
         switch (pathState) {
             case START:
-//                raxon.setPosition(.5);
-//                laxon.setPosition(.5);
-//                flywheelLeft.setVelocity(2000);
-//                flywheelRight.setVelocity(2000);
-//                hood.setPosition(.5);
-                setPathState(State.SCORE);
-                break;
+                if(!follower.isBusy()) {
 
+                    raxon.setPosition(.5);
+                    laxon.setPosition(.5);
+                    flywheelLeft.setVelocity(2000);
+                    flywheelRight.setVelocity(2000);
+                    hood.setPosition(.5);
+                    setPathState(State.SCORE);
+                    break;
+                }
 
             case SCORE:
 
@@ -200,11 +202,11 @@ public class YummyDemo extends OpMode {
                 }
                 else
                 {
-//                    intakeOuter.setPower(-.8);
-//                    intakeInner.setPower(.3);
-                   // gate.setPosition(.88);
+                    intakeOuter.setPower(-.8);
+                    intakeInner.setPower(.3);
+                    gate.setPosition(.88);
                     if (actionTimer.getElapsedTimeSeconds() > 3) {
-                        //gate.setPosition(.5);
+                        gate.setPosition(.5);
                         if(getLine) {
                             follower.followPath(paths.line1, true);
                             setPathState(State.PICKUP1);
@@ -218,6 +220,7 @@ public class YummyDemo extends OpMode {
 
                     }
                 }
+                break;
             case PICKUP1:
                 if (!follower.isBusy()) {
                     follower.followPath(paths.line2, true);

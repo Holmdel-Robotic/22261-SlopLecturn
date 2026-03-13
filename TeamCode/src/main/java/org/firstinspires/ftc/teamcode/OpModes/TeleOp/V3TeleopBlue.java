@@ -319,7 +319,7 @@ public class V3TeleopBlue extends OpMode {
                 DegreeOffset -= 5;
                 debounceDPAD = true;
 
-            }
+             }
 
             if (!gamepad1.dpad_right && !gamepad1.dpad_left && !gamepad1.dpad_up && !gamepad1.dpad_down){
                 debounceDPAD = false;
