@@ -111,7 +111,7 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
         follower = Constants.createFollower(hardwareMap);
         // Determine starting heading: prefer geometric heading when a path exists, otherwise fall back to explicit startPoint values
         follower.setStartingPose(
-                new Pose(48.000, 10.000, Math.toRadians(-180))
+                new Pose(24, 120.000, Math.toRadians(90))
         );
 
         pathTimer = new ElapsedTime();
