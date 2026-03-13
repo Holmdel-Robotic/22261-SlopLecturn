@@ -173,9 +173,9 @@ public class YummyDemo extends OpMode {
             line5 = follower
                     .pathBuilder()
                     .addPath(
-                            new BezierLine(new Pose(10,10), new Pose(24,36))
+                            new BezierLine(new Pose(48,10), new Pose(60,36))
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(225))
+                    .setConstantHeadingInterpolation(Math.toRadians(180))
                     .build();
         }
     }
@@ -205,12 +205,17 @@ public class YummyDemo extends OpMode {
                     intakeOuter.setPower(-.8);
                     intakeInner.setPower(.3);
 //                    gate.setPosition(.88);
-                    if (actionTimer.getElapsedTimeSeconds() > 3) {
+                    if (actionTimer.getElapsedTimeSeconds() > 2) {
 //                        gate.setPosition(.5);
                         if(getLine) {
                             follower.followPath(paths.line1, true);
                             setPathState(State.PICKUP1);
                             getLine = false;
+                        }
+                        else if(pathTimer.seconds() > 25)
+                        {
+                            follower.followPath(paths.line5);
+                            setPathState(State.END);
                         }
                         else
                         {
@@ -229,16 +234,10 @@ public class YummyDemo extends OpMode {
                 break;
             case HUMANZONE:
                 if (!follower.isBusy()) {
-                    if(pathTimer.seconds() > 28)
-                    {
-                        follower.followPath(paths.line5);
-                        setPathState(State.END);
-                    }
-                    else {
+
                         follower.followPath(paths.line4, true);
                         setPathState(State.SCORE);
 
-                    }
 
                 }
                 break;
