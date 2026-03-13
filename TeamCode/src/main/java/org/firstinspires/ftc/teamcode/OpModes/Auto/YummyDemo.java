@@ -42,15 +42,16 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 @Configurable // Panels
 public class YummyDemo extends OpMode {
 
-    private Servo gate, indicatorLight1, indicatorLight2;
-    private DcMotorEx frontRightMotor, frontLeftMotor, backRightMotor, backLeftMotor;
-    private DcMotorEx flywheelLeft, flywheelRight, intakeOuter, intakeInner;
+    private Follower follower;
+    private DcMotorEx frontRightMotor, frontLeftMotor, backRightMotor, backLeftMotor, intakeOuter,intakeInner, flywheelLeft, flywheelRight;
+
+    private Servo hood, raxon, laxon, innerGate, outerGate;
 
     private DistanceSensor intakeSensor1, intakeSensor2;
     private boolean getLine;
-    private Servo hood, raxon, laxon;
+
     private TelemetryManager panelsTelemetry; // Panels Telemetry instance
-    public Follower follower; // Pedro Pathing follower instance
+   // Pedro Pathing follower instance
     private State pathState = State.SCORE; // Current autonomous path state (state machine)
     private ElapsedTime pathTimer; // Timer for path state machine
     private Timer actionTimer;
@@ -69,6 +70,28 @@ public class YummyDemo extends OpMode {
         panelsTelemetry.debug("Status", "Initialized");
         panelsTelemetry.update(telemetry);
 
+        follower = Constants.createFollower(hardwareMap);
+        follower.setStartingPose(new Pose(144-84, 36, Math.toRadians(180)));
+        frontLeftMotor = hardwareMap.get(DcMotorEx.class, "fl");
+        frontRightMotor = hardwareMap.get(DcMotorEx.class, "fr");
+        backLeftMotor = hardwareMap.get(DcMotorEx.class, "bl");
+        backRightMotor = hardwareMap.get(DcMotorEx.class, "br");
+        backLeftMotor.setDirection(DcMotor.Direction.REVERSE);
+        frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
+
+        frontLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        intakeOuter = hardwareMap.get(DcMotorEx.class, "intOuter");
+        intakeInner = hardwareMap.get(DcMotorEx.class, "intInner");
+        intakeOuter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        intakeInner.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        intakeOuter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        intakeInner.setDirection(DcMotor.Direction.REVERSE);
+        intakeOuter.setDirection(DcMotor.Direction.FORWARD);
+        intakeInner.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         flywheelLeft = hardwareMap.get(DcMotorEx.class, "flyL");
         flywheelRight = hardwareMap.get(DcMotorEx.class, "flyR");
         flywheelRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -78,14 +101,12 @@ public class YummyDemo extends OpMode {
         flywheelLeft.setDirection(DcMotor.Direction.FORWARD);
         flywheelRight.setDirection(DcMotor.Direction.REVERSE);
 
-        intakeOuter = hardwareMap.get(DcMotorEx.class, "intOuter");
-        intakeInner = hardwareMap.get(DcMotorEx.class, "intInner");
-        intakeOuter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        intakeInner.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        intakeOuter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        intakeInner.setDirection(DcMotor.Direction.REVERSE);
-        intakeOuter.setDirection(DcMotor.Direction.REVERSE);
-        intakeInner.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        hood = hardwareMap.get(Servo.class, "hood");
+        raxon = hardwareMap.get(Servo.class, "raxon");
+        laxon = hardwareMap.get(Servo.class, "laxon");
+        innerGate = hardwareMap.get(Servo.class, "innerGate");
+        outerGate = hardwareMap.get(Servo.class, "outerGate");
+        hood.setDirection(Servo.Direction.REVERSE);
 
         //intakeSensor1 = hardwareMap.get(DistanceSensor.class, "intakeSensor1");
        // intakeSensor2 = hardwareMap.get(DistanceSensor.class, "intakeSensor2");
@@ -189,6 +210,7 @@ public class YummyDemo extends OpMode {
                     laxon.setPosition(.5);
                     flywheelLeft.setVelocity(2000);
                     flywheelRight.setVelocity(2000);
+                    intakeOuter.setPower(.9);
 //                    hood.setPosition(.5);
                     setPathState(State.SCORE);
                     break;
@@ -202,11 +224,15 @@ public class YummyDemo extends OpMode {
                 }
                 else
                 {
-                    intakeOuter.setPower(-.8);
-                    intakeInner.setPower(.3);
+                    intakeOuter.setPower(.9);
+                    innerGate.setPosition(.575);
+                    outerGate.setPosition(.6);
 //                    gate.setPosition(.88);
                     if (actionTimer.getElapsedTimeSeconds() > 2) {
 //                        gate.setPosition(.5);
+                        intakeInner.setPower(0);
+                        innerGate.setPosition(.2);
+                        outerGate.setPosition(0);
                         if(getLine) {
                             follower.followPath(paths.line1, true);
                             setPathState(State.PICKUP1);
@@ -242,7 +268,10 @@ public class YummyDemo extends OpMode {
                 }
                 break;
             case END:
-                requestOpModeStop();
+                if (!follower.isBusy())
+                {
+                    requestOpModeStop();
+                }
                 break;
 //            case 4:
 //                follower.followPath(paths.line3, true);

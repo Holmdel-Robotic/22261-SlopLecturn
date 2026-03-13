@@ -158,7 +158,7 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
             Path3 = follower
                     .pathBuilder()
                     .addPath(
-                            new BezierLine(new Pose(24.000, 84.000), new Pose(60.000, 74.000))
+                            new BezierLine(new Pose(24.000, 84.000), new Pose(56.000, 74.000))
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(180))
                     .build();
@@ -167,7 +167,7 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
                     .pathBuilder()
                     .addPath(
                             new BezierCurve(
-                                    new Pose(60.000, 74.000),
+                                    new Pose(56.000, 74.000),
                                     new Pose(48.000, 62.000),
                                     new Pose(14.000, 64.000)
                             )
@@ -178,7 +178,7 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
             Path5 = follower
                     .pathBuilder()
                     .addPath(
-                            new BezierLine(new Pose(14.000, 64.000), new Pose(56.000, 14.000))
+                            new BezierLine(new Pose(14.000, 64.000), new Pose(52.000, 12.000))
                     )
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(135))
                     .build();
@@ -187,7 +187,7 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
                     .pathBuilder()
                     .addPath(
                             new BezierCurve(
-                                    new Pose(56.000, 14.000),
+                                    new Pose(52.000, 12.000),
                                     new Pose(24.000, 9.000),
                                     new Pose(24.000, 36.000)
                             )
