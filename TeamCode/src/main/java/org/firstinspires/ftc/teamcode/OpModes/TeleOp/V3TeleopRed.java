@@ -306,7 +306,7 @@ public class V3TeleopRed extends OpMode {
             }
 
 
-            desiredAngle = (Math.toDegrees(Math.atan((144 - currPose.getY()) / (144 - currPose.getX() - XOffset)))) - Heading;
+            desiredAngle = 180 + (Math.toDegrees(Math.atan((144 - currPose.getY()) / (144 - currPose.getX() - XOffset)))) - Heading;
             desiredAngle = (int) desiredAngle + DegreeOffset;
             ServoPos = 0.00338889 * desiredAngle - 0.0366667;
             distanceToGoal = Math.sqrt(Math.pow(144 - currPose.getY(), 2) + Math.pow(144 - currPose.getX(), 2));
