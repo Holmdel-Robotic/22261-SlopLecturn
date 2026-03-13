@@ -28,7 +28,7 @@ public class V3Teleop extends OpMode {
 
     private Servo hood, raxon, laxon, innerGate, outerGate;
 
-    public static double IntendedFlywheelV = 1600, ServoPos = .5, desiredAngle, Heading, hoodPos = .53, XOffset = 16, distanceToGoal;
+    public static double IntendedFlywheelV = 1600, ServoPos = .5, desiredAngle, Heading, hoodPos = .53, XOffset = 16, distanceToGoal, DegreeOffset = 0, savedTime = 0;
 
     public static boolean autoTarget = true;
 
@@ -85,16 +85,18 @@ public class V3Teleop extends OpMode {
 
      follower.update();
         OuterIntakeOperation(gamepad1.b);
-        WholeIntakeOperation(gamepad1.a);
+        WholeIntakeOperation(gamepad1.right_trigger > .2);
      HandleInputs();
      driveRobot();
 
      changeFlywheelVelo();
      SetFlywheelVelocity(IntendedFlywheelV);
-     telemetry();
+     //telemetry();
      calculateCorrectAngle();
      setServoPos(ServoPos);
      hood.setPosition(hoodPos);
+     telemetry.addData("looptime", getRuntime() - savedTime);
+     savedTime = getRuntime();
 
 
 
@@ -306,16 +308,28 @@ public class V3Teleop extends OpMode {
 
 
             desiredAngle = (180 - Math.toDegrees(Math.atan((144 - currPose.getY()) / (currPose.getX() - XOffset)))) - Heading;
-            desiredAngle = 180 + (int) desiredAngle;
+            desiredAngle = 180 + (int) desiredAngle + DegreeOffset;
             ServoPos = 0.00338889 * desiredAngle - 0.0366667;
             distanceToGoal = Math.sqrt(Math.pow(144 - currPose.getY(), 2) + Math.pow(currPose.getX(), 2));
             IntendedFlywheelV = .037793 * Math.pow(distanceToGoal, 2) - 0.153573 * distanceToGoal + 1199.55171;
 
+            if (gamepad1.dpad_left && !debounceDPAD){
+                DegreeOffset -= 5;
+                debounceDPAD = true;
+            }
+
+            if (gamepad1.dpad_right && ! debounceDPAD){
+                DegreeOffset += 5;
+                debounceDPAD = true;
+
+            }
 
 
             }
         }
         else{
+
+
             /*
             if(gamepad1.left_trigger > 0 && !dLTR){
                 ServoPos -= .02;
@@ -333,10 +347,7 @@ public class V3Teleop extends OpMode {
             }
 
              */
-            if(gamepad1.right_trigger == 0)
-            {
-                dRTR = false;
-            }
+
             if(gamepad1.left_bumper  && !dLBR)
             {
                 hoodPos -= .05;
@@ -346,11 +357,19 @@ public class V3Teleop extends OpMode {
 
                 dLBR = false;
             }
+            /*
+            if(gamepad1.right_trigger == 0)
+            {
+                dRTR = false;
+            }
+
             if(gamepad1.right_bumper  && !dRBR)
             {
 
                 hoodPos += .05;
             }
+            */
+
             if(!gamepad1.right_bumper)
             {
                 dRBR = false;
