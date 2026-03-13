@@ -25,7 +25,7 @@ public class V3TeleopRed extends OpMode {
 
     private Servo hood, raxon, laxon, innerGate, outerGate;
 
-    public static double IntendedFlywheelV = 1600, ServoPos = .5, desiredAngle, Heading, hoodPos = .53, XOffset = 0, distanceToGoal, DegreeOffset = 0, savedTime = 0;
+    public static double IntendedFlywheelV = 1600, ServoPos = .5, desiredAngle, Heading, hoodPos = .53, XOffset = 0, distanceToGoal, DegreeOffset = -20, savedTime = 0;
 
     public static boolean autoTarget = true;
 
@@ -88,7 +88,7 @@ public class V3TeleopRed extends OpMode {
 
      changeFlywheelVelo();
      SetFlywheelVelocity(IntendedFlywheelV);
-     //telemetry();
+     telemetry();
      calculateCorrectAngle();
      setServoPos(ServoPos);
      hood.setPosition(hoodPos);
@@ -285,7 +285,6 @@ public class V3TeleopRed extends OpMode {
         telemetry.addData("flywheelLeft", flywheelLeft.getVelocity());
         telemetry.addData("flywheelRight", flywheelRight.getVelocity());
         telemetry.addData("distance to goal", distanceToGoal);
-
     }
 
     private void calculateCorrectAngle(){
@@ -293,11 +292,12 @@ public class V3TeleopRed extends OpMode {
         follower.update();
         Pose currPose = follower.getPose();
         distanceToGoal = Math.sqrt(Math.pow(144-currPose.getY(),2) + Math.pow(currPose.getX(),2));
-        hoodPos = .00225 * distanceToGoal + .63;
+
 
         if (autoTarget) {
+            hoodPos = .00263168 * distanceToGoal + .0605263;
             if ((currPose.getY() < 30 && currPose.getX() > 42 && currPose.getX() < 103) || (currPose.getY() > 70)){
-                desiredAngle = Math.atan(144 - currPose.getY() / (144-currPose.getX()));
+
             telemetry.addData("X dist", currPose.getX());
             telemetry.addData("Y dist", currPose.getY());
             Heading = Math.toDegrees(currPose.getHeading());
@@ -307,9 +307,14 @@ public class V3TeleopRed extends OpMode {
             }
 
 
-            desiredAngle = (Math.toDegrees(Math.atan((144 - currPose.getY()) / (144 - currPose.getX() - XOffset)))) - Heading;
-            desiredAngle = 180 + (int) desiredAngle + DegreeOffset;
+            desiredAngle = 180 + (Math.toDegrees(Math.atan((144 - currPose.getY()) / (144 - currPose.getX() - XOffset)))) - Heading;
+            desiredAngle = (int) desiredAngle + DegreeOffset;
+
+            if (desiredAngle < 0) {
+             desiredAngle = 360 + desiredAngle;
+            }
             ServoPos = 0.00338889 * desiredAngle - 0.0366667;
+
             distanceToGoal = Math.sqrt(Math.pow(144 - currPose.getY(), 2) + Math.pow(144 - currPose.getX(), 2));
             IntendedFlywheelV = .037793 * Math.pow(distanceToGoal, 2) - 0.153573 * distanceToGoal + 1199.55171;
 
