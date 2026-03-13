@@ -88,7 +88,7 @@ public class V3TeleopRed extends OpMode {
 
      changeFlywheelVelo();
      SetFlywheelVelocity(IntendedFlywheelV);
-     //telemetry();
+     telemetry();
      calculateCorrectAngle();
      setServoPos(ServoPos);
      hood.setPosition(hoodPos);
@@ -307,7 +307,7 @@ public class V3TeleopRed extends OpMode {
 
 
             desiredAngle = (Math.toDegrees(Math.atan((144 - currPose.getY()) / (144 - currPose.getX() - XOffset)))) - Heading;
-            desiredAngle = 180 + (int) desiredAngle + DegreeOffset;
+            desiredAngle = (int) desiredAngle + DegreeOffset;
             ServoPos = 0.00338889 * desiredAngle - 0.0366667;
             distanceToGoal = Math.sqrt(Math.pow(144 - currPose.getY(), 2) + Math.pow(144 - currPose.getX(), 2));
             IntendedFlywheelV = .037793 * Math.pow(distanceToGoal, 2) - 0.153573 * distanceToGoal + 1199.55171;
