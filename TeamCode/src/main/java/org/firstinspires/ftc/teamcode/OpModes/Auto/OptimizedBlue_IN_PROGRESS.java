@@ -64,7 +64,7 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
         END
     }
     State pathState;
-    public int count = 0;
+    public int count = 1;
 
     @Override
     public void init() {
