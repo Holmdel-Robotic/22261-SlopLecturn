@@ -189,7 +189,7 @@ public class YummyDemo extends OpMode {
                     laxon.setPosition(.5);
                     flywheelLeft.setVelocity(2000);
                     flywheelRight.setVelocity(2000);
-                    hood.setPosition(.5);
+//                    hood.setPosition(.5);
                     setPathState(State.SCORE);
                     break;
                 }
@@ -204,9 +204,9 @@ public class YummyDemo extends OpMode {
                 {
                     intakeOuter.setPower(-.8);
                     intakeInner.setPower(.3);
-                    gate.setPosition(.88);
+//                    gate.setPosition(.88);
                     if (actionTimer.getElapsedTimeSeconds() > 3) {
-                        gate.setPosition(.5);
+//                        gate.setPosition(.5);
                         if(getLine) {
                             follower.followPath(paths.line1, true);
                             setPathState(State.PICKUP1);
