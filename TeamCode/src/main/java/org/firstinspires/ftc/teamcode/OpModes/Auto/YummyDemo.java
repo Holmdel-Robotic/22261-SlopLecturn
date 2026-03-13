@@ -183,14 +183,16 @@ public class YummyDemo extends OpMode {
     public void autonomousPathUpdate() {
         switch (pathState) {
             case START:
-                raxon.setPosition(.5);
-                laxon.setPosition(.5);
-                flywheelLeft.setVelocity(2000);
-                flywheelRight.setVelocity(2000);
-                hood.setPosition(.5);
-                setPathState(State.SCORE);
-                break;
+                if(!follower.isBusy()) {
 
+                    raxon.setPosition(.5);
+                    laxon.setPosition(.5);
+                    flywheelLeft.setVelocity(2000);
+                    flywheelRight.setVelocity(2000);
+                    hood.setPosition(.5);
+                    setPathState(State.SCORE);
+                    break;
+                }
 
             case SCORE:
 
