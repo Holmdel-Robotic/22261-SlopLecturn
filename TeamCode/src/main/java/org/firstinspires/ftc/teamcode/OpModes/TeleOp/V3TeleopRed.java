@@ -26,7 +26,7 @@ public class V3TeleopRed extends OpMode {
 
     private Servo hood, raxon, laxon, innerGate, outerGate;
 
-    public static double IntendedFlywheelV = 1600, ServoPos = .5, desiredAngle, Heading, hoodPos = .53, XOffset = 0, distanceToGoal, DegreeOffset = -20, savedTime = 0, p, i, d, previous_error, previous_time, k_p, k_i, k_d, max_i;
+    public static double IntendedFlywheelV = 1600, ServoPos = .5, desiredAngle, Heading, hoodPos = .2, XOffset = 0, distanceToGoal, DegreeOffset = -20, savedTime = 0, gearRatio,ticksPerSecond,getGearRatio, currentVel;
 
     public static boolean autoTarget = true;
 
@@ -188,10 +188,26 @@ public class V3TeleopRed extends OpMode {
         }
     }
 
+
+
     private void SetFlywheelVelocity(double v){
         if (FlywheelOn) {
+
+
             flywheelLeft.setVelocity(v);
             flywheelRight.setVelocity(v);
+            ticksPerSecond = flywheelLeft.getVelocity();
+            gearRatio = 1;
+            currentVel =  (ticksPerSecond * (60.0/28) * gearRatio);
+
+            // tps -> rpm
+
+            double error = currentVel - v;
+            double pow = error > 125 ? -1 : error >= 0 ? 0 : 1;
+
+            flywheelLeft.setPower(pow);
+            flywheelRight.setPower(pow);
+
         }
         else {
             flywheelLeft.setVelocity(0);
@@ -206,7 +222,7 @@ public class V3TeleopRed extends OpMode {
         if (gamepad1.y && !debounceY){
             autoTarget = !autoTarget;
             IntendedFlywheelV = 1750;
-            hoodPos = .53;
+            hoodPos = .2;
             debounceY = true;
         }
 
