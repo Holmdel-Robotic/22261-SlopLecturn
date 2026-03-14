@@ -122,7 +122,7 @@ public class BlueSmallTriangle extends OpMode {
                     .pathBuilder()
                     .addPath(
                             new BezierCurve(
-                                    new Pose(48.000, 8.600),
+                                    new Pose(48.000, 8.603),
                                     new Pose(22.203, 23.234),
                                     new Pose(24.203, 31.126)
                             )
@@ -145,7 +145,8 @@ public class BlueSmallTriangle extends OpMode {
             line3 = follower
                     .pathBuilder()
                     .addPath(
-                            new BezierLine(new Pose(46.640, 9.009), new Pose(8.900, 9.400))
+                            new BezierLine(new Pose(46.640, 9.009),
+                                    new Pose(8.900, 9.400))
                     )
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build();
@@ -153,7 +154,8 @@ public class BlueSmallTriangle extends OpMode {
             line4 = follower
                     .pathBuilder()
                     .addPath(
-                            new BezierLine(new Pose(8.900, 9.400), new Pose(46.900, 9.000))
+                            new BezierLine(new Pose(8.900, 9.400),
+                                    new Pose(46.900, 9.000))
                     )
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build();
@@ -161,7 +163,8 @@ public class BlueSmallTriangle extends OpMode {
             line5 = follower
                     .pathBuilder()
                     .addPath(
-                            new BezierLine(new Pose(46.900, 9.000), new Pose(60.000, 36.000))
+                            new BezierLine(new Pose(46.900, 9.000),
+                                    new Pose(60.000, 36.000))
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(180))
                     .build();
