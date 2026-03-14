@@ -292,7 +292,7 @@ public class V3TeleopBlue extends OpMode {
 
 
         if (autoTarget) {
-            hoodPos = .00263168 * distanceToGoal + .0605263;
+            hoodPos = .00263636 * distanceToGoal - .02182;
             if ((currPose.getY() < 30 && currPose.getX() > 42 && currPose.getX() < 103) || (currPose.getY() > 70)){
                 desiredAngle = Math.atan(144 - currPose.getY() / currPose.getX());
             telemetry.addData("X dist", currPose.getX());
