@@ -26,7 +26,7 @@ public class BlueSmallTriangle extends OpMode {
 
     private Servo hood, raxon, laxon, innerGate, outerGate;
 
-    public static double VELO, SERVOPOS, HOODPOS;
+    public static double VELO = 1900, SERVOPOS = .3, HOODPOS = .33;
 
     private TelemetryManager panelsTelemetry;
     private ElapsedTime pathTimer;
