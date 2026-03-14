@@ -26,7 +26,7 @@ public class V3TeleopRed extends OpMode {
 
     private Servo hood, raxon, laxon, innerGate, outerGate;
 
-    public static double IntendedFlywheelV = 1600, ServoPos = .5, desiredAngle, Heading, hoodPos = .53, XOffset = 0, distanceToGoal, DegreeOffset = -20, savedTime = 0, p, i, d, previous_error, previous_time, k_p, k_i, k_d, max_i;
+    public static double IntendedFlywheelV = 1600, ServoPos = .5, desiredAngle, Heading, hoodPos = .2, XOffset = 0, distanceToGoal, DegreeOffset = -20, savedTime = 0, p, i, d, previous_error, previous_time, k_p, k_i, k_d, max_i;
 
     public static boolean autoTarget = true;
 
