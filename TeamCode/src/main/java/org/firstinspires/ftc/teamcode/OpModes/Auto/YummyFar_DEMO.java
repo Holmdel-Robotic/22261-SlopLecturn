@@ -143,6 +143,7 @@ public class YummyFar_DEMO extends OpMode {
             case 0:
                 follower.followPath(paths.line1, true);
                 setPathState(1);
+
                 break;
             case 1:
                 if (!follower.isBusy()) {
