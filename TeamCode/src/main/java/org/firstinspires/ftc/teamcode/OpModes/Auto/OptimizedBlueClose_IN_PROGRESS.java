@@ -29,7 +29,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 @Autonomous(name = "OptimizedBluePathing")
 @Configurable // Panels
-public class OptimizedBlue_IN_PROGRESS extends OpMode {
+public class OptimizedBlueClose_IN_PROGRESS extends OpMode {
 
     private DcMotorEx frontRightMotor, frontLeftMotor, backRightMotor, backLeftMotor, intakeOuter,intakeInner, flywheelLeft, flywheelRight;
 
