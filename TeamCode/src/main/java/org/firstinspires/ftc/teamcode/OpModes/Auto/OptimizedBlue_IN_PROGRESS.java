@@ -31,20 +31,10 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 @Configurable // Panels
 public class OptimizedBlue_IN_PROGRESS extends OpMode {
 
-    private Servo hood;
+    private DcMotorEx frontRightMotor, frontLeftMotor, backRightMotor, backLeftMotor, intakeOuter,intakeInner, flywheelLeft, flywheelRight;
 
-    private Servo raxon;
-
-    private Servo laxon;
-
-    private DcMotorEx flywheelLeft;
-
-    private DcMotorEx flywheelRight;
-
-    private DcMotorEx IntakeInner;
-
-    private DcMotorEx IntakeOuter;
-    private Servo kicker;
+    private Servo hood, raxon, laxon, innerGate, outerGate;
+    
     private TelemetryManager panelsTelemetry; // Panels Telemetry instance
     public Follower follower; // Pedro Pathing follower instance
 
@@ -64,7 +54,7 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
         END
     }
     State pathState;
-    public int count = 0;
+    public int count = 1;
 
     @Override
     public void init() {
@@ -72,43 +62,62 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
         // ...
         panelsTelemetry.debug("Status", "Initialized");
         panelsTelemetry.update(telemetry);
+
+        follower = Constants.createFollower(hardwareMap);
+        follower.setStartingPose(new Pose(144-84, 36, Math.toRadians(180)));
+        frontLeftMotor = hardwareMap.get(DcMotorEx.class, "fl");
+        frontRightMotor = hardwareMap.get(DcMotorEx.class, "fr");
+        backLeftMotor = hardwareMap.get(DcMotorEx.class, "bl");
+        backRightMotor = hardwareMap.get(DcMotorEx.class, "br");
+        backLeftMotor.setDirection(DcMotor.Direction.REVERSE);
+        frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
+
+        frontLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        intakeOuter = hardwareMap.get(DcMotorEx.class, "intOuter");
+        intakeInner = hardwareMap.get(DcMotorEx.class, "intInner");
+        intakeOuter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        intakeInner.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        intakeOuter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        intakeInner.setDirection(DcMotor.Direction.REVERSE);
+        intakeOuter.setDirection(DcMotor.Direction.FORWARD);
+        intakeInner.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         flywheelLeft = hardwareMap.get(DcMotorEx.class, "flyL");
         flywheelRight = hardwareMap.get(DcMotorEx.class, "flyR");
         flywheelRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         flywheelLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         flywheelRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         flywheelLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        flywheelLeft.setDirection(DcMotor.Direction.REVERSE);
-        flywheelRight.setDirection(DcMotor.Direction.FORWARD);
-
-        raxon = hardwareMap.get(Servo.class,"raxon");
-        laxon = hardwareMap.get(Servo.class,"laxon");
-
-        IntakeInner = hardwareMap.get(DcMotorEx.class, "intInner");
-        IntakeOuter = hardwareMap.get(DcMotorEx.class, "intOuter");
-        kicker = hardwareMap.get(Servo.class, "blocker");
-        IntakeInner.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        IntakeOuter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        IntakeInner.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        IntakeOuter.setDirection(DcMotor.Direction.REVERSE);
-        IntakeInner.setDirection(DcMotor.Direction.FORWARD);
-        IntakeOuter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        pathState = State.START;
+        flywheelLeft.setDirection(DcMotor.Direction.FORWARD);
+        flywheelRight.setDirection(DcMotor.Direction.REVERSE);
 
         hood = hardwareMap.get(Servo.class, "hood");
+        raxon = hardwareMap.get(Servo.class, "raxon");
+        laxon = hardwareMap.get(Servo.class, "laxon");
+        innerGate = hardwareMap.get(Servo.class, "innerGate");
+        outerGate = hardwareMap.get(Servo.class, "outerGate");
+        hood.setDirection(Servo.Direction.REVERSE);
 
+        //intakeSensor1 = hardwareMap.get(DistanceSensor.class, "intakeSensor1");
+        // intakeSensor2 = hardwareMap.get(DistanceSensor.class, "intakeSensor2");
 
-        raxon.setPosition(.63);
-        laxon.setPosition(.63);
-        kicker.setPosition(.5);
+        hood = hardwareMap.get(Servo.class, "hood");
+        raxon = hardwareMap.get(Servo.class, "raxon");
+        laxon = hardwareMap.get(Servo.class, "laxon");
 
         follower = Constants.createFollower(hardwareMap);
         // Determine starting heading: prefer geometric heading when a path exists, otherwise fall back to explicit startPoint values
-        follower.setStartingPose(new Pose(24.000, 120.000, Math.toRadians(90.000)));
+        follower.setStartingPose(
+                new Pose(24, 120.000, Math.toRadians(90))
+        );
 
         pathTimer = new ElapsedTime();
         actionTimer = new Timer();
         paths = new Paths(follower); // Build paths
+        pathState = State.START; // Build paths
     }
 
     @Override
@@ -158,7 +167,7 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
             Path3 = follower
                     .pathBuilder()
                     .addPath(
-                            new BezierLine(new Pose(24.000, 84.000), new Pose(60.000, 74.000))
+                            new BezierLine(new Pose(24.000, 84.000), new Pose(56.000, 74.000))
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(180))
                     .build();
@@ -167,7 +176,7 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
                     .pathBuilder()
                     .addPath(
                             new BezierCurve(
-                                    new Pose(60.000, 74.000),
+                                    new Pose(56.000, 74.000),
                                     new Pose(48.000, 62.000),
                                     new Pose(14.000, 64.000)
                             )
@@ -178,7 +187,7 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
             Path5 = follower
                     .pathBuilder()
                     .addPath(
-                            new BezierLine(new Pose(14.000, 64.000), new Pose(56.000, 14.000))
+                            new BezierLine(new Pose(14.000, 64.000), new Pose(52.000, 12.000))
                     )
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(135))
                     .build();
@@ -187,7 +196,7 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
                     .pathBuilder()
                     .addPath(
                             new BezierCurve(
-                                    new Pose(56.000, 14.000),
+                                    new Pose(52.000, 12.000),
                                     new Pose(24.000, 9.000),
                                     new Pose(24.000, 36.000)
                             )
@@ -235,12 +244,11 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
             case START:
                 //if(!follower.isBusy())
                 //{
-                    flywheelLeft.setVelocity(-1675);
-                    flywheelRight.setVelocity(-1675);
-                    hood.setPosition(.67);
-                    kicker.setPosition(.3);
-                    IntakeOuter.setPower(-.8);
-                    IntakeInner.setPower(-.4);
+                raxon.setPosition(.42);
+                laxon.setPosition(.42);
+                flywheelLeft.setVelocity(600);
+                flywheelRight.setVelocity(600);
+                intakeOuter.setPower(.9);
 
                     actionTimer.resetTimer();
                     follower.followPath(paths.Path1, true);
@@ -249,32 +257,46 @@ public class OptimizedBlue_IN_PROGRESS extends OpMode {
                 //}
 
             case SCORE:
-                if(follower.isBusy())
-                {
+                if (follower.isBusy()){
                     actionTimer.resetTimer();
                 }
-                else if (!follower.isBusy())
+                else
                 {
-
-                    if(actionTimer.getElapsedTimeSeconds() <= 1){
-
-
-                        hood.setPosition(.67);
-                        // && flywheelRight.getVelocity() > 1650 && flywheelLeft.getVelocity() > 1650 &&
-                    } else if (actionTimer.getElapsedTimeSeconds() >= 1 && actionTimer.getElapsedTimeSeconds() <= 3) {
-
-                        IntakeOuter.setPower(-.8);
-                        IntakeInner.setPower(-.4);
-                        kicker.setPosition(.5);
-
-
-                    }
-                    else if (actionTimer.getElapsedTimeSeconds() >= 3 && actionTimer.getElapsedTimeSeconds() <= 3.1) {
-                        kicker.setPosition(.3);
-
-
-                    }
-                    else {
+                    intakeInner.setPower(.9);
+                    innerGate.setPosition(.575);
+                    outerGate.setPosition(.6);
+//                    gate.setPosition(.88);
+                    if (actionTimer.getElapsedTimeSeconds() > 2) {
+//                        gate.setPosition(.5);
+                        intakeInner.setPower(0);
+                        innerGate.setPosition(.2);
+                        outerGate.setPosition(0);
+//                if(follower.isBusy())
+//                {
+//                    actionTimer.resetTimer();
+//                }
+//                else if (!follower.isBusy())
+//                {
+//
+//                    if(actionTimer.getElapsedTimeSeconds() <= 1){
+//
+//
+//                        hood.setPosition(.67);
+//                        // && flywheelRight.getVelocity() > 1650 && flywheelLeft.getVelocity() > 1650 &&
+//                    } else if (actionTimer.getElapsedTimeSeconds() >= 1 && actionTimer.getElapsedTimeSeconds() <= 3) {
+//
+//                        IntakeOuter.setPower(-.8);
+//                        IntakeInner.setPower(-.4);
+//                        kicker.setPosition(.5);
+//
+//
+//                    }
+//                    else if (actionTimer.getElapsedTimeSeconds() >= 3 && actionTimer.getElapsedTimeSeconds() <= 3.1) {
+//                        kicker.setPosition(.3);
+//
+//
+//                    }
+//                    else {
 
                         //IntakeInner.setVelocity(0);
                         //IntakeOuter.setVelocity(0);

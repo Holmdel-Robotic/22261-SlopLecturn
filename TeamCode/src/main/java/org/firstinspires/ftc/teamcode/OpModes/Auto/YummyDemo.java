@@ -42,20 +42,22 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 @Configurable // Panels
 public class YummyDemo extends OpMode {
 
-    private Servo gate, indicatorLight1, indicatorLight2;
-    private DcMotorEx frontRightMotor, frontLeftMotor, backRightMotor, backLeftMotor;
-    private DcMotorEx flywheelLeft, flywheelRight, intakeOuter, intakeInner;
+    private Follower follower;
+    private DcMotorEx frontRightMotor, frontLeftMotor, backRightMotor, backLeftMotor, intakeOuter,intakeInner, flywheelLeft, flywheelRight;
+
+    private Servo hood, raxon, laxon, innerGate, outerGate;
 
     private DistanceSensor intakeSensor1, intakeSensor2;
     private boolean getLine;
-    private Servo hood, raxon, laxon;
+
     private TelemetryManager panelsTelemetry; // Panels Telemetry instance
-    public Follower follower; // Pedro Pathing follower instance
+   // Pedro Pathing follower instance
     private State pathState = State.SCORE; // Current autonomous path state (state machine)
     private ElapsedTime pathTimer; // Timer for path state machine
     private Timer actionTimer;
     private Paths paths; // Paths defined in the Paths class
     private enum State{
+        START,
         SCORE,
         PICKUP1,
         HUMANZONE,
@@ -68,6 +70,28 @@ public class YummyDemo extends OpMode {
         panelsTelemetry.debug("Status", "Initialized");
         panelsTelemetry.update(telemetry);
 
+        follower = Constants.createFollower(hardwareMap);
+        follower.setStartingPose(new Pose(144-84, 36, Math.toRadians(180)));
+        frontLeftMotor = hardwareMap.get(DcMotorEx.class, "fl");
+        frontRightMotor = hardwareMap.get(DcMotorEx.class, "fr");
+        backLeftMotor = hardwareMap.get(DcMotorEx.class, "bl");
+        backRightMotor = hardwareMap.get(DcMotorEx.class, "br");
+        backLeftMotor.setDirection(DcMotor.Direction.REVERSE);
+        frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
+
+        frontLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        intakeOuter = hardwareMap.get(DcMotorEx.class, "intOuter");
+        intakeInner = hardwareMap.get(DcMotorEx.class, "intInner");
+        intakeOuter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        intakeInner.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        intakeOuter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        intakeInner.setDirection(DcMotor.Direction.REVERSE);
+        intakeOuter.setDirection(DcMotor.Direction.FORWARD);
+        intakeInner.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         flywheelLeft = hardwareMap.get(DcMotorEx.class, "flyL");
         flywheelRight = hardwareMap.get(DcMotorEx.class, "flyR");
         flywheelRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -77,14 +101,12 @@ public class YummyDemo extends OpMode {
         flywheelLeft.setDirection(DcMotor.Direction.FORWARD);
         flywheelRight.setDirection(DcMotor.Direction.REVERSE);
 
-        intakeOuter = hardwareMap.get(DcMotorEx.class, "intOuter");
-        intakeInner = hardwareMap.get(DcMotorEx.class, "intInner");
-        intakeOuter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        intakeInner.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        intakeOuter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        intakeInner.setDirection(DcMotor.Direction.REVERSE);
-        intakeOuter.setDirection(DcMotor.Direction.REVERSE);
-        intakeInner.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        hood = hardwareMap.get(Servo.class, "hood");
+        raxon = hardwareMap.get(Servo.class, "raxon");
+        laxon = hardwareMap.get(Servo.class, "laxon");
+        innerGate = hardwareMap.get(Servo.class, "innerGate");
+        outerGate = hardwareMap.get(Servo.class, "outerGate");
+        hood.setDirection(Servo.Direction.REVERSE);
 
         //intakeSensor1 = hardwareMap.get(DistanceSensor.class, "intakeSensor1");
        // intakeSensor2 = hardwareMap.get(DistanceSensor.class, "intakeSensor2");
@@ -102,7 +124,7 @@ public class YummyDemo extends OpMode {
         pathTimer = new ElapsedTime();
         actionTimer = new Timer();
         paths = new Paths(follower); // Build paths
-        pathState = State.SCORE;
+        pathState = State.START;
         getLine = true;
 
     }
@@ -117,9 +139,10 @@ public class YummyDemo extends OpMode {
         panelsTelemetry.debug("X", follower.getPose().getX());
         panelsTelemetry.debug("Y", follower.getPose().getY());
         panelsTelemetry.debug("Heading", follower.getPose().getHeading());
-        panelsTelemetry.addData("actionTimer", actionTimer.getElapsedTimeSeconds());
-        panelsTelemetry.addData("getLine", getLine);
-        panelsTelemetry.addData("isBusy?", follower.isBusy());
+        panelsTelemetry.debug("actionTimer", actionTimer.getElapsedTimeSeconds());
+        panelsTelemetry.debug("getLine", getLine);
+        panelsTelemetry.debug("isBusy?", follower.isBusy());
+        panelsTelemetry.debug("pathTime", pathTimer.seconds());
         panelsTelemetry.update(telemetry);
     }
 
@@ -171,34 +194,54 @@ public class YummyDemo extends OpMode {
             line5 = follower
                     .pathBuilder()
                     .addPath(
-                            new BezierLine(new Pose(10,10), new Pose(24,36))
+                            new BezierLine(new Pose(48,10), new Pose(60,36))
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(225))
+                    .setConstantHeadingInterpolation(Math.toRadians(180))
                     .build();
         }
     }
 
     public void autonomousPathUpdate() {
         switch (pathState) {
+            case START:
+                if(!follower.isBusy()) {
+
+                    raxon.setPosition(.5);
+                    laxon.setPosition(.5);
+                    flywheelLeft.setVelocity(2000);
+                    flywheelRight.setVelocity(2000);
+                    intakeOuter.setPower(.9);
+//                    hood.setPosition(.5);
+                    setPathState(State.SCORE);
+                    break;
+                }
+
             case SCORE:
-                raxon.setPosition(.5);
-                laxon.setPosition(.5);
-                flywheelLeft.setVelocity(2000);
-                flywheelRight.setVelocity(2000);
-                hood.setPosition(.5);
+
 
                 if (follower.isBusy()){
                     actionTimer.resetTimer();
-                }else{
-                    intakeOuter.setPower(-.8);
-                    intakeInner.setPower(.3);
-                   // gate.setPosition(.88);
-                    if (actionTimer.getElapsedTimeSeconds() > 3) {
-                        //gate.setPosition(.5);
+                }
+                else
+                {
+                    intakeOuter.setPower(.9);
+                    innerGate.setPosition(.575);
+                    outerGate.setPosition(.6);
+//                    gate.setPosition(.88);
+                    if (actionTimer.getElapsedTimeSeconds() > 2) {
+//                        gate.setPosition(.5);
+                        intakeInner.setPower(0);
+                        innerGate.setPosition(.2);
+                        outerGate.setPosition(0);
                         if(getLine) {
                             follower.followPath(paths.line1, true);
                             setPathState(State.PICKUP1);
                             getLine = false;
+                        }
+                        else if(pathTimer.seconds() > 25)
+                        {
+                            follower.followPath(paths.line5);
+                            setPathState(State.END);
                         }
                         else
                         {
@@ -208,6 +251,7 @@ public class YummyDemo extends OpMode {
 
                     }
                 }
+                break;
             case PICKUP1:
                 if (!follower.isBusy()) {
                     follower.followPath(paths.line2, true);
@@ -216,20 +260,18 @@ public class YummyDemo extends OpMode {
                 break;
             case HUMANZONE:
                 if (!follower.isBusy()) {
-                    if(pathTimer.seconds() < 2)
-                    {
-                        follower.followPath(paths.line5);
-                        setPathState(State.END);
-                    }
-                    else {
+
                         follower.followPath(paths.line4, true);
                         setPathState(State.SCORE);
-                    }
+
 
                 }
                 break;
             case END:
-                requestOpModeStop();
+                if (!follower.isBusy())
+                {
+                    requestOpModeStop();
+                }
                 break;
 //            case 4:
 //                follower.followPath(paths.line3, true);

@@ -1,26 +1,23 @@
 package org.firstinspires.ftc.teamcode.OpModes.TeleOp;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.follower.Follower;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.*;
-import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
-import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.*;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Servo;
+
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 //try?
 
-import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 @Config
 @TeleOp
 
 
-public class V3Teleop extends OpMode {
+public class V3TeleopRed extends OpMode {
 
 
     private Follower follower;
@@ -28,7 +25,7 @@ public class V3Teleop extends OpMode {
 
     private Servo hood, raxon, laxon, innerGate, outerGate;
 
-    public static double IntendedFlywheelV = 1600, ServoPos = .5, desiredAngle, Heading, hoodPos = .53, XOffset = 16, distanceToGoal;
+    public static double IntendedFlywheelV = 1600, ServoPos = .5, desiredAngle, Heading, hoodPos = .53, XOffset = 0, distanceToGoal, DegreeOffset = -20, savedTime = 0;
 
     public static boolean autoTarget = true;
 
@@ -39,7 +36,7 @@ public class V3Teleop extends OpMode {
 
     public void init(){
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(144-84, 36, Math.toRadians(180)));
+        follower.setStartingPose(new Pose(84, 36, Math.toRadians(0)));
         frontLeftMotor = hardwareMap.get(DcMotorEx.class, "fl");
         frontRightMotor = hardwareMap.get(DcMotorEx.class, "fr");
         backLeftMotor = hardwareMap.get(DcMotorEx.class, "bl");
@@ -85,7 +82,7 @@ public class V3Teleop extends OpMode {
 
      follower.update();
         OuterIntakeOperation(gamepad1.b);
-        WholeIntakeOperation(gamepad1.a);
+        WholeIntakeOperation(gamepad1.right_trigger > .2);
      HandleInputs();
      driveRobot();
 
@@ -95,6 +92,9 @@ public class V3Teleop extends OpMode {
      calculateCorrectAngle();
      setServoPos(ServoPos);
      hood.setPosition(hoodPos);
+     telemetry.addData("looptime", getRuntime() - savedTime);
+     telemetry.addData("offset", DegreeOffset);
+     savedTime = getRuntime();
 
 
 
@@ -175,6 +175,7 @@ public class V3Teleop extends OpMode {
             debounceB = true;
         }
         if (gamepad && debounceB) {
+            outerIntakeOn = !outerIntakeOn;
             if (outerIntakeOn){
                 intakeOuter.setPower(.75);
             }else {
@@ -291,11 +292,12 @@ public class V3Teleop extends OpMode {
         follower.update();
         Pose currPose = follower.getPose();
         distanceToGoal = Math.sqrt(Math.pow(144-currPose.getY(),2) + Math.pow(currPose.getX(),2));
-        //hoodPos = .00347222 * distanceToGoal;
+
 
         if (autoTarget) {
+            hoodPos = .00263168 * distanceToGoal + .0605263;
             if ((currPose.getY() < 30 && currPose.getX() > 42 && currPose.getX() < 103) || (currPose.getY() > 70)){
-                desiredAngle = Math.atan(144 - currPose.getY() / currPose.getX());
+
             telemetry.addData("X dist", currPose.getX());
             telemetry.addData("Y dist", currPose.getY());
             Heading = Math.toDegrees(currPose.getHeading());
@@ -305,17 +307,38 @@ public class V3Teleop extends OpMode {
             }
 
 
-            desiredAngle = (180 - Math.toDegrees(Math.atan((144 - currPose.getY()) / (currPose.getX() - XOffset)))) - Heading;
-            desiredAngle = 180 + (int) desiredAngle;
+            desiredAngle = 180 + (Math.toDegrees(Math.atan((144 - currPose.getY()) / (144 - currPose.getX() - XOffset)))) - Heading;
+            desiredAngle = (int) desiredAngle + DegreeOffset;
+
+            if (desiredAngle < 0) {
+             desiredAngle = 360 + desiredAngle;
+            }
             ServoPos = 0.00338889 * desiredAngle - 0.0366667;
-            distanceToGoal = Math.sqrt(Math.pow(144 - currPose.getY(), 2) + Math.pow(currPose.getX(), 2));
+
+            distanceToGoal = Math.sqrt(Math.pow(144 - currPose.getY(), 2) + Math.pow(144 - currPose.getX(), 2));
             IntendedFlywheelV = .037793 * Math.pow(distanceToGoal, 2) - 0.153573 * distanceToGoal + 1199.55171;
-            hoodPos = .3 + .001667 * distanceToGoal;
+
+            if (gamepad1.dpad_left && !debounceDPAD){
+                DegreeOffset += 5;
+                debounceDPAD = true;
+            }
+
+            if (gamepad1.dpad_right && ! debounceDPAD){
+                DegreeOffset -= 5;
+                debounceDPAD = true;
+
+            }
+
+            if (!gamepad1.dpad_right && !gamepad1.dpad_left && !gamepad1.dpad_up && !gamepad1.dpad_down){
+                debounceDPAD = false;
+            }
 
 
             }
         }
         else{
+
+
             /*
             if(gamepad1.left_trigger > 0 && !dLTR){
                 ServoPos -= .02;
@@ -333,22 +356,29 @@ public class V3Teleop extends OpMode {
             }
 
              */
-            if(gamepad1.right_trigger == 0)
-            {
-                dRTR = false;
-            }
+
             if(gamepad1.left_bumper  && !dLBR)
             {
                 hoodPos -= .05;
             }
             if(!gamepad1.left_bumper)
             {
+
                 dLBR = false;
             }
+            /*
+            if(gamepad1.right_trigger == 0)
+            {
+                dRTR = false;
+            }
+
             if(gamepad1.right_bumper  && !dRBR)
             {
+
                 hoodPos += .05;
             }
+            */
+
             if(!gamepad1.right_bumper)
             {
                 dRBR = false;

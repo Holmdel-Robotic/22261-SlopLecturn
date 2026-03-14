@@ -18,10 +18,10 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@Autonomous(name = "Pedro Pathing Autonomous", group = "Autonomous")
+@Autonomous(name = "Pedro Path away from me", group = "Autonomous")
 @Configurable // Panels
 public class PathAwayFromMe extends OpMode {
-    private TelemetryManager panelsTelemetry; // Panels Telemetry instance
+    private TelemetryManager panelsTelemetry; // Panels Telem  etry instance
     public Follower follower; // Pedro Pathing follower instance
     private int pathState; // Current autonomous path state (state machine)
     private Paths paths; // Paths defined in the Paths class
