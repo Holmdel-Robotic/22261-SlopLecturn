@@ -236,6 +236,7 @@ public class BlueSmallTriangle extends OpMode {
                 if (!follower.isBusy()) {
                     follower.followPath(paths.line4, true);
                     setPathState(State.SCORE);
+                    timer2.resetTimer();
                 }
                 break;
 
