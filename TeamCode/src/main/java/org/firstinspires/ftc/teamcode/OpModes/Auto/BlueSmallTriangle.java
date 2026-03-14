@@ -188,8 +188,9 @@ public class BlueSmallTriangle extends OpMode {
                 break;
 
             case SCORE:
-                if (timer2.getElapsedTimeSeconds() < .3){
+                if (timer2.getElapsedTimeSeconds() < 1){
                     outerGate.setPosition(.6);
+                    intakeInner.setPower(.9);
                 }
                 if (follower.isBusy()) {
                     actionTimer.resetTimer();
