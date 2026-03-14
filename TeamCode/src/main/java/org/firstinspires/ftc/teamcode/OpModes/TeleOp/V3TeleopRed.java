@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 //try?
 
@@ -25,13 +26,15 @@ public class V3TeleopRed extends OpMode {
 
     private Servo hood, raxon, laxon, innerGate, outerGate;
 
-    public static double IntendedFlywheelV = 1600, ServoPos = .5, desiredAngle, Heading, hoodPos = .53, XOffset = 0, distanceToGoal, DegreeOffset = -20, savedTime = 0;
+    public static double IntendedFlywheelV = 1600, ServoPos = .5, desiredAngle, Heading, hoodPos = .2, XOffset = 0, distanceToGoal, DegreeOffset = -20, savedTime = 0, gearRatio,ticksPerSecond,getGearRatio, currentVel;
 
     public static boolean autoTarget = true;
 
     private boolean debounceDPAD, debounceX, FlywheelOn, debounceB, outerIntakeOn, DriveMode = true, debounceY, dLTR, dRTR, dRBR, dLBR;
     public static double testPos = 0.5;
     private double open, close;
+
+
 
 
     public void init(){
@@ -80,21 +83,21 @@ public class V3TeleopRed extends OpMode {
 
     public void loop(){
 
-     follower.update();
+        follower.update();
         OuterIntakeOperation(gamepad1.b);
         WholeIntakeOperation(gamepad1.right_trigger > .2);
-     HandleInputs();
-     driveRobot();
+        HandleInputs();
+        driveRobot();
 
-     changeFlywheelVelo();
-     SetFlywheelVelocity(IntendedFlywheelV);
-     telemetry();
-     calculateCorrectAngle();
-     setServoPos(ServoPos);
-     hood.setPosition(hoodPos);
-     telemetry.addData("looptime", getRuntime() - savedTime);
-     telemetry.addData("offset", DegreeOffset);
-     savedTime = getRuntime();
+        changeFlywheelVelo();
+        SetFlywheelVelocity(IntendedFlywheelV);
+        telemetry();
+        calculateCorrectAngle();
+        setServoPos(ServoPos);
+        hood.setPosition(hoodPos);
+        telemetry.addData("looptime", getRuntime() - savedTime);
+        telemetry.addData("offset", DegreeOffset);
+        savedTime = getRuntime();
 
 
 
@@ -153,7 +156,7 @@ public class V3TeleopRed extends OpMode {
             frontRightMotor.setPower(frontRightPower);
             backRightMotor.setPower(backRightPower);
         }
-        }
+    }
 
 
     private void WholeIntakeOperation(boolean gamepad){
@@ -185,10 +188,26 @@ public class V3TeleopRed extends OpMode {
         }
     }
 
+
+
     private void SetFlywheelVelocity(double v){
         if (FlywheelOn) {
+
+
             flywheelLeft.setVelocity(v);
             flywheelRight.setVelocity(v);
+            ticksPerSecond = flywheelLeft.getVelocity();
+            gearRatio = 1;
+            currentVel =  (ticksPerSecond * (60.0/28) * gearRatio);
+
+            // tps -> rpm
+
+            double error = currentVel - v;
+            double pow = error > 125 ? -1 : error >= 0 ? 0 : 1;
+
+            flywheelLeft.setPower(pow);
+            flywheelRight.setPower(pow);
+
         }
         else {
             flywheelLeft.setVelocity(0);
@@ -203,7 +222,7 @@ public class V3TeleopRed extends OpMode {
         if (gamepad1.y && !debounceY){
             autoTarget = !autoTarget;
             IntendedFlywheelV = 1750;
-            hoodPos = .53;
+            hoodPos = .2;
             debounceY = true;
         }
 
@@ -244,59 +263,63 @@ public class V3TeleopRed extends OpMode {
 
     }
 
-    private void changeFlywheelVelo(){
-
-
-
-        if (gamepad1.dpad_up && !debounceDPAD){
-            IntendedFlywheelV += 50;
-            debounceDPAD = true;
-
-        } else if (gamepad1.dpad_down && !debounceDPAD) {
-            IntendedFlywheelV -= 50;
-            debounceDPAD = true;
+    private void changeFlywheelVelo() {
+        if (FlywheelOn) {
+            flywheelLeft.setVelocity(IntendedFlywheelV);
+            flywheelRight.setVelocity(IntendedFlywheelV);
         }
-        if (gamepad1.dpad_down && gamepad1.dpad_up){
-            debounceDPAD = false;
+        else {
+            flywheelLeft.setVelocity(0);
+            flywheelRight.setVelocity(0);
         }
-
-    }
-
-    private void setServoPos(double pos){
-      laxon.setPosition(pos);
-      raxon.setPosition(pos);
-
     }
 
 
 
-    private void telemetry(){
-        telemetry.addData("laxon pos", laxon.getPosition());
-        telemetry.addData("raxon pos", raxon.getPosition());
-        telemetry.addData("flywheel V", (flywheelLeft.getVelocity() + flywheelRight.getVelocity())/2);
-        telemetry.addData("runtime", getRuntime());
-        telemetry.addData("desired Pos", ServoPos);
-        telemetry.addData("desired angle", desiredAngle);
-        telemetry.addData("Robot heading", Heading);
-        telemetry.addData("alt desired pos", desiredAngle/340);
-        telemetry.addData("atan", Math.atan(144 - follower.getPose().getY()/ follower.getPose().getX()));
-        telemetry.addData("hood pos", hood.getPosition());
-        telemetry.addData("distance from goal", Math.sqrt(Math.pow((144 - follower.getPose().getY()), 2) + Math.pow((follower.getPose().getX()), 2)));
-        telemetry.addData("flywheelLeft", flywheelLeft.getVelocity());
-        telemetry.addData("flywheelRight", flywheelRight.getVelocity());
-        telemetry.addData("distance to goal", distanceToGoal);
-    }
+private void setServoPos(double pos){
+    laxon.setPosition(pos);
+    raxon.setPosition(pos);
 
-    private void calculateCorrectAngle(){
-
-        follower.update();
-        Pose currPose = follower.getPose();
-        distanceToGoal = Math.sqrt(Math.pow(144-currPose.getY(),2) + Math.pow(currPose.getX(),2));
+}
 
 
-        if (autoTarget) {
-            hoodPos = .00263168 * distanceToGoal + .0605263;
-            if ((currPose.getY() < 30 && currPose.getX() > 42 && currPose.getX() < 103) || (currPose.getY() > 70)){
+
+private void telemetry(){
+    telemetry.addData("laxon pos", laxon.getPosition());
+    telemetry.addData("raxon pos", raxon.getPosition());
+    telemetry.addData("flywheel V", (flywheelLeft.getVelocity() + flywheelRight.getVelocity())/2);
+    telemetry.addData("runtime", getRuntime());
+    telemetry.addData("desired Pos", ServoPos);
+    telemetry.addData("desired angle", desiredAngle);
+    telemetry.addData("Robot heading", Heading);
+    telemetry.addData("alt desired pos", desiredAngle/340);
+    telemetry.addData("atan", Math.atan(144 - follower.getPose().getY()/ follower.getPose().getX()));
+    telemetry.addData("hood pos", hood.getPosition());
+    telemetry.addData("flywheelLeft", flywheelLeft.getVelocity());
+    telemetry.addData("flywheelRight", flywheelRight.getVelocity());
+    telemetry.addData("distance to goal", distanceToGoal);
+    telemetry.addData("fl current", frontLeftMotor.getCurrent(CurrentUnit.AMPS));
+    telemetry.addData("bl current", backLeftMotor.getCurrent(CurrentUnit.AMPS));
+    telemetry.addData("fr current", frontRightMotor.getCurrent(CurrentUnit.AMPS));
+    telemetry.addData("br current", backRightMotor.getCurrent(CurrentUnit.AMPS));
+    telemetry.addData("intake Outer", intakeOuter.getCurrent(CurrentUnit.AMPS));
+    telemetry.addData("intake inner", intakeInner.getCurrent(CurrentUnit.AMPS));
+    telemetry.addData("flywheel L Current", flywheelLeft.getCurrent(CurrentUnit.AMPS));
+    telemetry.addData("flywheel R current", flywheelRight.getCurrent(CurrentUnit.AMPS));
+
+
+}
+
+private void calculateCorrectAngle(){
+
+    follower.update();
+    Pose currPose = follower.getPose();
+    distanceToGoal = Math.sqrt(Math.pow(144-currPose.getY(),2) + Math.pow(currPose.getX(),2));
+
+
+    if (autoTarget) {
+        //hoodPos = .00263636 * distanceToGoal - .02182;
+        if ((currPose.getY() < 30 && currPose.getX() > 42 && currPose.getX() < 103) || (currPose.getY() > 70)){
 
             telemetry.addData("X dist", currPose.getX());
             telemetry.addData("Y dist", currPose.getY());
@@ -311,7 +334,7 @@ public class V3TeleopRed extends OpMode {
             desiredAngle = (int) desiredAngle + DegreeOffset;
 
             if (desiredAngle < 0) {
-             desiredAngle = 360 + desiredAngle;
+                desiredAngle = 360 + desiredAngle;
             }
             ServoPos = 0.00338889 * desiredAngle - 0.0366667;
 
@@ -334,9 +357,9 @@ public class V3TeleopRed extends OpMode {
             }
 
 
-            }
         }
-        else{
+    }
+    else{
 
 
             /*
@@ -345,10 +368,10 @@ public class V3TeleopRed extends OpMode {
                 dLTR = true;
             }
             */
-            if(gamepad1.left_trigger == 0)
-            {
-                dLTR = false;
-            }
+        if(gamepad1.left_trigger == 0)
+        {
+            dLTR = false;
+        }
             /*
             if(gamepad1.right_trigger > 0 && !dRTR){
                 ServoPos += .02;
@@ -357,15 +380,15 @@ public class V3TeleopRed extends OpMode {
 
              */
 
-            if(gamepad1.left_bumper  && !dLBR)
-            {
-                hoodPos -= .05;
-            }
-            if(!gamepad1.left_bumper)
-            {
+        if(gamepad1.left_bumper  && !dLBR)
+        {
+            hoodPos -= .05;
+        }
+        if(!gamepad1.left_bumper)
+        {
 
-                dLBR = false;
-            }
+            dLBR = false;
+        }
             /*
             if(gamepad1.right_trigger == 0)
             {
@@ -379,13 +402,13 @@ public class V3TeleopRed extends OpMode {
             }
             */
 
-            if(!gamepad1.right_bumper)
-            {
-                dRBR = false;
-            }
+        if(!gamepad1.right_bumper)
+        {
+            dRBR = false;
         }
-
     }
+
+}
 
 }
 
