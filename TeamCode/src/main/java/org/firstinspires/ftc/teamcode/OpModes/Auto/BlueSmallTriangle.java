@@ -87,7 +87,7 @@ public class BlueSmallTriangle extends OpMode {
         hood.setDirection(Servo.Direction.REVERSE);
 
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(47.800, 12.500, Math.toRadians(90)));
+        follower.setStartingPose(new Pose(47.800, 9, Math.toRadians(90)));
 
         pathTimer = new ElapsedTime();
         actionTimer = new Timer();
