@@ -16,7 +16,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
+//
 @Autonomous(name = "Blue  Small Triangle", group = "Autonomous")
 @Configurable
 public class BlueSmallTriangle extends OpMode {

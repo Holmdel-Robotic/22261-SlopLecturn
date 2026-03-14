@@ -11,7 +11,7 @@ import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.geometry.Pose;
-3
+
 @Autonomous(name = "Blue Big Triangle Yummy", group = "Autonomous")
 @Configurable // Panels
 public class BlueBigTriangleYummy extends OpMode {
@@ -36,7 +36,7 @@ public class BlueBigTriangleYummy extends OpMode {
     @Override
     public void loop() {
         follower.update(); // Update Pedro Pathing
-        pathState = autonomousPathUpdate(); // Update autonomous state machine
+        autonomousPathUpdate(); // Update autonomous state machine
 
         // Log values to Panels and Driver Station
         panelsTelemetry.debug("Path State", pathState);
@@ -55,9 +55,9 @@ public class BlueBigTriangleYummy extends OpMode {
         public PathChain Path6;
         public PathChain Path7;
         public PathChain Path10;
-        public PathChain Path10;
+
         public PathChain Path8;
-        public PathChain Path8;
+
 
         public Paths(Follower follower) {
             Path1 = follower.pathBuilder().addPath(
