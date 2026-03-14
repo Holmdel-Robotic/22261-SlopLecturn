@@ -87,7 +87,7 @@ public class BlueSmallTriangle extends OpMode {
         hood.setDirection(Servo.Direction.REVERSE);
 
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(48.000, 8.600, Math.toRadians(90)));
+        follower.setStartingPose(new Pose(47.800, 10.500, Math.toRadians(90)));
 
         pathTimer = new ElapsedTime();
         actionTimer = new Timer();
@@ -122,9 +122,9 @@ public class BlueSmallTriangle extends OpMode {
                     .pathBuilder()
                     .addPath(
                             new BezierCurve(
-                                    new Pose(48.000, 8.603),
+                                    new Pose(47.800, 11.000),
                                     new Pose(22.203, 23.234),
-                                    new Pose(24.203, 31.126)
+                                    new Pose(24.000, 33.000)
                             )
                     )
                     .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(100))
@@ -134,9 +134,9 @@ public class BlueSmallTriangle extends OpMode {
                     .pathBuilder()
                     .addPath(
                             new BezierCurve(
-                                    new Pose(24.203, 31.126),
+                                    new Pose(24.000, 33.000),
                                     new Pose(22.609, 23.031),
-                                    new Pose(46.640, 9.009)
+                                    new Pose(47.800, 11.000)
                             )
                     )
                     .setLinearHeadingInterpolation(Math.toRadians(100), Math.toRadians(180))
@@ -145,8 +145,8 @@ public class BlueSmallTriangle extends OpMode {
             line3 = follower
                     .pathBuilder()
                     .addPath(
-                            new BezierLine(new Pose(46.640, 9.009),
-                                    new Pose(8.900, 9.400))
+                            new BezierLine(new Pose(47.800, 11.000),
+                                    new Pose(6.700, 11.000))
                     )
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build();
@@ -154,8 +154,8 @@ public class BlueSmallTriangle extends OpMode {
             line4 = follower
                     .pathBuilder()
                     .addPath(
-                            new BezierLine(new Pose(8.900, 9.400),
-                                    new Pose(46.900, 9.000))
+                            new BezierLine(new Pose(6.700, 11.000),
+                                    new Pose(47.800, 11.000))
                     )
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build();
@@ -163,8 +163,8 @@ public class BlueSmallTriangle extends OpMode {
             line5 = follower
                     .pathBuilder()
                     .addPath(
-                            new BezierLine(new Pose(46.900, 9.000),
-                                    new Pose(60.000, 36.000))
+                            new BezierLine(new Pose(47.800, 11.000),
+                                    new Pose(6.000, 36.000))
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(180))
                     .build();
