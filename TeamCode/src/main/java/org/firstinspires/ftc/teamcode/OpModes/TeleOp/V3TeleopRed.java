@@ -279,7 +279,6 @@ private void telemetry(){
     telemetry.addData("alt desired pos", desiredAngle/340);
     telemetry.addData("atan", Math.atan(144 - follower.getPose().getY()/ follower.getPose().getX()));
     telemetry.addData("hood pos", hood.getPosition());
-    telemetry.addData("distance from goal", Math.sqrt(Math.pow((144 - follower.getPose().getY()), 2) + Math.pow((follower.getPose().getX()), 2)));
     telemetry.addData("flywheelLeft", flywheelLeft.getVelocity());
     telemetry.addData("flywheelRight", flywheelRight.getVelocity());
     telemetry.addData("distance to goal", distanceToGoal);
