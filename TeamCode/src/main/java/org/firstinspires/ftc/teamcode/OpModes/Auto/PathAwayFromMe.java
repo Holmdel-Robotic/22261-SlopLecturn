@@ -1,5 +1,7 @@
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.OpModes.Auto;
+import com.pedropathing.util.Timer;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.bylazar.configurables.annotations.Configurable;
@@ -11,6 +13,10 @@ import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.geometry.Pose;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.Servo;
 
 @Autonomous(name = "Pedro Pathing Autonomous", group = "Autonomous")
 @Configurable // Panels
@@ -20,9 +26,68 @@ public class PathAwayFromMe extends OpMode {
     private int pathState; // Current autonomous path state (state machine)
     private Paths paths; // Paths defined in the Paths class
 
+    private Pose pose;
+
+    private Servo gate, indicatorLight1, indicatorLight2;
+    private DcMotorEx frontRightMotor, frontLeftMotor, backRightMotor, backLeftMotor;
+    private DcMotorEx flywheelLeft, flywheelRight, intakeOuter, intakeInner;
+
+    private DistanceSensor intakeSensor1, intakeSensor2;
+
+    private Servo hood, raxon, laxon;
+
+    private Limelight3A limelight;
+
+    private boolean gateOpen = false;
+
+    private boolean driving;
+    private boolean intakeOn = false;
+    private boolean flywheelOn = false;
+    private boolean aprilTagTracking = false;
+
+    private boolean debounceA, debounceX, debounceRightStick, debounceBack, debounceLEFT_TRIGGER;
+
+    private double FlywheelV = 2000;
+    private double hoodPos = .67;
+    private double raxonPos = .63;
+    private double laxonPos = .63;
+
+    private Timer actionTimer = new Timer();
+
+    private Timer pathTimer = new Timer();
+    private TelemetryManager panalsTelemetry;
     @Override
     public void init() {
         panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
+
+        frontLeftMotor = hardwareMap.get(DcMotorEx.class, "fl");
+        frontRightMotor = hardwareMap.get(DcMotorEx.class, "fr");
+        backLeftMotor = hardwareMap.get(DcMotorEx.class, "bl");
+        backRightMotor = hardwareMap.get(DcMotorEx.class, "br");
+
+        flywheelLeft = hardwareMap.get(DcMotorEx.class, "flyL");
+        flywheelRight = hardwareMap.get(DcMotorEx.class, "flyR");
+        flywheelRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        flywheelLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        flywheelRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        flywheelLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        flywheelLeft.setDirection(DcMotor.Direction.FORWARD);
+        flywheelRight.setDirection(DcMotor.Direction.REVERSE);
+
+        intakeOuter = hardwareMap.get(DcMotorEx.class, "intOuter");
+        intakeInner = hardwareMap.get(DcMotorEx.class, "intInner");
+        intakeOuter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        intakeInner.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        intakeOuter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        intakeInner.setDirection(DcMotor.Direction.REVERSE);
+        intakeOuter.setDirection(DcMotor.Direction.REVERSE);
+        intakeInner.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        hood = hardwareMap.get(Servo.class, "hood");
+        raxon = hardwareMap.get(Servo.class, "raxon");
+        laxon = hardwareMap.get(Servo.class, "laxon");
+
+
 
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(new Pose(72, 8, Math.toRadians(90)));
@@ -98,7 +163,6 @@ public class PathAwayFromMe extends OpMode {
             Path5 = follower.pathBuilder().addPath(
                             new BezierLine(
                                     new Pose(51.945, 16.641),
-
                                     new Pose(60.000, 36.000)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
@@ -109,6 +173,14 @@ public class PathAwayFromMe extends OpMode {
 
 
     public int autonomousPathUpdate() {
+        switch(pathState) {
+
+        }
+
+
+
+
+
         // Add your state machine Here
         // Access paths with paths.pathName
         // Refer to the Pedro Pathing Docs (Auto Example) for an example state machine
