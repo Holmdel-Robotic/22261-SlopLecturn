@@ -30,6 +30,7 @@ public class BlueSmallTriangle extends OpMode {
     public static double VELO = 1900, SERVOPOS = .3, HOODPOS = .33;
 
     private TelemetryManager panelsTelemetry;
+    private Timer timer2;
     private ElapsedTime pathTimer;
     private Timer actionTimer;
     private Paths paths;
@@ -91,7 +92,7 @@ public class BlueSmallTriangle extends OpMode {
 
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(new Pose(47.800, 9, Math.toRadians(90)));
-
+        timer2 = new Timer();
         pathTimer = new ElapsedTime();
         actionTimer = new Timer();
         paths = new Paths(follower);
@@ -183,13 +184,18 @@ public class BlueSmallTriangle extends OpMode {
                 flywheelRight.setVelocity(VELO);
                 intakeOuter.setPower(.9);
                 setPathState(State.SCORE);
+                timer2.resetTimer();
                 break;
 
             case SCORE:
+                if (timer2.getElapsedTimeSeconds() < .3){
+                    outerGate.setPosition(.6);
+                }
                 if (follower.isBusy()) {
                     actionTimer.resetTimer();
                 }
                 else {
+
                     raxon.setPosition(SERVOPOS);
                     laxon.setPosition(SERVOPOS);
                     flywheelLeft.setVelocity(VELO);
@@ -197,6 +203,7 @@ public class BlueSmallTriangle extends OpMode {
                     hood.setPosition(HOODPOS);
                     innerGate.setPosition(.575);
                     outerGate.setPosition(.6);
+                    intakeInner.setPower(.9);
                     if (actionTimer.getElapsedTimeSeconds() > 2) {
                         intakeInner.setPower(0);
                         innerGate.setPosition(.2);
