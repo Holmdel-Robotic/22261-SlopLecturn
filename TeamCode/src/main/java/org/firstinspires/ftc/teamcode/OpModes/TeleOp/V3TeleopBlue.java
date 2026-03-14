@@ -22,7 +22,7 @@ public class V3TeleopBlue extends OpMode {
 
     private Servo hood, raxon, laxon, innerGate, outerGate;
 
-    public static double IntendedFlywheelV = 1600, ServoPos = .5, desiredAngle, Heading, hoodPos = .53, XOffset = 16, distanceToGoal, DegreeOffset = 0, savedTime = 0;
+    public static double IntendedFlywheelV = 1600, ServoPos = .5, desiredAngle, Heading, hoodPos = .2, XOffset = 16, distanceToGoal, DegreeOffset = 0, savedTime = 0;
 
     public static boolean autoTarget = true;
 
@@ -200,7 +200,7 @@ public class V3TeleopBlue extends OpMode {
         if (gamepad1.y && !debounceY){
             autoTarget = !autoTarget;
             IntendedFlywheelV = 1750;
-            hoodPos = .53;
+            hoodPos = .2;
             debounceY = true;
         }
 
@@ -292,7 +292,7 @@ public class V3TeleopBlue extends OpMode {
 
 
         if (autoTarget) {
-            hoodPos = .00263636 * distanceToGoal - .02182;
+            //hoodPos = .00263636 * distanceToGoal - .02182;
             if ((currPose.getY() < 30 && currPose.getX() > 42 && currPose.getX() < 103) || (currPose.getY() > 70)){
                 desiredAngle = Math.atan(144 - currPose.getY() / currPose.getX());
             telemetry.addData("X dist", currPose.getX());

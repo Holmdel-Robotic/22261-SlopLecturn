@@ -206,7 +206,7 @@ public class V3TeleopRed extends OpMode {
         if (gamepad1.y && !debounceY){
             autoTarget = !autoTarget;
             IntendedFlywheelV = 1750;
-            hoodPos = .53;
+            hoodPos = .2;
             debounceY = true;
         }
 
