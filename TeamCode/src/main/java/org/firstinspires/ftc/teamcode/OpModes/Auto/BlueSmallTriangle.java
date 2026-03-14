@@ -26,6 +26,8 @@ public class BlueSmallTriangle extends OpMode {
 
     private Servo hood, raxon, laxon, innerGate, outerGate;
 
+    public static double VELO, SERVOPOS, HOODPOS;
+
     private TelemetryManager panelsTelemetry;
     private ElapsedTime pathTimer;
     private Timer actionTimer;
@@ -174,10 +176,10 @@ public class BlueSmallTriangle extends OpMode {
     public void autonomousPathUpdate() {
         switch (pathState) {
             case START:
-                raxon.setPosition(.5);
-                laxon.setPosition(.5);
-                flywheelLeft.setVelocity(2000);
-                flywheelRight.setVelocity(2000);
+                raxon.setPosition(SERVOPOS);
+                laxon.setPosition(SERVOPOS);
+                flywheelLeft.setVelocity(VELO);
+                flywheelRight.setVelocity(VELO);
                 intakeOuter.setPower(.9);
                 setPathState(State.SCORE);
                 break;
@@ -187,6 +189,11 @@ public class BlueSmallTriangle extends OpMode {
                     actionTimer.resetTimer();
                 }
                 else {
+                    raxon.setPosition(SERVOPOS);
+                    laxon.setPosition(SERVOPOS);
+                    flywheelLeft.setVelocity(VELO);
+                    flywheelRight.setVelocity(VELO);
+                    hood.setPosition(HOODPOS);
                     innerGate.setPosition(.575);
                     outerGate.setPosition(.6);
                     if (actionTimer.getElapsedTimeSeconds() > 2) {
