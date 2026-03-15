@@ -196,8 +196,10 @@ public class BlueSmallTriangle extends OpMode {
                 }
 
                 if (firstTime){
-                    while (actionTimer.getElapsedTimeSeconds() < 2){
+                    resetRuntime();
 
+                    while (getRuntime() < 2){
+                        telemetry.addData("waiting",true);
                     }
 
                 }
