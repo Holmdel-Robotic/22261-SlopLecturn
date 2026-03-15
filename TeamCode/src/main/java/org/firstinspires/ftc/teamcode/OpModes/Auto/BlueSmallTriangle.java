@@ -1,5 +1,3 @@
-//CHECK CHECK CHECK GRANT
-
 package org.firstinspires.ftc.teamcode.OpModes.Auto;
 
 import com.pedropathing.util.Timer;
