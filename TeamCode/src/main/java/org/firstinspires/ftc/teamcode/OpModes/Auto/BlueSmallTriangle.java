@@ -201,7 +201,7 @@ public class BlueSmallTriangle extends OpMode {
                 }
                 if (firstTime){
                     while (actionTimer.getElapsedTimeSeconds() < 1){
-            
+
                     }
                     firstTime = false;
                 }
