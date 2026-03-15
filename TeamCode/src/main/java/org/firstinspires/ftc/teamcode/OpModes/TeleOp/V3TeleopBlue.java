@@ -24,12 +24,12 @@ public class V3TeleopBlue extends OpMode {
 
     private Servo hood, raxon, laxon, innerGate, outerGate;
 
-    public static double IntendedFlywheelV = 1600, ServoPos = .5, desiredAngle, Heading, hoodPos = .2, XOffset = 16, distanceToGoal, DegreeOffset = 0, savedTime = 0;
+    public static double IntendedFlywheelV = 1600, ServoPos = .5, desiredAngle, Heading, hoodPos = .2, XOffset = 16 ,DegreeOffsetALT = 0, distanceToGoal, DegreeOffset = 0, savedTime = 0;
 
     public static boolean autoTarget = true;
 
     private boolean debounceDPAD, debounceX, FlywheelOn, debounceB, outerIntakeOn, DriveMode = true, debounceY, dLTR, dRTR, dRBR, dLBR;
-    public static double testPos = 0.5;
+    public static double testPos = 0.5, loops = 0;
     private double open, close;
 
     private boolean dBack;
@@ -242,7 +242,7 @@ public class V3TeleopBlue extends OpMode {
         }
         if(gamepad1.back && !dBack)
         {
-            follower.setStartingPose(new Pose(48,8,Math.toRadians(180)));
+            follower.setStartingPose(new Pose(60,36,Math.toRadians(180)));
             dBack = true;
         }
         if(!gamepad1.back)
@@ -313,28 +313,46 @@ public class V3TeleopBlue extends OpMode {
             telemetry.addData("Y dist", currPose.getY());
             Heading = Math.toDegrees(currPose.getHeading());
 
+
+
             if (Heading < 0) {
                 Heading = 360 + Heading;
             }
 
 
+
+
             desiredAngle = (180 - Math.toDegrees(Math.atan((144 - currPose.getY()) / (currPose.getX() - XOffset)))) - Heading;
-            desiredAngle = 180 + (int) desiredAngle + DegreeOffset;
-            desiredAngle = (int) desiredAngle + DegreeOffset;
+            desiredAngle = 180 + (int) desiredAngle;
+                if ((currPose.getY() < 30 && currPose.getX() > 42 && currPose.getX() < 103)){
+                    desiredAngle += DegreeOffsetALT;
+                } else if ((currPose.getY() > 70)) {
+                    desiredAngle += DegreeOffset;
+                }
             ServoPos = 0.00338889 * desiredAngle - 0.0366667;
             distanceToGoal = Math.sqrt(Math.pow(144 - currPose.getY(), 2) + Math.pow(currPose.getX(), 2));
-            IntendedFlywheelV = .037793 * Math.pow(distanceToGoal, 2) - 0.153573 * distanceToGoal + 1250.55171;
+            IntendedFlywheelV = .037793 * Math.pow(distanceToGoal, 2) - 0.153573 * distanceToGoal + 1225.55171;
 
-            if (gamepad1.dpad_left && !debounceDPAD){
+            if (gamepad1.dpad_left && !debounceDPAD && (currPose.getY() > 70)){
                 DegreeOffset += 5;
                 debounceDPAD = true;
             }
 
-            if (gamepad1.dpad_right && ! debounceDPAD){
+            if (gamepad1.dpad_right && ! debounceDPAD && (currPose.getY() > 70)){
                 DegreeOffset -= 5;
                 debounceDPAD = true;
 
              }
+                if (gamepad1.dpad_left && !debounceDPAD && (currPose.getY() < 30 && currPose.getX() > 42 && currPose.getX() < 103)){
+                    DegreeOffsetALT += 5;
+                    debounceDPAD = true;
+                }
+
+                if (gamepad1.dpad_right && ! debounceDPAD && (currPose.getY() < 30 && currPose.getX() > 42 && currPose.getX() < 103)){
+                    DegreeOffsetALT -= 5;
+                    debounceDPAD = true;
+
+                }
 
             if (!gamepad1.dpad_right && !gamepad1.dpad_left && !gamepad1.dpad_up && !gamepad1.dpad_down){
                 debounceDPAD = false;

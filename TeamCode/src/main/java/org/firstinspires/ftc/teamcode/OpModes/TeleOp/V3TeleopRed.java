@@ -26,7 +26,7 @@ public class V3TeleopRed extends OpMode {
 
     private Servo hood, raxon, laxon, innerGate, outerGate;
 
-    public static double IntendedFlywheelV = 1600, ServoPos = .5, desiredAngle, Heading, hoodPos = .2, XOffset = 0, distanceToGoal, DegreeOffset = -20, savedTime = 0, gearRatio,ticksPerSecond,getGearRatio, currentVel;
+    public static double IntendedFlywheelV = 1600, ServoPos = .5, desiredAngle, Heading, hoodPos = .2, XOffset = 0, distanceToGoal, DegreeOffset = -20,DegreeOffsetALT = 0, savedTime = 0, gearRatio,ticksPerSecond,getGearRatio, currentVel;
 
     public static boolean autoTarget = true;
 
@@ -292,7 +292,9 @@ private void telemetry(){
     telemetry.addData("runtime", getRuntime());
     telemetry.addData("desired Pos", ServoPos);
     telemetry.addData("desired angle", desiredAngle);
+    telemetry.addData("alt desired angle", DegreeOffsetALT);
     telemetry.addData("Robot heading", Heading);
+    telemetry.addData("intended flywheel V", IntendedFlywheelV);
     telemetry.addData("alt desired pos", desiredAngle/340);
     telemetry.addData("atan", Math.atan(144 - follower.getPose().getY()/ follower.getPose().getX()));
     telemetry.addData("hood pos", hood.getPosition());
@@ -332,7 +334,13 @@ private void calculateCorrectAngle(){
 
 
             desiredAngle = 180 + (Math.toDegrees(Math.atan((144 - currPose.getY()) / (144 - currPose.getX() - XOffset)))) - Heading;
-            desiredAngle = (int) desiredAngle + DegreeOffset;
+
+            desiredAngle = (int) desiredAngle;
+            if ((currPose.getY() < 30 && currPose.getX() > 42 && currPose.getX() < 103)){
+                desiredAngle += DegreeOffsetALT;
+            } else if ((currPose.getY() > 70)) {
+                desiredAngle += DegreeOffset;
+            }
 
             if (desiredAngle < 0) {
                 desiredAngle = 360 + desiredAngle;
@@ -342,20 +350,30 @@ private void calculateCorrectAngle(){
             distanceToGoal = Math.sqrt(Math.pow(144 - currPose.getY(), 2) + Math.pow(144 - currPose.getX(), 2));
             IntendedFlywheelV = .037793 * Math.pow(distanceToGoal, 2) - 0.153573 * distanceToGoal + 1250.55171;
 
-            if (gamepad1.dpad_left && !debounceDPAD){
+            if (gamepad1.dpad_left && !debounceDPAD && (currPose.getY() > 70)){
                 DegreeOffset += 5;
                 debounceDPAD = true;
             }
 
-            if (gamepad1.dpad_right && ! debounceDPAD){
+            if (gamepad1.dpad_right && ! debounceDPAD && (currPose.getY() > 70)){
                 DegreeOffset -= 5;
                 debounceDPAD = true;
 
             }
+            if (gamepad1.dpad_left && !debounceDPAD && (currPose.getY() < 30 && currPose.getX() > 42 && currPose.getX() < 103)){
+                DegreeOffsetALT += 5;
+                debounceDPAD = true;
+            }
 
+            if (gamepad1.dpad_right && ! debounceDPAD && (currPose.getY() < 30 && currPose.getX() > 42 && currPose.getX() < 103)){
+                DegreeOffsetALT -= 5;
+                debounceDPAD = true;
+
+            }
             if (!gamepad1.dpad_right && !gamepad1.dpad_left && !gamepad1.dpad_up && !gamepad1.dpad_down){
                 debounceDPAD = false;
             }
+
 
 
         }

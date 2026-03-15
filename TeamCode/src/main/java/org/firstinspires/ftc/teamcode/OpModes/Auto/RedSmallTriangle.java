@@ -28,7 +28,8 @@ public class RedSmallTriangle extends OpMode {
 
     private Servo hood, raxon, laxon, innerGate, outerGate;
 
-    public static double VELO = 2200, SERVOPOS = .285, HOODPOS = .33, ADJUSTEDSERVOPOS = .485;
+    public static double VELO = 2200, SERVOPOS = .72
+            , HOODPOS = .375, ADJUSTEDSERVOPOS = .465, loops = 0;
 
     private TelemetryManager panelsTelemetry;
     private Timer timer2;
@@ -97,7 +98,7 @@ public class RedSmallTriangle extends OpMode {
         hood.setDirection(Servo.Direction.REVERSE);
 
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(47.800, 9, Math.toRadians(90)));
+        follower.setStartingPose(mirror(new  Pose(47.800, 9, Math.toRadians(90))));
         timer2 = new Timer();
         pathTimer = new ElapsedTime();
         actionTimer = new Timer();
@@ -122,67 +123,74 @@ public class RedSmallTriangle extends OpMode {
         panelsTelemetry.update(telemetry);
     }
 
-    public static class Paths {
-        public PathChain line1;
-        public PathChain line2;
-        public PathChain line3;
-        public PathChain line4;
-        public PathChain line5;
 
-        public Paths(Follower follower) {
-            line1 = follower
-                    .pathBuilder()
-                    .addPath(
-                            new BezierCurve(
-                                    mirror(new Pose(47.800, 13.000)),
-                                    mirror( new Pose(22.203, 23.234)),
-                                    mirror(new Pose(24.000, 33.000))
-                            )
-                    )
-                    .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(80))
-                    .build();
 
-            line2 = follower
-                    .pathBuilder()
-                    .addPath(
-                            new BezierCurve(
-                                    mirror( new Pose(24.000, 33.000)),
-                                    mirror(new Pose(22.609, 23.031)),
-                                    mirror(  new Pose(47.800, 13.000))
-                            )
-                    )
-                    .setLinearHeadingInterpolation(Math.toRadians(80), Math.toRadians(0))
-                    .build();
 
-            line3 = follower
-                    .pathBuilder()
-                    .addPath(
-                            new BezierLine(mirror(new Pose(47.800, 13.000)),
-                                    mirror(new Pose(6.700, 13.000)))
-                    )
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
-                    .build();
 
-            line4 = follower
-                    .pathBuilder()
-                    .addPath(
-                            new BezierLine(mirror(new Pose(6.700, 13.000)),
-                                    mirror(new Pose(47.800, 13.000)))
-                    )
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
-                    .build();
+        public static class Paths {
+            public PathChain line1;
+            public PathChain line2;
+            public PathChain line3;
+            public PathChain line4;
+            public PathChain line5;
 
-            line5 = follower
-                    .pathBuilder()
-                    .addPath(
-                            new BezierLine( mirror(new Pose(47.800, 13.000)),
-                                    mirror(new Pose(60, 36)))
-                    )
-                    .setConstantHeadingInterpolation(Math.toRadians(0))
-                    .build();
+            public Paths(Follower follower) {
+                line1 = follower.pathBuilder().addPath(
+                                new BezierCurve(
+                                        new Pose(97.000, 9.000),
+                                        new Pose(119.571, 12.216),
+                                        new Pose(119.469, 35.318)
+                                )
+                        ).setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(90))
+
+                        .build();
+
+                line2 = follower.pathBuilder().addPath(
+                                new BezierLine(
+                                        new Pose(119.469, 35.318),
+
+                                        new Pose(97.488, 8.645)
+                                )
+                        ).setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(0))
+
+                        .build();
+
+                line3 = follower.pathBuilder().addPath(
+                                new BezierLine(
+                                        new Pose(97.488, 8.645),
+
+                                        new Pose(133.943, 9.569)
+                                )
+                        ).setTangentHeadingInterpolation()
+
+                        .build();
+
+                line4 = follower.pathBuilder().addPath(
+                                new BezierLine(
+                                        new Pose(133.943, 9.569),
+
+                                        new Pose(97.109, 9.569)
+                                )
+                        ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
+
+                        .build();
+
+                line5 = follower.pathBuilder().addPath(
+                                new BezierLine(
+                                        new Pose(97.109, 9.569),
+
+                                        new Pose(84.033, 36.047)
+                                )
+                        ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
+
+                        .build();
+            }
         }
-    }
-    public static Pose mirror(Pose p) {
+
+
+
+
+        public static Pose mirror(Pose p) {
         return new Pose(144 - p.getX(), p.getY(), Math.toRadians(180 - Math.toDegrees(p.getHeading())));
     }
     public void autonomousPathUpdate() {
@@ -247,11 +255,12 @@ public class RedSmallTriangle extends OpMode {
                             setPathState(State.PICKUP1);
 
                         }
-                        else if (pathTimer.seconds() > 23) {
+                        else if (loops >= 5){
                             follower.followPath(paths.line5);
                             setPathState(State.END);
                         }
                         else {
+                            loops += 1;
                             follower.followPath(paths.line3, true);
                             setPathState(State.HUMANZONE);
                         }
