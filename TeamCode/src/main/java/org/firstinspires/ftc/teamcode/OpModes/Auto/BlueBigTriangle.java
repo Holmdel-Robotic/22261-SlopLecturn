@@ -31,6 +31,8 @@ public class BlueBigTriangle extends OpMode {
     private Timer actionTimer;
     private Paths paths;
 
+    private double SERVOPOS = .3, FLYV = 1600, HOOD =.2;
+
     private boolean scored = false;
     private int row = 0;
 
@@ -198,24 +200,29 @@ public class BlueBigTriangle extends OpMode {
     public void autonomousPathUpdate() {
         switch (pathState) {
             case START:
-                raxon.setPosition(.5);
-                laxon.setPosition(.5);
-                flywheelLeft.setVelocity(2000);
-                flywheelRight.setVelocity(2000);
+                raxon.setPosition(SERVOPOS);
+                laxon.setPosition(SERVOPOS);
+                flywheelLeft.setVelocity(FLYV);
+                flywheelRight.setVelocity(FLYV);
+                hood.setPosition(HOOD);
                 intakeOuter.setPower(.9);
                 intakeInner.setPower(.8);
                 follower.followPath(paths.line1, true);
                 setPathState(State.SCORE);
+                resetRuntime();
                 break;
 
             case SCORE:
+                if (getRuntime() > 1 && follower.isBusy()){
+                    outerGate.setPosition(.6);
+                }
                 if (follower.isBusy()) {
                     actionTimer.resetTimer();
                 }
                 else {
                     innerGate.setPosition(.575);
                     outerGate.setPosition(.6);
-                    if (actionTimer.getElapsedTimeSeconds() > 2) {
+                    if (actionTimer.getElapsedTimeSeconds() > 1) {
                         intakeInner.setPower(0);
                         innerGate.setPosition(.2);
                         outerGate.setPosition(0);
