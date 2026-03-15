@@ -139,7 +139,7 @@ public class RedSmallTriangle extends OpMode {
                                     mirror(new Pose(24.000, 33.000))
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(270), Math.toRadians(280))
+                    .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(80))
                     .build();
 
             line2 = follower
@@ -151,7 +151,7 @@ public class RedSmallTriangle extends OpMode {
                                     mirror(  new Pose(47.800, 13.000))
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(280), Math.toRadians(0))
+                    .setLinearHeadingInterpolation(Math.toRadians(80), Math.toRadians(0))
                     .build();
 
             line3 = follower
