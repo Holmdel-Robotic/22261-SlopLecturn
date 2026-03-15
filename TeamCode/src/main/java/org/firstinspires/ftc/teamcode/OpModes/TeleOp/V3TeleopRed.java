@@ -139,7 +139,6 @@ public class V3TeleopRed extends OpMode {
             // Rotate the movement direction counter to the bot's rotation
             double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
             double rotY = x * Math.sin(-botHeading) + y * Math.cos(-botHeading);
-
             rotX = rotX * 1.1;  // Counteract imperfect strafing
 
             // Denominator is the largest motor power (absolute value) or 1
