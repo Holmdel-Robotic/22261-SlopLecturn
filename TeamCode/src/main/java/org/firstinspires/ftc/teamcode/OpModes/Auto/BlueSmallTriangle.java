@@ -27,7 +27,7 @@ public class BlueSmallTriangle extends OpMode {
 
     private Servo hood, raxon, laxon, innerGate, outerGate;
 
-    public static double VELO = 1900, SERVOPOS = .3, HOODPOS = .33;
+    public static double VELO = 2200, SERVOPOS = .285, HOODPOS = .33, ADJUSTEDSERVOPOS = .5;
 
     private TelemetryManager panelsTelemetry;
     private Timer timer2;
@@ -206,9 +206,14 @@ public class BlueSmallTriangle extends OpMode {
                     firstTime = false;
                 }
                 else {
-
                     raxon.setPosition(SERVOPOS);
                     laxon.setPosition(SERVOPOS);
+                    if (!pickedUp){
+                        raxon.setPosition(ADJUSTEDSERVOPOS);
+                        laxon.setPosition(ADJUSTEDSERVOPOS);
+                    }
+
+
                     flywheelLeft.setVelocity(VELO);
                     flywheelRight.setVelocity(VELO);
                     hood.setPosition(HOODPOS);
@@ -216,6 +221,7 @@ public class BlueSmallTriangle extends OpMode {
                     outerGate.setPosition(.6);
                     intakeInner.setPower(.9);
                     if (actionTimer.getElapsedTimeSeconds() > 2) {
+
                         intakeInner.setPower(0);
                         innerGate.setPosition(.2);
                         outerGate.setPosition(0);
