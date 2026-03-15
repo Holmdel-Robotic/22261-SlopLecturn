@@ -180,7 +180,9 @@ public class BlueSmallTriangle extends OpMode {
                     .build();
         }
     }
-
+    public static Pose mirror(Pose p) {
+        return new Pose(144 - p.getX(), p.getY(), Math.toRadians(180 - Math.toDegrees(p.getHeading())));
+    }
     public void autonomousPathUpdate() {
         switch (pathState) {
             case START:
@@ -196,7 +198,7 @@ public class BlueSmallTriangle extends OpMode {
                 break;
 
             case FLYWHEELRAMPUP:
-                if (actionTimer.getElapsedTimeSeconds() > 2){
+                if (actionTimer.getElapsedTimeSeconds() > 4){
                     actionTimer.resetTimer();
                     setPathState(State.SCORE);
                     innerGate.setPosition(.575);
