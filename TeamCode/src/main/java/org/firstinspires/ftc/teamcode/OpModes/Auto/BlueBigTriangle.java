@@ -203,6 +203,7 @@ public class BlueBigTriangle extends OpMode {
                 flywheelLeft.setVelocity(2000);
                 flywheelRight.setVelocity(2000);
                 intakeOuter.setPower(.9);
+                intakeInner.setPower(.8);
                 follower.followPath(paths.line1, true);
                 setPathState(State.SCORE);
                 break;

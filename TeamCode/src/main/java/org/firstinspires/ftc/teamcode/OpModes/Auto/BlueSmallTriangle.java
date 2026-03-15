@@ -40,6 +40,8 @@ public class BlueSmallTriangle extends OpMode {
 
     private enum State {
         START,
+
+        FLYWHEELRAMPUP,
         SCORE,
         PICKUP1,
         HUMANZONE,
@@ -184,24 +186,21 @@ public class BlueSmallTriangle extends OpMode {
                 flywheelLeft.setVelocity(VELO);
                 flywheelRight.setVelocity(VELO);
                 intakeOuter.setPower(.9);
-                setPathState(State.SCORE);
+                setPathState(State.FLYWHEELRAMPUP);
                 actionTimer.resetTimer();
                 timer2.resetTimer();
                 break;
+
+            case FLYWHEELRAMPUP:
+                if (actionTimer.getElapsedTimeSeconds() > 2){
+                    actionTimer.resetTimer();
+                    setPathState(State.SCORE);
+                }
 
             case SCORE:
                 if (timer2.getElapsedTimeSeconds() < 2){
                     outerGate.setPosition(.6);
                     intakeInner.setPower(.9);
-                }
-
-                if (firstTime){
-                    resetRuntime();
-
-                    while (getRuntime() < 2){
-                        telemetry.addData("waiting",true);
-                    }
-
                 }
 
                 if (follower.isBusy() || firstTime) {
