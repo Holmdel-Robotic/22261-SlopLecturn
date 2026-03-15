@@ -35,7 +35,7 @@ public class BlueSmallTriangle extends OpMode {
     private Timer actionTimer;
     private Paths paths;
 
-    private boolean scored = false;
+    private boolean scored = false, firstTime = true;
     private boolean pickedUp = false;
 
     private enum State {
@@ -104,6 +104,7 @@ public class BlueSmallTriangle extends OpMode {
         follower.update();
         autonomousPathUpdate();
         telemetry.addData("flywheelV", flywheelLeft.getVelocity());
+        telemetry.addData("FirstTime", firstTime);
         panelsTelemetry.debug("Path State", pathState);
         panelsTelemetry.debug("X", follower.getPose().getX());
         panelsTelemetry.debug("Y", follower.getPose().getY());
@@ -168,7 +169,7 @@ public class BlueSmallTriangle extends OpMode {
                     .pathBuilder()
                     .addPath(
                             new BezierLine(new Pose(47.800, 13.000),
-                                    new Pose(6.000, 36.000))
+                                    new Pose(36.47607934655776, 70.10968494749125))
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(180))
                     .build();
@@ -193,8 +194,9 @@ public class BlueSmallTriangle extends OpMode {
                     outerGate.setPosition(.6);
                     intakeInner.setPower(.9);
                 }
-                if (follower.isBusy()) {
+                if (follower.isBusy() || firstTime) {
                     actionTimer.resetTimer();
+                    firstTime = false;
                 }
                 else {
 
@@ -213,6 +215,7 @@ public class BlueSmallTriangle extends OpMode {
                         if (!pickedUp) {
                             follower.followPath(paths.line1, true);
                             setPathState(State.PICKUP1);
+
                         }
                         else if (pathTimer.seconds() > 27) {
                             follower.followPath(paths.line5);
