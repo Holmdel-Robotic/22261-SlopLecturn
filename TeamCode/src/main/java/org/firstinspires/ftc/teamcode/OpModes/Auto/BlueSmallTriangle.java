@@ -179,8 +179,8 @@ public class BlueSmallTriangle extends OpMode {
     public void autonomousPathUpdate() {
         switch (pathState) {
             case START:
-                raxon.setPosition(SERVOPOS);
-                laxon.setPosition(SERVOPOS);
+                raxon.setPosition(ADJUSTEDSERVOPOS);
+                laxon.setPosition(ADJUSTEDSERVOPOS);
                 flywheelLeft.setVelocity(VELO);
                 flywheelRight.setVelocity(VELO);
                 intakeOuter.setPower(.9);
@@ -190,27 +190,31 @@ public class BlueSmallTriangle extends OpMode {
                 break;
 
             case SCORE:
-                if (timer2.getElapsedTimeSeconds() < 1){
+                if (timer2.getElapsedTimeSeconds() < 2){
                     outerGate.setPosition(.6);
                     intakeInner.setPower(.9);
                 }
 
-                if (follower.isBusy() || firstTime) {
-                    actionTimer.resetTimer();
-
-                }
                 if (firstTime){
                     while (actionTimer.getElapsedTimeSeconds() < 2){
 
                     }
+
+                }
+
+                if (follower.isBusy() || firstTime) {
+                    actionTimer.resetTimer();
                     firstTime = false;
                 }
+
                 else {
-                    raxon.setPosition(SERVOPOS);
-                    laxon.setPosition(SERVOPOS);
+
                     if (!pickedUp){
                         raxon.setPosition(ADJUSTEDSERVOPOS);
                         laxon.setPosition(ADJUSTEDSERVOPOS);
+                    }else{
+                        raxon.setPosition(SERVOPOS);
+                        laxon.setPosition(SERVOPOS);
                     }
 
 
