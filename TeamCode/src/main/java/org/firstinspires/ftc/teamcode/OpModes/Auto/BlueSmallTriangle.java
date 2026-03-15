@@ -194,8 +194,15 @@ public class BlueSmallTriangle extends OpMode {
                     outerGate.setPosition(.6);
                     intakeInner.setPower(.9);
                 }
+
                 if (follower.isBusy() || firstTime) {
                     actionTimer.resetTimer();
+
+                }
+                if (firstTime){
+                    while (actionTimer.getElapsedTimeSeconds() < 1){
+            
+                    }
                     firstTime = false;
                 }
                 else {
