@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.OpModes.Auto;
+package org.firstinspires.ftc.teamcode.vault;
     import com.pedropathing.util.Timer;
     import com.qualcomm.hardware.limelightvision.Limelight3A;
     import com.qualcomm.robotcore.eventloop.opmode.OpMode;

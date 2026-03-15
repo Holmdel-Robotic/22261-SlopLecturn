@@ -8,7 +8,7 @@
  *  Changes will be overwritten when regenerated.                *
  * ============================================================= */
 
-package org.firstinspires.ftc.teamcode.OpModes.Auto;
+package org.firstinspires.ftc.teamcode.vault;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
