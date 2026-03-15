@@ -35,7 +35,8 @@ public class BlueSmallTriangle extends OpMode {
     private Timer actionTimer;
     private Paths paths;
 
-    private boolean scored = false, firstTime = true;
+//    private boolean scored = false
+    private boolean firstTime = true;
     private boolean pickedUp = false;
 
     private Servo indicatorLight;
@@ -111,6 +112,7 @@ public class BlueSmallTriangle extends OpMode {
         paths = new Paths(follower);
         pathState = State.START;
         innerGate.setPosition(.2);
+        firstTime = true;
     }
 
     @Override
