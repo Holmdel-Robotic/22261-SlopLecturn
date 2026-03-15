@@ -28,7 +28,7 @@ public class RedSmallTriangle extends OpMode {
 
     private Servo hood, raxon, laxon, innerGate, outerGate;
 
-    public static double VELO = 2200, SERVOPOS = .285, HOODPOS = .33, ADJUSTEDSERVOPOS = .575;
+    public static double VELO = 2200, SERVOPOS = .285, HOODPOS = .33, ADJUSTEDSERVOPOS = .485;
 
     private TelemetryManager panelsTelemetry;
     private Timer timer2;
