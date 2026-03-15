@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.OpModes.TeleOp;
+package org.firstinspires.ftc.teamcode.vault;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.follower.Follower;
@@ -16,7 +16,7 @@ import java.util.List;
 
 @Config
 @TeleOp
-public class ChatgptBlueTeleopLL extends OpMode {
+public class DONTUSEChatgptBlueTeleopLL extends OpMode {
 
     private double flV, blV, frV, brV;
 
