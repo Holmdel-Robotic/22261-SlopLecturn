@@ -214,6 +214,7 @@ public class BlueSmallTriangle extends OpMode {
                     setPathState(State.SCORE);
                     innerGate.setPosition(.575);
                     outerGate.setPosition(0);
+                    firstTime = true;
                 }
 
             case SCORE:
