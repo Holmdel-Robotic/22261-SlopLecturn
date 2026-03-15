@@ -196,6 +196,7 @@ public class BlueSmallTriangle extends OpMode {
                 setPathState(State.FLYWHEELRAMPUP);
                 actionTimer.resetTimer();
                 timer2.resetTimer();
+                outerGate.setPosition(0);
                 break;
 
             case FLYWHEELRAMPUP:
@@ -203,6 +204,7 @@ public class BlueSmallTriangle extends OpMode {
                     actionTimer.resetTimer();
                     setPathState(State.SCORE);
                     innerGate.setPosition(.575);
+                    outerGate.setPosition(0);
                 }
 
             case SCORE:
