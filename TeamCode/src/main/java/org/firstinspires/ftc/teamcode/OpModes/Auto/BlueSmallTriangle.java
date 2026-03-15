@@ -92,6 +92,7 @@ public class BlueSmallTriangle extends OpMode {
         laxon.setPosition(ADJUSTEDSERVOPOS);
         innerGate = hardwareMap.get(Servo.class, "innerGate");
         outerGate = hardwareMap.get(Servo.class, "outerGate");
+        outerGate.setPosition(0);
         hood.setDirection(Servo.Direction.REVERSE);
 
         follower = Constants.createFollower(hardwareMap);
