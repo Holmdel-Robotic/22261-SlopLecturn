@@ -19,7 +19,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 //
-@Autonomous(name = "Blue  Small Triangle", group = "Autonomous")
+@Autonomous(name = "Red  Small Triangle", group = "Autonomous")
 @Config
 public class RedSmallTriangle extends OpMode {
 
@@ -207,6 +207,7 @@ public class RedSmallTriangle extends OpMode {
                     innerGate.setPosition(.575);
                     outerGate.setPosition(0);
                 }
+                break;
 
             case SCORE:
                 if (timer2.getElapsedTimeSeconds() > 1){

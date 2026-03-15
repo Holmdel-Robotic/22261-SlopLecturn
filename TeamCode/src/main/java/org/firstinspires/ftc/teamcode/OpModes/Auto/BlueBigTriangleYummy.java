@@ -239,6 +239,7 @@ public class BlueBigTriangleYummy extends OpMode {
                 intakeInner.setPower(.8);
                 follower.followPath(paths.Path1, true);
                 setPathState(State.SCORE);
+                outerGate.setPosition(.6);
                 break;
 
             case SCORE:

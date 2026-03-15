@@ -311,7 +311,7 @@ public class V3TeleopBlue extends OpMode {
             desiredAngle = (int) desiredAngle + DegreeOffset;
             ServoPos = 0.00338889 * desiredAngle - 0.0366667;
             distanceToGoal = Math.sqrt(Math.pow(144 - currPose.getY(), 2) + Math.pow(currPose.getX(), 2));
-            IntendedFlywheelV = .037793 * Math.pow(distanceToGoal, 2) - 0.153573 * distanceToGoal + 1199.55171;
+            IntendedFlywheelV = .037793 * Math.pow(distanceToGoal, 2) - 0.153573 * distanceToGoal + 1250.55171;
 
             if (gamepad1.dpad_left && !debounceDPAD){
                 DegreeOffset += 5;
