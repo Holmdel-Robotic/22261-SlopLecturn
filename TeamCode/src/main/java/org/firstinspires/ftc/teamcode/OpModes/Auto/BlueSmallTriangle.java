@@ -237,7 +237,7 @@ public class BlueSmallTriangle extends OpMode {
                             setPathState(State.PICKUP1);
 
                         }
-                        else if (pathTimer.seconds() > 25) {
+                        else if (pathTimer.seconds() > 23) {
                             follower.followPath(paths.line5);
                             setPathState(State.END);
                         }
