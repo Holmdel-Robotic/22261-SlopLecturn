@@ -30,7 +30,7 @@ public class V3TeleopRed extends OpMode {
 
     public static boolean autoTarget = true;
 
-    private boolean debounceDPAD, debounceX, FlywheelOn, debounceB, outerIntakeOn, DriveMode = true, debounceY, dLTR, dRTR, dRBR, dLBR;
+    private boolean debounceDPAD, debounceX, FlywheelOn, debounceB, outerIntakeOn, DriveMode = true, debounceY, dLTR, dRTR, dRBR, dLBR, dBack;
     public static double testPos = 0.5;
     private double open, close;
 
@@ -258,6 +258,15 @@ public class V3TeleopRed extends OpMode {
         {
             dRTR = false;
         }
+        if(gamepad1.back && !dBack)
+        {
+            follower.setStartingPose(new Pose(96,8,Math.toRadians(0)));
+            dBack = true;
+        }
+        if(!gamepad1.back)
+        {
+            dBack = false;
+        }
 
 
 
@@ -425,6 +434,7 @@ private void calculateCorrectAngle(){
         {
             dRBR = false;
         }
+
     }
 
 }
