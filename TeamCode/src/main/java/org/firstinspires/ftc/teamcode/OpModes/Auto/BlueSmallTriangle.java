@@ -200,7 +200,7 @@ public class BlueSmallTriangle extends OpMode {
                 break;
 
             case FLYWHEELRAMPUP:
-                if (actionTimer.getElapsedTimeSeconds() > 4){
+                if (actionTimer.getElapsedTimeSeconds() > 3){
                     actionTimer.resetTimer();
                     setPathState(State.SCORE);
                     innerGate.setPosition(.575);
