@@ -219,6 +219,7 @@ public class BlueSmallTriangle extends OpMode {
                     outerGate.setPosition(0);
                     firstTime = true;
                 }
+                break;
 
             case SCORE:
                 if (timer2.getElapsedTimeSeconds() > 1){
