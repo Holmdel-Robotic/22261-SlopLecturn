@@ -38,7 +38,7 @@ public class BlueSmallTriangle extends OpMode {
     private boolean scored = false, firstTime = true;
     private boolean pickedUp = false;
 
-    private Servo indicatorLight1, indicatorLight2;
+    private Servo indicatorLight;
     private double GREEN = .5;
     private double BLUE = .6;
 
@@ -61,8 +61,8 @@ public class BlueSmallTriangle extends OpMode {
         panelsTelemetry.debug("Status", "Initialized");
         panelsTelemetry.update(telemetry);
 
-        indicatorLight1 = hardwareMap.get(Servo.class, "lightOne");
-        indicatorLight2 = hardwareMap.get(Servo.class, "lightTwo");
+        indicatorLight = hardwareMap.get(Servo.class, "light");
+        //indicatorLight2 = hardwareMap.get(Servo.class, "lightTwo");
 
         frontLeftMotor = hardwareMap.get(DcMotorEx.class, "fl");
         frontRightMotor = hardwareMap.get(DcMotorEx.class, "fr");
@@ -205,8 +205,7 @@ public class BlueSmallTriangle extends OpMode {
                 actionTimer.resetTimer();
                 timer2.resetTimer();
                 outerGate.setPosition(0);
-                indicatorLight2.setPosition(BLUE);
-                indicatorLight1.setPosition(BLUE);
+                indicatorLight.setPosition(BLUE);
                 break;
 
             case FLYWHEELRAMPUP:
@@ -221,8 +220,7 @@ public class BlueSmallTriangle extends OpMode {
                 if (timer2.getElapsedTimeSeconds() > 1){
                     outerGate.setPosition(.6);
                     intakeInner.setPower(.9);
-                    indicatorLight2.setPosition(GREEN);
-                    indicatorLight1.setPosition(GREEN);
+                    indicatorLight.setPosition(GREEN);
 
                 }
 
@@ -248,12 +246,10 @@ public class BlueSmallTriangle extends OpMode {
                     innerGate.setPosition(.575);
                     outerGate.setPosition(.6);
                     intakeInner.setPower(.9);
-                    indicatorLight2.setPosition(GREEN);
-                    indicatorLight1.setPosition(GREEN);
+                    indicatorLight.setPosition(GREEN);
                     if (actionTimer.getElapsedTimeSeconds() > 2) {
 
-                        indicatorLight2.setPosition(BLUE);
-                        indicatorLight1.setPosition(BLUE);
+                        indicatorLight.setPosition(BLUE);
                         intakeInner.setPower(0);
                         innerGate.setPosition(.2);
                         outerGate.setPosition(0);
