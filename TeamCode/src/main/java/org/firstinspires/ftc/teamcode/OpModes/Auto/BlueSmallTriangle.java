@@ -88,6 +88,8 @@ public class BlueSmallTriangle extends OpMode {
         hood = hardwareMap.get(Servo.class, "hood");
         raxon = hardwareMap.get(Servo.class, "raxon");
         laxon = hardwareMap.get(Servo.class, "laxon");
+        raxon.setPosition(ADJUSTEDSERVOPOS);
+        laxon.setPosition(ADJUSTEDSERVOPOS);
         innerGate = hardwareMap.get(Servo.class, "innerGate");
         outerGate = hardwareMap.get(Servo.class, "outerGate");
         hood.setDirection(Servo.Direction.REVERSE);
