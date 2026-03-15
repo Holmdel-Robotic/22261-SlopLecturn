@@ -32,6 +32,8 @@ public class V3TeleopBlue extends OpMode {
     public static double testPos = 0.5;
     private double open, close;
 
+    private boolean dBack;
+
 
     public void init(){
         follower = Constants.createFollower(hardwareMap);
@@ -73,6 +75,7 @@ public class V3TeleopBlue extends OpMode {
         hood.setDirection(Servo.Direction.REVERSE);
 
         FlywheelOn = false;
+        dBack = false;
 
 
     }
@@ -236,6 +239,15 @@ public class V3TeleopBlue extends OpMode {
         if(gamepad1.right_trigger == 0)
         {
             dRTR = false;
+        }
+        if(gamepad1.back && !dBack)
+        {
+            follower.setStartingPose(new Pose(48,8,Math.toRadians(180)));
+            dBack = true;
+        }
+        if(!gamepad1.back)
+        {
+            dBack = false;
         }
 
 
