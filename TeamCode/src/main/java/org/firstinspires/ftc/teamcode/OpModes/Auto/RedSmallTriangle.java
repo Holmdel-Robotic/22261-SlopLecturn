@@ -207,6 +207,7 @@ public class RedSmallTriangle extends OpMode {
                     innerGate.setPosition(.575);
                     outerGate.setPosition(0);
                 }
+                break;
 
             case SCORE:
                 if (timer2.getElapsedTimeSeconds() > 1){
