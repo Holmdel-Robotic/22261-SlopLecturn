@@ -103,7 +103,7 @@ public class BlueSmallTriangle extends OpMode {
     public void loop() {
         follower.update();
         autonomousPathUpdate();
-
+        telemetry.addData("flywheelV", flywheelLeft.getVelocity());
         panelsTelemetry.debug("Path State", pathState);
         panelsTelemetry.debug("X", follower.getPose().getX());
         panelsTelemetry.debug("Y", follower.getPose().getY());
@@ -184,6 +184,7 @@ public class BlueSmallTriangle extends OpMode {
                 flywheelRight.setVelocity(VELO);
                 intakeOuter.setPower(.9);
                 setPathState(State.SCORE);
+                actionTimer.resetTimer();
                 timer2.resetTimer();
                 break;
 
