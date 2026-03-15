@@ -169,7 +169,7 @@ public class BlueSmallTriangle extends OpMode {
                     .pathBuilder()
                     .addPath(
                             new BezierLine(new Pose(47.800, 13.000),
-                                    new Pose(36.47607934655776, 70.10968494749125))
+                                    new Pose(60, 36))
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(180))
                     .build();
