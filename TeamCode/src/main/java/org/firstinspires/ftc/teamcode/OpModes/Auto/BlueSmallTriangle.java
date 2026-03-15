@@ -101,6 +101,7 @@ public class BlueSmallTriangle extends OpMode {
         actionTimer = new Timer();
         paths = new Paths(follower);
         pathState = State.START;
+        innerGate.setPosition(.2);
     }
 
     @Override
@@ -183,6 +184,7 @@ public class BlueSmallTriangle extends OpMode {
     public void autonomousPathUpdate() {
         switch (pathState) {
             case START:
+                innerGate.setPosition(.2);
                 raxon.setPosition(ADJUSTEDSERVOPOS);
                 laxon.setPosition(ADJUSTEDSERVOPOS);
                 flywheelLeft.setVelocity(VELO);
@@ -197,10 +199,11 @@ public class BlueSmallTriangle extends OpMode {
                 if (actionTimer.getElapsedTimeSeconds() > 2){
                     actionTimer.resetTimer();
                     setPathState(State.SCORE);
+                    innerGate.setPosition(.575);
                 }
 
             case SCORE:
-                if (timer2.getElapsedTimeSeconds() < 2){
+                if (timer2.getElapsedTimeSeconds() > 1){
                     outerGate.setPosition(.6);
                     intakeInner.setPower(.9);
                 }
