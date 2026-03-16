@@ -27,7 +27,7 @@ public class BlueSmallTriangle extends OpMode {
 
     private Servo hood, raxon, laxon, innerGate, outerGate;
 
-    public static double VELO = 2200, SERVOPOS = .285, HOODPOS = .33, ADJUSTEDSERVOPOS = .55;
+    public static double VELO = 2200, SERVOPOS = .285, HOODPOS = .33, ADJUSTEDSERVOPOS = .55, loops = 0;
 
     private TelemetryManager panelsTelemetry;
     private Timer timer2;
@@ -263,11 +263,12 @@ public class BlueSmallTriangle extends OpMode {
                             setPathState(State.PICKUP1);
 
                         }
-                        else if (pathTimer.seconds() > 23) {
+                        else if (loops >= 3) {
                             follower.followPath(paths.line5);
                             setPathState(State.END);
                         }
                         else {
+                            loops += 1;
                             follower.followPath(paths.line3, true);
                             setPathState(State.HUMANZONE);
                         }
