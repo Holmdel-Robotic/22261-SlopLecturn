@@ -195,20 +195,8 @@ public class V3TeleopRed extends OpMode {
         if (FlywheelOn) {
 
 
-            flywheelLeft.setVelocity(v);
-            flywheelRight.setVelocity(v);
-            ticksPerSecond = flywheelLeft.getVelocity();
-            gearRatio = 1;
-            currentVel =  (ticksPerSecond * (60.0/28) * gearRatio);
-
-            // tps -> rpm
-
-            double error = currentVel - v;
-            double pow = error > 125 ? -1 : error >= 0 ? 0 : 1;
-
-            flywheelLeft.setPower(pow);
-            flywheelRight.setPower(pow);
-
+            flywheelLeft.setVelocity(IntendedFlywheelV);
+            flywheelRight.setVelocity(IntendedFlywheelV);
         }
         else {
             flywheelLeft.setVelocity(0);
@@ -260,7 +248,7 @@ public class V3TeleopRed extends OpMode {
         }
         if(gamepad1.back && !dBack)
         {
-            follower.setStartingPose(new Pose(96,8,Math.toRadians(0)));
+            follower.setStartingPose(new Pose(84,35,Math.toRadians(0)));
             dBack = true;
         }
         if(!gamepad1.back)
