@@ -299,10 +299,8 @@ public class BlueSmallTriangle extends OpMode {
                 break;
         }
     }
-
-    /**public void setPathState(State pState) {
+    public void setPathState(State pState) {
         pathState = pState;
         pathTimer.reset();
     }
-     **/
 }
